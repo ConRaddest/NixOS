@@ -83,8 +83,8 @@
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.bash}/bin/bash -lc 'sleep 1; ${pkgs.ncurses}/bin/clear; exec ${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd \"uwsm start hyprland-uwsm.desktop\"'";
-      user = "greeter";
+      command = "uwsm start hyprland-uwsm.desktop";
+      user = "cdt";
     };
   };
 
