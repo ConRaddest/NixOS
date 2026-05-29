@@ -2,6 +2,7 @@
 hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE")
   hl.exec_cmd("polkit-gnome-authentication-agent")
+  hl.exec_cmd("hyprpaper")
 end)
 
 -- Monitor
@@ -27,7 +28,7 @@ hl.config({
   },
   animations = { enabled = true },
   dwindle = { preserve_split = true },
-  misc = { disable_hyprland_logo = true },
+  misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
 })
 
 -- Keybinds
