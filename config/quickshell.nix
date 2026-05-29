@@ -241,6 +241,13 @@ in
           menuStack = menuStack.concat([Object.assign({}, item, { parentIndex: parentIndex })])
           menuQuery = ""
           resetMenuView()
+        } else if (item.terminal) {
+          const t = item.terminal
+          const cmd = t.pause
+            ? "bash -lc " + shellQuote(t.cmd + "; echo; read -rp 'Press Enter to close...'")
+            : t.cmd
+          launchTerminal(t.klass, t.title, cmd)
+          closeMenu()
         } else if (item.command) {
           if (item.confirm) confirmAction(item)
           else { runDetached(item.command); closeMenu() }

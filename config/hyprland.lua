@@ -105,13 +105,17 @@ local managers = {
   "wifi-manager",
   "bluetooth-manager",
   "performance-monitor",
+  "nixos-refresh",
+  "nixos-build",
+  "nixos-update",
+  "nixos-check",
 }
 for _, name in ipairs(managers) do
   hl.window_rule({
     match = { title = name },
     float = true,
     center = true,
-    size = { 900, 550 },
+    size = { 1100, 650 },
   })
 end
 
@@ -123,7 +127,7 @@ for _, name in ipairs(launchers) do
     match = { title = name },
     float = true,
     center = true,
-    size = { 500, 500 },
+    size = { 400, 400 },
   })
 end
 

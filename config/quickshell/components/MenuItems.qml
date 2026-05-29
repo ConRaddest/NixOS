@@ -5,20 +5,21 @@ QtObject {
     { name: "Apps", icon: "󰀻", items: [
       { name: "Firefox",   icon: "󰈹", command: "firefox" },
       { name: "Nautilus",  icon: "󰉋", command: "nautilus" },
-      { name: "Yazi",      icon: "󰝰", command: "kitty --class terminal-file-manager --title terminal-file-manager -e yazi" },
+      { name: "Yazi",      icon: "󰝰", terminal: { klass: "terminal-file-manager", title: "terminal-file-manager", cmd: "yazi" } },
       { name: "LocalSend", icon: "󰒍", command: "localsend_app" },
       { name: "Terminal",  icon: "󰆍", command: "kitty" },
       { name: "VS Code",   icon: "󰨞", command: "code" },
     ] },
 
     { name: "System", icon: "󰒓", items: [
-      { name: "Build",     icon: "󰔷", command: "kitty --class nixos-build --title nixos-build -e bash -lc 'NIXOS_REPO=$HOME/OS $HOME/.config/quickshell/scripts/nixos-action.sh build; echo; read -r -p \"Press Enter to close...\"'" },
-      { name: "Update",    icon: "󰚰", command: "kitty --class nixos-update --title nixos-update -e bash -lc 'NIXOS_REPO=$HOME/OS $HOME/.config/quickshell/scripts/nixos-action.sh update; echo; read -r -p \"Press Enter to close...\"'" },
-      { name: "Check",     icon: "󰁨", command: "kitty --class nixos-check --title nixos-check -e bash -lc 'NIXOS_REPO=$HOME/OS $HOME/.config/quickshell/scripts/nixos-action.sh check; echo; read -r -p \"Press Enter to close...\"'" },
-      { name: "Wi-Fi",     icon: "󰖩", command: "kitty --class wifi-manager --title wifi-manager -e impala" },
-      { name: "Bluetooth", icon: "󰂯", command: "kitty --class bluetooth-manager --title bluetooth-manager -e bluetui" },
-      { name: "Audio",     icon: "󰕾", command: "kitty --class audio-manager --title audio-manager -e wiremix" },
-      { name: "Status",    icon: "󰓅", command: "kitty --class performance-monitor --title performance-monitor -e btop" },
+      { name: "Refresh",    icon: "󰑐", terminal: { klass: "nixos-refresh", title: "nixos-refresh", cmd: "home-manager switch --flake $HOME/OS#cdt",                      pause: true } },
+      { name: "Build",      icon: "󰔷", terminal: { klass: "nixos-build",  title: "nixos-build",  cmd: "sudo nixos-rebuild switch --flake $HOME/OS#nixos",             pause: true } },
+      { name: "Update",     icon: "󰚰", terminal: { klass: "nixos-update", title: "nixos-update", cmd: "nix flake update --flake $HOME/OS && sudo nixos-rebuild switch --flake $HOME/OS#nixos", pause: true } },
+      { name: "Check",      icon: "󰁨", terminal: { klass: "nixos-check",  title: "nixos-check",  cmd: "sudo nixos-rebuild dry-run --flake $HOME/OS#nixos",              pause: true } },
+      { name: "Wi-Fi",      icon: "󰖩", terminal: { klass: "wifi-manager",        title: "wifi-manager",        cmd: "impala" } },
+      { name: "Bluetooth",  icon: "󰂯", terminal: { klass: "bluetooth-manager",   title: "bluetooth-manager",   cmd: "bluetui" } },
+      { name: "Audio",      icon: "󰕾", terminal: { klass: "audio-manager",       title: "audio-manager",       cmd: "wiremix" } },
+      { name: "Status",     icon: "󰓅", terminal: { klass: "performance-monitor", title: "performance-monitor", cmd: "btop" } },
     ] },
 
     { name: "Power", icon: "󰐥", items: [
