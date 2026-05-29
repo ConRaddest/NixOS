@@ -29,6 +29,13 @@ in
 
       readonly property string monoFont: "${font.mono}"
 
+      // Centralised terminal launcher. Switch the binary here to swap term.
+      // klass/title get applied as window identifiers for hyprland window rules.
+      readonly property string terminal: "kitty"
+      function launchTerminal(klass, title, cmd) {
+        runDetached(terminal + " --class " + shellQuote(klass) + " --title " + shellQuote(title) + " -e " + cmd)
+      }
+
       readonly property int activeWorkspace: Hyprland.focusedWorkspace?.id || 1
       property var occupiedWorkspaceIds: []
 
@@ -37,6 +44,7 @@ in
       property string wifiText:      "󰖪"
       property string bluetoothText: "󰂲"
       property string batteryText:   "󰚥 AC"
+      property string timeText:      Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
       function workspaceIds() {
         const ids = occupiedWorkspaceIds.slice()
@@ -88,6 +96,8 @@ in
         repeat: true
         triggeredOnStart: true
         onTriggered: {
+          root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
+
           workspaceProcess.running = false
           workspaceProcess.command = ["bash", "-c", "hyprctl clients -j | jq -r '[.[].workspace.id | select(. > 0)] | unique | join(\",\")'"]
           workspaceProcess.running = true

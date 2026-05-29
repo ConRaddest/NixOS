@@ -3,6 +3,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE")
   hl.exec_cmd("polkit-gnome-authentication-agent")
   hl.exec_cmd("hyprpaper")
+  hl.exec_cmd("qs")
 end)
 
 -- Monitor
@@ -16,20 +17,39 @@ hl.config({
     touchpad = { natural_scroll = true },
   },
   general = {
-    gaps_in = 4,
-    gaps_out = 8,
+    gaps_in = 5,
+    gaps_out = 10,
     border_size = 0,
     layout = "dwindle",
   },
   decoration = {
     rounding = 0,
-    active_opacity = 0.97,
-    inactive_opacity = 0.95,
+    active_opacity = 0.95,
+    inactive_opacity = 0.93,
   },
   animations = { enabled = true },
   dwindle = { preserve_split = true },
   misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
 })
+
+-- Animations
+hl.curve("fast", {
+  type = "bezier",
+  points = { { 0.05, 0.7 }, { 0.1, 1.0 } },
+})
+
+local animations = {
+  { leaf = "windows",    speed = 4,  bezier = "fast" },
+  { leaf = "windowsOut", speed = 4,  bezier = "fast" },
+  { leaf = "border",     speed = 8,  bezier = "fast" },
+  { leaf = "fade",       speed = 4,  bezier = "fast" },
+  { leaf = "workspaces", speed = 4,  bezier = "fast" },
+}
+
+for _, animation in ipairs(animations) do
+  animation.enabled = true
+  hl.animation(animation)
+end
 
 -- Keybinds
 hl.bind("SUPER + Return",        hl.dsp.exec_cmd("kitty"))
@@ -70,3 +90,19 @@ hl.bind("Print", hl.dsp.exec_cmd(
   "file=\"$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png\" && " ..
   "grim -g \"$(slurp)\" \"$file\" && printf '%s' \"$file\" | wl-copy"
 ))
+
+-- Floating panes launched from the status bar.
+-- class/title strings are set by shell.qml's launchTerminal().
+local floating_panes = {
+  "wifi-manager",
+  "bluetooth-manager",
+  "performance-monitor",
+}
+for _, name in ipairs(floating_panes) do
+  hl.window_rule({
+    match = { class = name, title = name },
+    float = true,
+    center = true,
+    size = { 900, 550 },
+  })
+end

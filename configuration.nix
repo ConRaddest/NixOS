@@ -19,6 +19,8 @@
   # ── System ─────────────────────────────────────────────────────────────── #
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.backend = "iwd";
+  networking.wireless.iwd.enable = true;
   time.timeZone = "Africa/Johannesburg";
   i18n.defaultLocale = "en_ZA.UTF-8";
   services.xserver.xkb.layout = "za";
@@ -132,12 +134,15 @@
     libnotify
     playerctl
     brightnessctl
+    home-manager
 
     # Shell
     quickshell
 
-    # Bluetooth
+    # Bluetooth / Wifi
     bluetui
+    impala
+    iwd
 
     # Terminal / CLI
     git

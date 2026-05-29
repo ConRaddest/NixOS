@@ -11,9 +11,16 @@
 
   outputs =
     { nixpkgs, home-manager, ... }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
         modules = [
           ./hardware.nix
           ./configuration.nix
@@ -25,6 +32,11 @@
             home-manager.users.cdt = import ./home.nix;
           }
         ];
+      };
+
+      homeConfigurations."cdt" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [ ./home.nix ];
       };
     };
 }

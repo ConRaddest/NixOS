@@ -4,14 +4,14 @@
 
 # CPU usage (%)
 CPU_RAW=$(top -bn1 | awk '/^%Cpu/ {print $2+$4+$6}')
-CPU_USAGE=$(awk -v cpu="$CPU_RAW" 'BEGIN { printf "%.1f%%", cpu }')
+CPU_USAGE=$(awk -v cpu="$CPU_RAW" 'BEGIN { printf "  %.1f%%", cpu }')
 if [ -z "$CPU_USAGE" ] || [ "$CPU_USAGE" = "0.0%" ]; then
     CPU_IDLE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/")
     CPU_USAGE=$(awk -v idle="$CPU_IDLE" 'BEGIN { printf "%.1f%%", 100 - idle }')
 fi
 
 # RAM (GiB)
-RAM_USAGE=$(free -m | awk '/Mem:/ { printf "%0.1fG", $3/1024 }')
+RAM_USAGE=$(free -m | awk '/Mem:/ { printf "  %0.1fG", $3/1024 }')
 
 # Wi-Fi (signal strength of active connection, via NetworkManager)
 WIFI_INTF=$(ip link | awk -F': ' '/wl/ {print $2}' | head -n 1)
