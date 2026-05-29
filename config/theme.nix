@@ -30,7 +30,7 @@
 
   home.pointerCursor = {
     name = "Adwaita";
-    package = pkgs.adwaita-icon-theme;
+    package = pkgs.adwaita-icon-theme; 
     size = 24;
     gtk.enable = true;
     hyprcursor.enable = true;

@@ -41,6 +41,7 @@ in
     ./config/btop.nix
     ./config/yazi.nix
     ./config/vscode.nix
+    ./config/starship.nix
   ];
 
   home.username = "cdt";
