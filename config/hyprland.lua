@@ -9,6 +9,14 @@ end)
 -- Monitor
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
+hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })
+hl.workspace_rule({ workspace = "2", monitor = "eDP-1", default = true })
+hl.workspace_rule({ workspace = "3", monitor = "eDP-1", default = true })
+
+hl.workspace_rule({ workspace = "4", monitor = "HDMI-A-1", default = true })
+hl.workspace_rule({ workspace = "5", monitor = "HDMI-A-1", default = true })
+hl.workspace_rule({ workspace = "6", monitor = "HDMI-A-1", default = true })
+
 -- Settings
 hl.config({
   input = {
@@ -52,6 +60,7 @@ for _, animation in ipairs(animations) do
 end
 
 -- Keybinds
+hl.bind("SUPER + Space",         hl.dsp.exec_cmd("qs ipc call launcher open"))
 hl.bind("SUPER + Return",        hl.dsp.exec_cmd("kitty"))
 hl.bind("SUPER + E",             hl.dsp.exec_cmd("nautilus"))
 hl.bind("SUPER + W",             hl.dsp.window.close())
@@ -92,17 +101,41 @@ hl.bind("Print", hl.dsp.exec_cmd(
 ))
 
 -- Floating panes launched from the status bar.
--- class/title strings are set by shell.qml's launchTerminal().
-local floating_panes = {
+local managers = {
   "wifi-manager",
   "bluetooth-manager",
   "performance-monitor",
 }
-for _, name in ipairs(floating_panes) do
+for _, name in ipairs(managers) do
   hl.window_rule({
-    match = { class = name, title = name },
+    match = { title = name },
     float = true,
     center = true,
     size = { 900, 550 },
+  })
+end
+
+local launchers = {
+  "shell-launcher",
+}
+for _, name in ipairs(launchers) do
+  hl.window_rule({
+    match = { title = name },
+    float = true,
+    center = true,
+    size = { 500, 500 },
+  })
+end
+
+local file_explorers = {
+  "xdg-desktop-portal-gtk",
+  "org.gnome.Nautilus",
+}
+for _, class in ipairs(file_explorers) do
+  hl.window_rule({
+    match = { class = class },
+    float = true,
+    center = true,
+    size = { 1300, 800 },
   })
 end

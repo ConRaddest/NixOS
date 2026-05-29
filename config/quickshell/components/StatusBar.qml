@@ -16,11 +16,33 @@ PanelWindow {
   implicitHeight: 30
   color: "transparent"
 
+  // Match this bar's screen to its Hyprland monitor.
+  readonly property HyprlandMonitor hyprMonitor: {
+    for (const m of Hyprland.monitors.values) {
+      if (m.name === bar.screen.name) return m
+    }
+    return null
+  }
+
+  // Workspaces that belong to this monitor (occupied + currently active).
+  readonly property var monitorWorkspaceIds: {
+    const ids = []
+    for (const ws of Hyprland.workspaces.values) {
+      if (ws.monitor?.name === bar.screen.name && !ids.includes(ws.id))
+        ids.push(ws.id)
+    }
+    const active = bar.hyprMonitor?.activeWorkspace?.id
+    if (active && !ids.includes(active)) ids.push(active)
+    return ids.sort((a, b) => a - b)
+  }
+
+  readonly property int monitorActiveWorkspace: bar.hyprMonitor?.activeWorkspace?.id || 0
+
   Rectangle {
     anchors.fill: parent
     color: bar.shell.bg
 
-    // Left: active workspace + workspaces with windows.
+    // Left: workspaces for this monitor only.
     Row {
       anchors.left: parent.left
       anchors.leftMargin: 14
@@ -28,12 +50,12 @@ PanelWindow {
       spacing: 6
 
       Repeater {
-        model: bar.shell.workspaceIds()
+        model: bar.monitorWorkspaceIds
 
         Rectangle {
           required property int modelData
 
-          readonly property bool active: bar.shell.activeWorkspace === modelData
+          readonly property bool active: bar.monitorActiveWorkspace === modelData
 
           width: 22
           height: 22
@@ -53,9 +75,7 @@ PanelWindow {
           MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            // hyprland-lua wraps dispatch input as `hl.dispatch(<text>)` and
-            // expects a dispatcher object — same form keybinds use.
-            onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + parent.modelData + " })")
+            onClicked: Hyprland.dispatch("workspace " + parent.modelData)
           }
         }
       }

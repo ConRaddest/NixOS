@@ -108,6 +108,7 @@
       xdg-desktop-portal-hyprland
     ];
     config.common.default = [ "hyprland" "gtk" ];
+    config.common."org.freedesktop.impl.portal.Settings" = [ "gtk" ];
   };
 
   # ── Fonts ──────────────────────────────────────────────────────────────── #

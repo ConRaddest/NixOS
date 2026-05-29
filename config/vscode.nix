@@ -12,7 +12,9 @@
       "editor.fontLigatures" = true;
       "terminal.integrated.fontFamily" = "'${font.mono}'";
       "git.enableSmartCommit" = true;
-      "workbench.iconTheme" = "file-icons-colourless";
+      "workbench.iconTheme" = "file-icons";
+      "explorer.confirmDelete" = false;
+      "window.dialogStyle" = "native";
     };
   };
 }
