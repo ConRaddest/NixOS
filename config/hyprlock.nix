@@ -1,4 +1,4 @@
-{ ... }:
+{ colors, ... }:
 
 {
   programs.hyprlock = {
@@ -21,6 +21,12 @@
           position = "0, -80";
           halign = "center";
           valign = "center";
+          outer_color = "rgb(${builtins.substring 1 6 colors.bgAlt})";
+          inner_color = "rgb(${builtins.substring 1 6 colors.bg})";
+          font_color = "rgb(${builtins.substring 1 6 colors.fg})";
+          check_color = "rgb(${builtins.substring 1 6 colors.blue})";
+          fail_color = "rgb(${builtins.substring 1 6 colors.red})";
+          capslock_color = "rgb(${builtins.substring 1 6 colors.yellow})";
         }
       ];
     };
