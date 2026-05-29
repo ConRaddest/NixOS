@@ -11,8 +11,8 @@
       format = "$directory$git_branch$git_status$character";
 
       character = {
-        success_symbol = "[](bold ${colors.blue})";
-        error_symbol = "[](bold ${colors.red})";
+        success_symbol = "[](bold ${colors.blue})";
+        error_symbol = "[](bold ${colors.red})";
       };
 
       directory = {
@@ -23,7 +23,7 @@
       };
 
       git_branch = {
-        symbol = " ";
+        symbol = " ";
         style = "bold ${colors.magenta}";
         format = "[$symbol$branch]($style) ";
       };

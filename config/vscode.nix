@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, font, ... }:
 
 {
   programs.vscode = {
@@ -8,6 +8,9 @@
     extensions = [ pkgs.vscode-extensions.enkia.tokyo-night ];
     userSettings = {
       "workbench.colorTheme" = "Tokyo Night";
+      "editor.fontFamily" = "'${font.mono}', monospace";
+      "editor.fontLigatures" = true;
+      "terminal.integrated.fontFamily" = "'${font.mono}'";
     };
   };
 }
