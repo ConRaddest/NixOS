@@ -4,18 +4,18 @@
   programs.kitty = {
     enable = true;
     settings = {
-      font_family = font.mono;
-      font_size = font.monoSize;
-      window_padding_width = 8;
-      confirm_os_window_close = 0;
-      enable_audio_bell = false;
+      font_family               = font.mono;
+      font_size                 = 13;
+      window_padding_width      = 8;
+      confirm_os_window_close   = 0;
+      enable_audio_bell         = false;
 
-      background            = colors.bg;
-      foreground            = colors.fg;
-      cursor                = colors.blue;
-      cursor_text_color     = colors.bg;
-      selection_background  = colors.bgAlt;
-      selection_foreground  = colors.fg;
+      background                = colors.bg;
+      foreground                = colors.fg;
+      cursor                    = colors.blue;
+      cursor_text_color         = colors.bg;
+      selection_background      = colors.bgAlt;
+      selection_foreground      = colors.fg;
 
       # Normal colors
       color0  = colors.bgDark;
