@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
-# 1. Unified copy / paste + clipboard manager (DONE)
-
 # 2. Docker w/ Windows (QEMU)
 # 3. SSH key management (not 1Password)
 # 4. Wifi / Bluetooth UI
@@ -203,10 +201,16 @@
     nodejs
     claude-code
     pi-coding-agent
+    lazydocker
+    
     nixd
     direnv
     nix-direnv
     nixfmt
+
+    # Virtualisation
+    qemu
+    quickemu
 
     # Apps
     firefox
