@@ -112,7 +112,6 @@
     pulse.enable = true;
   };
 
-
   # ── Hyprland & Desktop Portals ─────────────────────────────────────────── #
   programs.hyprland = {
     enable = true;
