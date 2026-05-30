@@ -1,7 +1,2 @@
-Host github.com
-  HostName github.com
-  User git
-  IdentityAgent ~/.1password/agent.sock
-  IdentitiesOnly yes
-  PreferredAuthentications publickey
-  BatchMode yes
+Host *
+	IdentityAgent ~/.1password/agent.sock
