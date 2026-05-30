@@ -202,6 +202,13 @@ hl.window_rule({
   size = { 800, 600 },
 })
 
+hl.window_rule({
+  match = { class = "1password", title = "1Password" },
+  float = true,
+  center = true,
+  size = { 500, 500 },
+})
+
 -- File pickers
 local file_explorers = {
   "xdg-desktop-portal-gtk",
