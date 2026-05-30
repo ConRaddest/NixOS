@@ -39,6 +39,7 @@ in
   _module.args = { inherit font colors; };
 
   imports = [
+    ./config/firefox.nix
     ./config/theme.nix
     ./config/hyprland.nix
     ./config/hyprlock.nix

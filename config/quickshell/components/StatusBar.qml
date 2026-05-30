@@ -121,7 +121,12 @@ PanelWindow {
         clickable: true
         onClicked: bar.shell.launchTerminal("performance-monitor", "performance-monitor", "btop")
       }
-      StatusPill { shell: bar.shell; text: bar.shell.batteryText }
+      StatusPill {
+        shell: bar.shell
+        text: bar.shell.batteryText
+        clickable: true
+        onClicked: bar.shell.runDetached("qs ipc call launcher openSubmenu Speed")
+      }
     }
   }
 }

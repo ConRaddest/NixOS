@@ -5,6 +5,7 @@
     enable = true;
     package = pkgs.vscode;
     argvSettings."disable-features" = "WaylandWindowDecorations";
+    argvSettings."enable-features" = "WebRTCPipeWireCapturer";
     profiles.default.extensions = [ pkgs.vscode-extensions.enkia.tokyo-night ];
     profiles.default.userSettings = {
       "workbench.colorTheme" = "Tokyo Night";
@@ -14,7 +15,7 @@
       "git.enableSmartCommit" = true;
       "workbench.iconTheme" = "file-icons";
       "explorer.confirmDelete" = false;
-      "window.dialogStyle" = "native";
+      "files.simpleDialog.enable" = false;
     };
   };
 }

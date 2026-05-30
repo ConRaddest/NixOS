@@ -99,6 +99,7 @@
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
     GTK_USE_PORTAL = "1";
+    QT_QPA_PLATFORM = "wayland";
   };
 
   xdg.portal = {
@@ -109,6 +110,8 @@
     ];
     config.common.default = [ "hyprland" "gtk" ];
     config.common."org.freedesktop.impl.portal.Settings" = [ "gtk" ];
+    config.common."org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+    config.common."org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
   };
 
   # ── Fonts ──────────────────────────────────────────────────────────────── #

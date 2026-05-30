@@ -43,6 +43,7 @@ in
 
       // ── Launcher state ───────────────────────────────────────────────── //
       property bool   menuOpen:         false
+      property bool   screenShareOpen:  false
       property string menuQuery:        ""
       property var    menuStack:        []
       property var    confirmItem:      null
@@ -287,7 +288,7 @@ in
       }
 
       function runDetached(command) {
-        launchProcess.command = ["bash", "-lc", "setsid bash -lc " + shellQuote(command) + " >/dev/null 2>&1 &"]
+        launchProcess.command = ["bash", "-c", "setsid bash -lc " + shellQuote(command) + " >/dev/null 2>&1 &"]
         launchProcess.running = true
       }
 
@@ -341,6 +342,19 @@ in
 
       // ── IPC ──────────────────────────────────────────────────────────── //
       IpcHandler {
+        target: "screenshare"
+
+        function open(resultPath: string, sourcePath: string): void {
+          root.closeMenu()
+          screenShare.openPicker(resultPath, sourcePath)
+        }
+
+        function close(): void {
+          root.screenShareOpen = false
+        }
+      }
+
+      IpcHandler {
         target: "launcher"
 
         function open() {
@@ -376,6 +390,11 @@ in
         id: launcher
         shell: root
       }
+
+      ScreenShareWindow {
+        id: screenShare
+        shell: root
+      }
     }
   '';
 
@@ -383,6 +402,12 @@ in
     source = config.lib.file.mkOutOfStoreSymlink "${repo}/quickshell/components";
     recursive = true;
   };
+
+  xdg.configFile."hypr/xdph.conf".text = ''
+    screencopy {
+      custom_picker_binary = ${config.home.homeDirectory}/.config/quickshell/scripts/screen-share-picker.sh
+    }
+  '';
 
   xdg.configFile."quickshell/scripts" = {
     source = config.lib.file.mkOutOfStoreSymlink "${repo}/quickshell/scripts";
