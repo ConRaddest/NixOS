@@ -1,86 +1,6 @@
 import QtQuick
 import Quickshell
 
-// ─── Inline component: ConfirmButton ─────────────────────────────────────────
-// A bordered button used in the confirmation dialog.
-component ConfirmButton: Rectangle {
-  id: button
-
-  required property var shell
-  property string text: ""
-  property bool selected: false
-  signal clicked()
-
-  width: 110
-  height: 32
-  color: button.selected || mouse.containsMouse ? button.shell.selection : "transparent"
-  border.color: button.selected || mouse.containsMouse ? button.shell.accent : button.shell.surfaceLight
-  border.width: 2
-
-  Text {
-    anchors.centerIn: parent
-    text: button.text
-    color: button.shell.fg
-    font.family: "monospace"
-    font.pixelSize: 14
-    font.weight: Font.Bold
-  }
-
-  MouseArea {
-    id: mouse
-    anchors.fill: parent
-    hoverEnabled: true
-    onClicked: button.clicked()
-  }
-}
-
-// ─── Inline component: ConfirmOverlay ────────────────────────────────────────
-// Full-window modal shown when a destructive action (power/session) is selected.
-// Keyboard: left/right to choose, enter to confirm, escape to cancel.
-component ConfirmOverlay: Rectangle {
-  id: overlay
-
-  required property var shell
-
-  visible: overlay.shell.confirmItem !== null
-  color: overlay.shell.bg
-  opacity: 0.96
-
-  Column {
-    visible: overlay.shell.confirmItem !== null
-    anchors.centerIn: parent
-    spacing: 18
-
-    Text {
-      anchors.horizontalCenter: parent.horizontalCenter
-      text: overlay.shell.confirmItem ? "Are you sure?" : ""
-      color: overlay.shell.fg
-      font.family: "monospace"
-      font.pixelSize: 16
-      font.weight: Font.Bold
-    }
-
-    Row {
-      anchors.horizontalCenter: parent.horizontalCenter
-      spacing: 12
-
-      ConfirmButton {
-        shell: overlay.shell
-        text: "Cancel"
-        selected: overlay.shell.confirmSelection === "cancel"
-        onClicked: overlay.shell.cancelConfirm()
-      }
-
-      ConfirmButton {
-        shell: overlay.shell
-        text: overlay.shell.confirmItem ? overlay.shell.confirmItem.name : "Confirm"
-        selected: overlay.shell.confirmSelection === "confirm"
-        onClicked: overlay.shell.runConfirm()
-      }
-    }
-  }
-}
-
 // ─── Launcher window ─────────────────────────────────────────────────────────
 // Floating keyboard-driven menu. All runtime state (query, selection, confirm)
 // lives on the shell; this file only defines the window and its controls.
@@ -88,6 +8,85 @@ FloatingWindow {
   id: launcher
 
   required property var shell
+
+  // ─── Inline component: ConfirmButton ──────────────────────────────────────
+  // A bordered button used in the confirmation dialog.
+  component ConfirmButton: Rectangle {
+    id: button
+
+    required property var shell
+    property string text: ""
+    property bool selected: false
+    signal clicked()
+
+    width: 110
+    height: 32
+    color: button.selected || mouse.containsMouse ? button.shell.selection : "transparent"
+    border.color: button.selected || mouse.containsMouse ? button.shell.accent : button.shell.surfaceLight
+    border.width: 2
+
+    Text {
+      anchors.centerIn: parent
+      text: button.text
+      color: button.shell.fg
+      font.family: "monospace"
+      font.pixelSize: 14
+      font.weight: Font.Bold
+    }
+
+    MouseArea {
+      id: mouse
+      anchors.fill: parent
+      hoverEnabled: true
+      onClicked: button.clicked()
+    }
+  }
+
+  // ─── Inline component: ConfirmOverlay ─────────────────────────────────────
+  // Full-window modal for destructive actions. Left/right to choose, enter to confirm.
+  component ConfirmOverlay: Rectangle {
+    id: overlay
+
+    required property var shell
+
+    visible: overlay.shell.confirmItem !== null
+    color: overlay.shell.bg
+    opacity: 0.96
+
+    Column {
+      visible: overlay.shell.confirmItem !== null
+      anchors.centerIn: parent
+      spacing: 18
+
+      Text {
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: overlay.shell.confirmItem ? "Are you sure?" : ""
+        color: overlay.shell.fg
+        font.family: "monospace"
+        font.pixelSize: 16
+        font.weight: Font.Bold
+      }
+
+      Row {
+        anchors.horizontalCenter: parent.horizontalCenter
+        spacing: 12
+
+        ConfirmButton {
+          shell: overlay.shell
+          text: "Cancel"
+          selected: overlay.shell.confirmSelection === "cancel"
+          onClicked: overlay.shell.cancelConfirm()
+        }
+
+        ConfirmButton {
+          shell: overlay.shell
+          text: overlay.shell.confirmItem ? overlay.shell.confirmItem.name : "Confirm"
+          selected: overlay.shell.confirmSelection === "confirm"
+          onClicked: overlay.shell.runConfirm()
+        }
+      }
+    }
+  }
   property alias menuInputItem: menuInput
   property alias menuListItem: menuList
 

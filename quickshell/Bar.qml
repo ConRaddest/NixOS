@@ -2,40 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
-// ─── Inline component ────────────────────────────────────────────────────────
-// Small clickable status indicator used in the right section of the bar.
-component StatusPill: Rectangle {
-  id: pill
-
-  required property var shell
-  property string text: ""
-  property bool clickable: false
-  signal clicked()
-
-  width: label.implicitWidth + 14
-  height: 24
-  radius: 6
-  color: pill.clickable && mouse.containsMouse ? pill.shell.bgAlt : "transparent"
-
-  Text {
-    id: label
-    anchors.centerIn: parent
-    text: pill.text
-    color: pill.shell.fg
-    font.family: pill.shell.monoFont
-    font.pixelSize: 13
-  }
-
-  MouseArea {
-    id: mouse
-    anchors.fill: parent
-    enabled: pill.clickable
-    hoverEnabled: pill.clickable
-    cursorShape: pill.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
-    onClicked: pill.clicked()
-  }
-}
-
 // ─── Bar window ──────────────────────────────────────────────────────────────
 // Anchored full-width panel at the top of each monitor.
 PanelWindow {
@@ -52,7 +18,41 @@ PanelWindow {
   implicitHeight: 30
   color: "transparent"
 
-  // ─── Monitor binding ───────────────────────────────────────────────────────
+  // ─── Inline component: StatusPill ────────────────────────────────────────
+  // Small clickable status indicator used in the right section of the bar.
+  component StatusPill: Rectangle {
+    id: pill
+
+    required property var shell
+    property string text: ""
+    property bool clickable: false
+    signal clicked()
+
+    width: label.implicitWidth + 14
+    height: 24
+    radius: 6
+    color: pill.clickable && mouse.containsMouse ? pill.shell.bgAlt : "transparent"
+
+    Text {
+      id: label
+      anchors.centerIn: parent
+      text: pill.text
+      color: pill.shell.fg
+      font.family: pill.shell.monoFont
+      font.pixelSize: 13
+    }
+
+    MouseArea {
+      id: mouse
+      anchors.fill: parent
+      enabled: pill.clickable
+      hoverEnabled: pill.clickable
+      cursorShape: pill.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
+      onClicked: pill.clicked()
+    }
+  }
+
+  // ─── Monitor binding ─────────────────────────────────────────────────────
   // Find the Hyprland monitor whose name matches this bar's screen.
   readonly property HyprlandMonitor hyprMonitor: {
     for (const m of Hyprland.monitors.values) {
@@ -75,12 +75,12 @@ PanelWindow {
 
   readonly property int monitorActiveWorkspace: bar.hyprMonitor?.activeWorkspace?.id || 0
 
-  // ─── Background ───────────────────────────────────────────────────────────
+  // ─── Background ──────────────────────────────────────────────────────────
   Rectangle {
     anchors.fill: parent
     color: bar.shell.bg
 
-    // ─── Left: workspace indicators ─────────────────────────────────────────
+    // ─── Left: workspace indicators ───────────────────────────────────────
     Row {
       anchors.left: parent.left
       anchors.leftMargin: 14
@@ -119,7 +119,7 @@ PanelWindow {
       }
     }
 
-    // ─── Center: clock ──────────────────────────────────────────────────────
+    // ─── Center: clock ────────────────────────────────────────────────────
     Text {
       anchors.centerIn: parent
       text: bar.shell.timeText
@@ -128,7 +128,7 @@ PanelWindow {
       font.pixelSize: 13
     }
 
-    // ─── Right: system status pills ─────────────────────────────────────────
+    // ─── Right: system status pills ───────────────────────────────────────
     Row {
       anchors.right: parent.right
       anchors.rightMargin: 14
