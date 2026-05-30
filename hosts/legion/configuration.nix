@@ -1,9 +1,8 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
-# 3. SSH key management (not 1Password)
+# 1. System tray (minimised apps)
 # 4. Wifi / Bluetooth UI
-# 5. LocalSend integration
 # 6. Firewall / network hardening
 # 7. Secrets management
 # 8. Backup strategy

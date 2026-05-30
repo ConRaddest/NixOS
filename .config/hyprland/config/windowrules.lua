@@ -36,18 +36,18 @@ for _, name in ipairs(launchers) do
   })
 end
 
-hl.window_rule({
-  match = { title = "Select what to share" },
-  float = true,
-  center = true,
-  size = { 800, 600 },
-})
+-- hl.window_rule({
+--   match = { title = "Select what to share" },
+--   float = true,
+--   center = true,
+--   size = { 800, 600 },
+-- })
 
 hl.window_rule({
   match = { class = "1password", title = "1Password" },
   float = true,
   center = true,
-  size = { 500, 500 },
+  size = { 1300, 800 },
 })
 
 -- File pickers
