@@ -60,8 +60,19 @@
   services.udev.extraRules = ''
     ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
     ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
-    ACTION=="add", SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
+    SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
   '';
+
+  systemd.services.rfkill-unblock-bluetooth = {
+    description = "Unblock Bluetooth rfkill";
+    after = [ "bluetooth.service" ];
+    wantedBy = [ "bluetooth.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.util-linux}/bin/rfkill unblock bluetooth";
+      RemainAfterExit = true;
+    };
+  };
 
   # ── Printing ───────────────────────────────────────────────────────────── #
   services.printing.enable = true;
@@ -113,6 +124,7 @@
       xdg-desktop-portal-hyprland
     ];
     config.common.default = [ "hyprland" "gtk" ];
+    config.common."org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
     config.common."org.freedesktop.impl.portal.Settings" = [ "gtk" ];
     config.common."org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
     config.common."org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
@@ -170,6 +182,7 @@
     python3
     nodejs
     claude-code
+    pi-coding-agent
     nixd
     direnv
     nix-direnv
