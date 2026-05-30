@@ -21,8 +21,6 @@ FloatingWindow {
   screen: shell.launcherScreen
   visible: shell.clipboardOpen
   title: "shell-clipboard"
-  implicitWidth: 600
-  implicitHeight: 460
   color: shell.bg
 
   onVisibleChanged: {

@@ -156,6 +156,7 @@ FloatingWindow {
     ] },
   ]
 
+
   // ─── UI ──────────────────────────────────────────────────────────────────
   Rectangle {
     anchors.fill: parent

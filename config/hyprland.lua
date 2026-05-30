@@ -85,10 +85,33 @@ hl.bind("SUPER + E",             hl.dsp.exec_cmd("uwsm -- app nautilus"))
 hl.bind("SUPER + B",             hl.dsp.exec_cmd("uwsm -- app firefox"))
 hl.bind("SUPER + Grave",         hl.dsp.exec_cmd("uwsm -- app code"))
 
+-- Universal cut / copy / paste
+local pressed_shortcuts = {}
 
--- Universal copy / paste
-hl.bind("SUPER + C",             hl.dsp.send_shortcut({ mods = "CTRL", key = "Insert" }), { desc = "Universal copy" })
-hl.bind("SUPER + V",             hl.dsp.send_shortcut({ mods = "SHIFT", key = "Insert" }), { desc = "Universal paste" })
+local function send_shortcut_once(mods, key)
+  -- Avoid hl.dsp.send_shortcut here: it can leave synthetic keys pressed in
+  -- some clients. Send an explicit press and release instead.
+  hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
+  hl.timer(function()
+    hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
+  end, { timeout = 25, type = "oneshot" })
+end
+
+local function bind_shortcut_once(bind, mods, key, desc)
+  hl.bind(bind, function()
+    if pressed_shortcuts[bind] then return end
+    pressed_shortcuts[bind] = true
+    send_shortcut_once(mods, key)
+  end, { desc = desc })
+
+  hl.bind(bind, function()
+    pressed_shortcuts[bind] = false
+  end, { release = true })
+end
+
+bind_shortcut_once("SUPER + X", "SHIFT", "Delete", "Universal cut")
+bind_shortcut_once("SUPER + C", "CTRL",  "Insert", "Universal copy")
+bind_shortcut_once("SUPER + V", "SHIFT", "Insert", "Universal paste")
 
 -- Window Controls
 hl.bind("SUPER + W",             hl.dsp.window.close())
@@ -155,13 +178,14 @@ end
 -- Shell launcher
 local launchers = {
   "shell-launcher",
+  "shell-clipboard",
 }
 for _, name in ipairs(launchers) do
   hl.window_rule({
     match = { title = name },
     float = true,
     center = true,
-    size = { 400, 400 },
+    size = { 450, 400 },
   })
 end
 

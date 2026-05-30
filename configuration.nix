@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
-# 1. Unified copy / paste + clipboard manager
+# 1. Unified copy / paste + clipboard manager (DONE)
+
 # 2. Docker w/ Windows (QEMU)
 # 3. SSH key management (not 1Password)
 # 4. Wifi / Bluetooth UI

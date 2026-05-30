@@ -6,6 +6,27 @@
     package = pkgs.vscode;
     profiles.default.extensions = [ pkgs.vscode-extensions.enkia.tokyo-night ];
 
+    profiles.default.keybindings = [
+      # Hyprland's universal copy/paste sends Ctrl+Insert / Shift+Insert.
+      # Disable VS Code's Insert toggle so synthetic Insert events don't flicker
+      # between insert/overtype mode.
+      {
+        key = "insert";
+        command = "-toggleOverwriteMode";
+        when = "editorTextFocus";
+      }
+      {
+        key = "ctrl+insert";
+        command = "editor.action.clipboardCopyAction";
+        when = "editorTextFocus";
+      }
+      {
+        key = "shift+insert";
+        command = "editor.action.clipboardPasteAction";
+        when = "editorTextFocus";
+      }
+    ];
+
     profiles.default.userSettings = {
       "workbench.colorTheme" = "Tokyo Night";
       "editor.fontFamily" = "'${font.mono}', monospace";
