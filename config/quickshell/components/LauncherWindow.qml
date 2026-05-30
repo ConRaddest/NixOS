@@ -136,16 +136,33 @@ FloatingWindow {
               anchors.leftMargin: 8
               spacing: 12
 
-              Text {
+              Item {
                 width: 20
-                text: modelData.icon || ""
-                color: launcher.shell.accent
-                font.family: "JetBrainsMono Nerd Font"
-                font.pixelSize: 15
-                font.weight: Font.Bold
-                font.italic: launcher.shell.isCurrentPerformanceItem(modelData)
-                horizontalAlignment: Text.AlignHCenter
+                height: 20
                 anchors.verticalCenter: parent.verticalCenter
+
+                // Nerd-font glyph icon (non-app menu items)
+                Text {
+                  anchors.centerIn: parent
+                  visible: !modelData.iconPath
+                  text: modelData.icon || ""
+                  color: launcher.shell.accent
+                  font.family: "JetBrainsMono Nerd Font"
+                  font.pixelSize: 15
+                  font.weight: Font.Bold
+                  font.italic: launcher.shell.isCurrentPerformanceItem(modelData)
+                  horizontalAlignment: Text.AlignHCenter
+                }
+
+                // App image icon in natural color
+                Image {
+                  anchors.fill: parent
+                  visible: !!modelData.iconPath
+                  source: modelData.iconPath || ""
+                  sourceSize: Qt.size(20, 20)
+                  fillMode: Image.PreserveAspectFit
+                  asynchronous: true
+                }
               }
 
               Text {

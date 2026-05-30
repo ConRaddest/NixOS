@@ -13,6 +13,7 @@ in
     //@ pragma ShellId shell
 
     import QtQuick
+    import QtCore
     import Quickshell
     import Quickshell.Io
     import Quickshell.Hyprland
@@ -41,9 +42,12 @@ in
       property string batteryText:   "󰚥 AC"
       property string timeText:      Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
+      readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+
       // ── Launcher state ───────────────────────────────────────────────── //
       property bool   menuOpen:         false
       property bool   screenShareOpen:  false
+      property bool   wallpaperOpen:    false
       property string menuQuery:        ""
       property var    menuStack:        []
       property var    confirmItem:      null
@@ -187,6 +191,7 @@ in
 
       function closeMenu() {
         menuOpen = false
+        wallpaperOpen = false
         resetMenu()
       }
 
@@ -248,6 +253,10 @@ in
             ? "bash -lc " + shellQuote(t.cmd + "; echo; read -rp 'Press Enter to close...'")
             : t.cmd
           launchTerminal(t.klass, t.title, cmd)
+          closeMenu()
+        } else if (item.desktop) {
+          const entry = DesktopEntries.byId(item.desktop)
+          if (entry) entry.execute()
           closeMenu()
         } else if (item.command) {
           if (item.confirm) confirmAction(item)
@@ -342,6 +351,20 @@ in
 
       // ── IPC ──────────────────────────────────────────────────────────── //
       IpcHandler {
+        target: "wallpaper"
+
+        function open(): void {
+          root.closeMenu()
+          root.wallpaperOpen = true
+        }
+
+        function toggle(): void {
+          root.closeMenu()
+          root.wallpaperOpen = !root.wallpaperOpen
+        }
+      }
+
+      IpcHandler {
         target: "screenshare"
 
         function open(resultPath: string, sourcePath: string): void {
@@ -393,6 +416,10 @@ in
 
       ScreenShareWindow {
         id: screenShare
+        shell: root
+      }
+
+      WallpaperWindow {
         shell: root
       }
     }

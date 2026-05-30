@@ -62,6 +62,7 @@ end
 
 -- Keybinds
 hl.bind("SUPER + Space",         hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Apps"))
+hl.bind("SUPER + SHIFT + Space", hl.dsp.exec_cmd("qs ipc call launcher open"))
 hl.bind("SUPER + ALT + Space",   hl.dsp.exec_cmd("qs ipc call launcher openSubmenu System"))
 hl.bind("SUPER + Return",        hl.dsp.exec_cmd("kitty"))
 hl.bind("SUPER + E",             hl.dsp.exec_cmd("nautilus"))
@@ -105,6 +106,7 @@ hl.bind("Print", hl.dsp.exec_cmd(
 
 -- Floating panes launched from the status bar.
 local managers = {
+  "wallpaper-picker",
   "wifi-manager",
   "bluetooth-manager",
   "performance-monitor",

@@ -4,8 +4,6 @@
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;
-    argvSettings."disable-features" = "WaylandWindowDecorations";
-    argvSettings."enable-features" = "WebRTCPipeWireCapturer";
     argvSettings."password-store" = "basic";
     profiles.default.extensions = [ pkgs.vscode-extensions.enkia.tokyo-night ];
     profiles.default.userSettings = {

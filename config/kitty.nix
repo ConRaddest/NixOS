@@ -1,6 +1,19 @@
-{ font, colors, ... }:
+{ font, colors, config, ... }:
 
 {
+  xdg.configFile."kitty/open-url.sh" = {
+    executable = true;
+    text = ''
+      #!/usr/bin/env bash
+      url="$1"
+      if [[ "$url" == file://* ]]; then
+        code --goto "''${url#file://}"
+      else
+        xdg-open "$url"
+      fi
+    '';
+  };
+
   programs.kitty = {
     enable = true;
     settings = {
@@ -9,6 +22,7 @@
       window_padding_width      = 8;
       confirm_os_window_close   = 0;
       enable_audio_bell         = false;
+      open_url_with             = "${config.home.homeDirectory}/.config/kitty/open-url.sh";
 
       background                = colors.bg;
       foreground                = colors.fg;

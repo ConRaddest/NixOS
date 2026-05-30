@@ -1,7 +1,19 @@
 { colors, ... }:
 
 {
-  programs.bash.enable = true;
+  programs.bash = {
+    enable = true;
+    shellAliases = {
+      ls = "eza --icons";
+      ll = "eza -la --icons";
+      cd = "z";
+    };
+  };
+
+  programs.zoxide = {
+    enable = true;
+    enableBashIntegration = true;
+  };
 
   programs.starship = {
     enable = true;

@@ -47,7 +47,6 @@ in
     ./config/hyprpaper.nix
     ./config/kitty.nix
     ./config/btop.nix
-    ./config/yazi.nix
     ./config/vscode.nix
     ./config/starship.nix
     ./config/quickshell.nix
