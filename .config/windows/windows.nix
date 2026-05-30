@@ -3,6 +3,7 @@
 let
   windowsScript = pkgs.writeShellScriptBin "windows-vm" (builtins.readFile ./scripts/windows.sh);
   windowsInstallScript = pkgs.writeShellScriptBin "windows-install" (builtins.readFile ./scripts/windows-install.sh);
+  windowsUninstallScript = pkgs.writeShellScriptBin "windows-uninstall" (builtins.readFile ./scripts/windows-uninstall.sh);
 in
 {
   xdg.configFile."windows/docker-compose.yaml".source = ./docker-compose.yaml;
@@ -12,6 +13,7 @@ in
     freerdp
     windowsScript
     windowsInstallScript
+    windowsUninstallScript
 
     (writeShellScriptBin "windows-vm-stop" ''
       set -euo pipefail

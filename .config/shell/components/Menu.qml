@@ -52,6 +52,10 @@ FloatingWindow {
       { name: "Windows", icon: "󰖳", command: "windows-install" },
     ] },
 
+    { name: "Remove", icon: "󰆴", items: [
+      { name: "Windows", icon: "󰖳", command: "windows-uninstall", confirm: true },
+    ] },
+
     { name: "System", icon: "󰒓", items: [
       { name: "Wallpaper",  icon: "󰸉", command: "qs ipc call wallpaper open" },
       { name: "Clipboard",  icon: "󰅎", command: "qs ipc call clipboard open" },

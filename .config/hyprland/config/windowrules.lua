@@ -7,6 +7,7 @@ local managers = {
   "performance-monitor",
   "audio-manager",
   "windows-install",
+  "windows-uninstall",
   "windows-credentials",
   "nixos-refresh",
   "nixos-build",

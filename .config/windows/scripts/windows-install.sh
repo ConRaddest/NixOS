@@ -28,9 +28,7 @@ fi
 echo "Windows VM install"
 echo
 
-echo "Settings are defined in: $compose_file"
-echo "Edit /home/cdt/OS/.config/windows/docker-compose.yaml and run home-manager switch to change them."
-echo
+echo "Modify ~/OS/.config/windows/docker-compose.yaml to change vm settings..."
 
 username="$(grep -E '^      USERNAME:' "$compose_file" | sed -E 's/^ *USERNAME: *"?([^" ]+)"?.*/\1/' | tail -1)"
 password="$(grep -E '^      PASSWORD:' "$compose_file" | sed -E 's/^ *PASSWORD: *"?([^" ]+)"?.*/\1/' | tail -1)"
