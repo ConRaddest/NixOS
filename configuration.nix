@@ -1,5 +1,24 @@
 { config, pkgs, ... }:
 
+# ── still to do: ────────────────────────────────────────────────────────────────── #
+# 1. Unified copy / paste + clipboard manager
+# 2. Docker w/ Windows (QEMU)
+# 3. SSH key management (not 1Password)
+# 4. Wifi / Bluetooth UI
+# 5. LocalSend integration
+# 6. Firewall / network hardening
+# 7. Secrets management
+# 8. Backup strategy
+# 9. Git identity + commit signing
+# 10. Default apps / MIME associations
+# 11. GTK / Qt theming polish
+# 12. Clipboard / screenshot history
+# 13. Notification daemon polish
+# 14. Power / laptop behavior - laptop lid closing (monitor disabling management)
+# 15. Monitor / workspace robustness
+# 16. Development environment toolchains
+# 17. System recovery / maintenance workflow
+
 {
   # ── Nix ────────────────────────────────────────────────────────────────── #
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -13,7 +32,6 @@
   # ── Boot ───────────────────────────────────────────────────────────────── #
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelModules = [ "btusb" ];
 
   # ── System ─────────────────────────────────────────────────────────────── #
   networking.hostName = "nixos";
@@ -155,6 +173,7 @@
     playerctl
     brightnessctl
     home-manager
+    cliphist
 
     # Shell
     quickshell

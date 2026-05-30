@@ -36,10 +36,17 @@ ShellRoot {
 
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
+  // Screen used by the launcher. It is set from the cursor position immediately
+  // before opening so first boot does not default the floating window to the
+  // left-most monitor.
+  property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
+  property string pendingLauncherSubmenu: ""
+
   // ─── Menu state ──────────────────────────────────────────────────────────
   property bool   menuOpen:           false
   property bool   wallpaperOpen:      false
   property bool   screenShareOpen:    false
+  property bool   clipboardOpen:      false
   property string menuQuery:          ""
   property var    menuStack:          []
   property var    confirmItem:        null
@@ -115,6 +122,51 @@ ShellRoot {
       }
     }
     return false
+  }
+
+  function screenForPoint(px, py) {
+    for (const screen of Quickshell.screens) {
+      if (px >= screen.x && px < screen.x + screen.width
+          && py >= screen.y && py < screen.y + screen.height)
+        return screen
+    }
+
+    const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
+    if (focusedName !== "") {
+      for (const screen of Quickshell.screens) {
+        if (screen.name === focusedName)
+          return screen
+      }
+    }
+
+    return launcherScreen || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
+  }
+
+  function openLauncherAtCursor(submenuName) {
+    closeMenu()
+    pendingLauncherSubmenu = submenuName || ""
+    launcherCursorProcess.running = false
+    launcherCursorProcess.command = ["bash", "-c", "hyprctl cursorpos 2>/dev/null || true"]
+    launcherCursorProcess.running = true
+  }
+
+  function finishOpenLauncher(cursorText) {
+    const match = String(cursorText).match(/(-?\d+)\s*,\s*(-?\d+)/)
+    if (match) {
+      const screen = screenForPoint(Number(match[1]), Number(match[2]))
+      if (screen) launcherScreen = screen
+    }
+
+    if (pendingLauncherSubmenu !== "") {
+      let path = []
+      if (findMenuPath(menuItems, pendingLauncherSubmenu, path)) {
+        menuStack = path
+        openedAsSubmenu = true
+      }
+    }
+
+    pendingLauncherSubmenu = ""
+    menuOpen = true
   }
 
   onMenuOpenChanged: {
@@ -231,9 +283,14 @@ ShellRoot {
   }
 
   function closeMenu() {
-    menuOpen      = false
-    wallpaperOpen = false
+    menuOpen       = false
+    wallpaperOpen  = false
+    clipboardOpen  = false
     resetMenu()
+  }
+
+  function closeClipboard() {
+    clipboardOpen = false
   }
 
   // ─── Utilities ───────────────────────────────────────────────────────────
@@ -340,6 +397,13 @@ ShellRoot {
 
   Process { id: launchProcess }
 
+  Process {
+    id: launcherCursorProcess
+    stdout: StdioCollector {
+      onStreamFinished: root.finishOpenLauncher(this.text)
+    }
+  }
+
   // Parses the pipe-delimited output of bar.sh into individual status fields.
   Process {
     id: statusProcess
@@ -402,19 +466,22 @@ ShellRoot {
   }
 
   IpcHandler {
-    target: "launcher"
-    function open(): void { root.menuOpen = false; root.menuOpen = true }
-    function openSubmenu(targetName: string): void {
-      root.closeMenu()
-      if (targetName && targetName.trim() !== "") {
-        let path = []
-        if (root.findMenuPath(root.menuItems, targetName, path)) {
-          root.menuStack      = path
-          root.openedAsSubmenu = true
-        }
-      }
-      root.menuOpen = true
+    target: "clipboard"
+    function open(): void   { root.closeMenu(); root.clipboardOpen = true }
+    function toggle(): void {
+      if (root.clipboardOpen) root.clipboardOpen = false
+      else { root.closeMenu(); root.clipboardOpen = true }
     }
+  }
+
+  IpcHandler {
+    target: "launcher"
+    function open(): void { root.openLauncherAtCursor("") }
+    function toggle(): void {
+      if (root.menuOpen) root.closeMenu()
+      else root.openLauncherAtCursor("")
+    }
+    function openSubmenu(targetName: string): void { root.openLauncherAtCursor(targetName) }
   }
 
   // ─── Windows ─────────────────────────────────────────────────────────────
@@ -429,7 +496,8 @@ ShellRoot {
     }
   }
 
-  Menu      { id: launcher;    shell: root }
-  Screenshare { id: screenShare; shell: root }
+  Menu        { id: launcher;        shell: root }
+  Clipboard   { id: clipboardWindow; shell: root }
+  Screenshare { id: screenShare;     shell: root }
   Wallpaper { shell: root }
 }

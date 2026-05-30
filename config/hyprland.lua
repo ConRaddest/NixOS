@@ -3,6 +3,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("uwsm app -s s -- lxqt-policykit-agent")
   hl.exec_cmd("uwsm app -- hyprpaper")
   hl.exec_cmd("uwsm app -- qs")
+  hl.exec_cmd("uwsm app -- wl-paste --watch cliphist store")
 end)
 
 
@@ -10,8 +11,8 @@ end)
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
 -- Disable the laptop panel while the lid is closed, and restore it when opened.
-hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,disable"), { locked = true })
-hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1"), { locked = true })
+-- hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,disable"), { locked = true })
+-- hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1"), { locked = true })
 
 hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })
 hl.workspace_rule({ workspace = "2", monitor = "eDP-1", default = true })
@@ -84,10 +85,14 @@ hl.bind("SUPER + E",             hl.dsp.exec_cmd("uwsm -- app nautilus"))
 hl.bind("SUPER + B",             hl.dsp.exec_cmd("uwsm -- app firefox"))
 hl.bind("SUPER + Grave",         hl.dsp.exec_cmd("uwsm -- app code"))
 
+
+-- Universal copy / paste
+hl.bind("SUPER + C",             hl.dsp.send_shortcut({ mods = "CTRL", key = "Insert" }), { desc = "Universal copy" })
+hl.bind("SUPER + V",             hl.dsp.send_shortcut({ mods = "SHIFT", key = "Insert" }), { desc = "Universal paste" })
+
 -- Window Controls
 hl.bind("SUPER + W",             hl.dsp.window.close())
 hl.bind("SUPER + F",             hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
-hl.bind("SUPER + T",             hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + Tab",           hl.dsp.focus({ workspace = "previous" }))
 hl.bind("SUPER + S",             hl.dsp.workspace.toggle_special("scratchpad"))
 

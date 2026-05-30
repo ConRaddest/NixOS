@@ -90,6 +90,7 @@ FloatingWindow {
   property alias menuInputItem: menuInput
   property alias menuListItem: menuList
 
+  screen: shell.launcherScreen
   visible: shell.menuOpen
   title: "shell-launcher"
   implicitWidth: 600
@@ -127,6 +128,7 @@ FloatingWindow {
 
     { name: "System", icon: "󰒓", items: [
       { name: "Wallpaper",  icon: "󰸉", command: "qs ipc call wallpaper open" },
+      { name: "Clipboard",  icon: "󰅎", command: "qs ipc call clipboard open" },
       { name: "Wi-Fi",      icon: "󰖩", terminal: { klass: "wifi-manager",        title: "wifi-manager",        cmd: "impala" } },
       { name: "Bluetooth",  icon: "󰂯", terminal: { klass: "bluetooth-manager",   title: "bluetooth-manager",   cmd: "bluetui" } },
       { name: "Audio",      icon: "󰕾", terminal: { klass: "audio-manager",       title: "audio-manager",       cmd: "wiremix" } },

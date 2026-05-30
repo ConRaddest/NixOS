@@ -98,7 +98,7 @@ PanelWindow {
         Rectangle {
           required property int modelData
 
-          readonly property bool active: bar.monitorActiveWorkspace === modelData
+          readonly property bool active: (Hyprland.focusedWorkspace?.id || 0) === modelData
 
           width: 22
           height: 22
