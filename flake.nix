@@ -17,9 +17,8 @@
         inherit system;
         config.allowUnfree = true;
       };
-    in
-    {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+
+      legion = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           ./hosts/legion/hardware.nix
@@ -32,6 +31,12 @@
             home-manager.users.cdt = import ./hosts/legion/home.nix;
           }
         ];
+      };
+    in
+    {
+      nixosConfigurations = {
+        legion = legion;
+        nixos = legion;
       };
 
       homeConfigurations."cdt" = home-manager.lib.homeManagerConfiguration {
