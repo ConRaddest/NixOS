@@ -4,7 +4,7 @@
 
 # ─── CPU ─────────────────────────────────────────────────────────────────────
 CPU_RAW=$(top -bn1 | awk '/^%Cpu/ {print $2+$4+$6}')
-CPU_USAGE=$(awk -v cpu="$CPU_RAW" 'BEGIN { printf "󰍛 %.1f%%", cpu }')
+CPU_USAGE=$(awk -v cpu="$CPU_RAW" 'BEGIN { printf "  %.1f%%", cpu }')
 
 # Fallback: derive usage from idle time if the primary field returned nothing.
 if [ -z "$CPU_USAGE" ] || [ "$CPU_USAGE" = "0.0%" ]; then

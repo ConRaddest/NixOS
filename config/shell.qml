@@ -70,10 +70,7 @@ ShellRoot {
       resetMenuView()
     } else if (item.terminal) {
       const t = item.terminal
-      const cmd = t.pause
-        ? "bash -lc " + shellQuote(t.cmd + "; echo; read -rp 'Press Enter to close...'")
-        : t.cmd
-      launchTerminal(t.klass, t.title, cmd)
+      launchTerminal(t.klass, t.title, t.cmd, t.pause || false)
       closeMenu()
     } else if (item.desktop) {
       const entry = DesktopEntries.byId(item.desktop)
@@ -243,13 +240,16 @@ ShellRoot {
 
   readonly property string terminal: "kitty"
 
-  function launchTerminal(klass, title, cmd) {
-    runDetached(terminal + " --class " + shellQuote(klass) + " --title " + shellQuote(title) + " -e " + cmd)
+  // Uses array form to avoid all shell quoting; bash -lic expands aliases.
+  function launchTerminal(klass, title, cmd, pause) {
+    const shellCmd = pause ? cmd + "; echo; read -rp 'Press Enter to close...'" : cmd
+    launchProcess.command = [terminal, "--class", klass, "--title", title, "-e", "bash", "-lic", shellCmd]
+    launchProcess.running = true
   }
 
   // Spawns a command fully detached so it outlives the shell process.
   function runDetached(command) {
-    launchProcess.command = ["bash", "-c", "setsid bash -lc " + shellQuote(command) + " >/dev/null 2>&1 &"]
+    launchProcess.command = ["bash", "-lc", "setsid " + command + " >/dev/null 2>&1 &"]
     launchProcess.running = true
   }
 
