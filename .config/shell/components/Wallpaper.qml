@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Qt.labs.folderlistmodel
 
 // ─── Wallpaper picker window ─────────────────────────────────────────────────
@@ -25,10 +26,15 @@ FloatingWindow {
     return parts[parts.length - 1]
   }
 
+  Process {
+    id: wallpaperProcess
+  }
+
   // Invoke wallpaper.sh with the chosen path, then close the picker.
   function applyWallpaper(path) {
     if (!path || path === "") return
-    shell.runDetached("$HOME/OS/.config/shell/scripts/wallpaper.sh " + shell.shellQuote(path))
+    wallpaperProcess.command = [shell.homeDir + "/OS/.config/shell/scripts/wallpaper.sh", path]
+    wallpaperProcess.running = true
     shell.wallpaperOpen = false
   }
 

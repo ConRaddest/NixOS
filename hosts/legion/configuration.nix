@@ -1,13 +1,9 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
-# 1. System tray (minimised apps)
-# 2. Customise hyprlock
-# 4. Wifi / Bluetooth UI
+
 # 6. Firewall / network hardening
-# 7. Secrets management
 # 8. Backup strategy
-# 9. Git identity + commit signing
 # 10. Default apps / MIME associations
 # 11. GTK / Qt theming polish
 # 12. Clipboard / screenshot history
