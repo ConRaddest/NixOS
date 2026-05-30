@@ -21,19 +21,19 @@
     }
   '';
 
-  # All quickshell source files live in OS/quickshell/ and are symlinked here.
+  # All quickshell source files live in OS/.config/shell/ and are symlinked here.
   xdg.configFile."quickshell/shell.qml" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/config/shell.qml";
+    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/.config/shell/shell.qml";
   };
 
   xdg.configFile."quickshell/components" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/quickshell";
+    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/.config/shell/components";
     recursive = true;
   };
 
   xdg.configFile."hypr/xdph.conf".text = ''
     screencopy {
-      custom_picker_binary = ${config.home.homeDirectory}/OS/quickshell/screenshare.sh
+      custom_picker_binary = ${config.home.homeDirectory}/OS/.config/shell/scripts/screenshare.sh
     }
   '';
 }

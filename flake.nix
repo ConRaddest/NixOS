@@ -22,21 +22,21 @@
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./hardware.nix
-          ./configuration.nix
+          ./hosts/legion/hardware.nix
+          ./hosts/legion/configuration.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "hm-backup";
-            home-manager.users.cdt = import ./home.nix;
+            home-manager.users.cdt = import ./hosts/legion/home.nix;
           }
         ];
       };
 
       homeConfigurations."cdt" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        modules = [ ./home.nix ];
+        modules = [ ./hosts/legion/home.nix ];
       };
     };
 }

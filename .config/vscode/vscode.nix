@@ -37,6 +37,7 @@
       "explorer.confirmDelete" = false;
       "files.simpleDialog.enable" = false;
       "git.confirmSync" = false;
+      "explorer.confirmDragAndDrop" = false;
     };
 
     argvSettings = {

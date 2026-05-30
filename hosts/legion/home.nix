@@ -39,17 +39,18 @@ in
   _module.args = { inherit font colors; };
 
   imports = [
-    ./config/firefox.nix
-    ./config/theme.nix
-    ./config/hyprland.nix
-    ./config/hyprlock.nix
-    ./config/hypridle.nix
-    ./config/hyprpaper.nix
-    ./config/kitty.nix
-    ./config/btop.nix
-    ./config/vscode.nix
-    ./config/starship.nix
-    ./config/shell.nix
+    ../../.config/firefox/firefox.nix
+    ../../.config/theme/theme.nix
+    ../../.config/hyprland/hyprland.nix
+    ../../.config/hyprlock/hyprlock.nix
+    ../../.config/hypridle/hypridle.nix
+    ../../.config/hyprpaper/hyprpaper.nix
+    ../../.config/kitty/kitty.nix
+    ../../.config/btop/btop.nix
+    ../../.config/vscode/vscode.nix
+    ../../.config/starship/starship.nix
+    ../../.config/shell/shell.nix
+    ../../.config/windows/windows.nix
   ];
 
   home.username = "cdt";

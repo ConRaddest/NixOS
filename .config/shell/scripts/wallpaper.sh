@@ -20,7 +20,7 @@ wallpaper="$(readlink -f "$wallpaper")"
 # ─── Patch NixOS config ──────────────────────────────────────────────────────
 # Replace the wallpaper path in hyprpaper.nix in-place.
 sed -i "s|wallpaper = \"[^\"]*\";|wallpaper = \"$wallpaper\";|" \
-    "$HOME/OS/config/hyprpaper.nix"
+    "$HOME/OS/.config/hyprpaper/hyprpaper.nix"
 
 # ─── Rebuild ─────────────────────────────────────────────────────────────────
 # Run home-manager switch in a visible terminal so the user can follow progress.

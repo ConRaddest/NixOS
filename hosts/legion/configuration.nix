@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
+# 1. Package search
 # 2. Docker w/ Windows (QEMU)
 # 3. SSH key management (not 1Password)
 # 4. Wifi / Bluetooth UI
@@ -32,12 +33,11 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Required for KVM/QEMU acceleration and later GPU passthrough checks.
-  boot.kernelParams = [ "intel_iommu=on" "iommu=pt" ];
+  # Required for Dockerized QEMU/Windows acceleration and networking.
   boot.kernelModules = [ "kvm-intel" "tun" ];
 
   # ── System ─────────────────────────────────────────────────────────────── #
-  networking.hostName = "nixos";
+  networking.hostName = "legion";
   networking.networkmanager.enable = true;
   networking.networkmanager.wifi.backend = "iwd";
   time.timeZone = "Africa/Johannesburg";
@@ -48,7 +48,7 @@
   users.users.cdt = {
     isNormalUser = true;
     description = "Connor du Toit";
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "kvm" "libvirtd" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "kvm" ];
   };
 
   security.sudo.wheelNeedsPassword = true;
@@ -100,16 +100,9 @@
   services.printing.enable = true;
 
   # ── Virtualisation ─────────────────────────────────────────────────────── #
-  virtualisation.docker.enable = true;
-
-  virtualisation.libvirtd = {
+  virtualisation.docker = {
     enable = true;
-    qemu = {
-      package = pkgs.qemu_kvm;
-      runAsRoot = false;
-    };
   };
-  programs.virt-manager.enable = true;
 
   # ── Audio ──────────────────────────────────────────────────────────────── #
   services.pulseaudio.enable = false;
@@ -209,17 +202,12 @@
     tree
     unzip
 
-    # Dev
+    # General Dev
     python3
     nodejs
     claude-code
     pi-coding-agent
     lazydocker
-    
-    nixd
-    direnv
-    nix-direnv
-    nixfmt
 
     # Virtualisation
     qemu

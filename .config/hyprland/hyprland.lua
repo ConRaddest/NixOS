@@ -161,6 +161,8 @@ local managers = {
   "bluetooth-manager",
   "performance-monitor",
   "audio-manager",
+  "windows-install",
+  "windows-credentials",
   "nixos-refresh",
   "nixos-build",
   "nixos-update",

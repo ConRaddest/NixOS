@@ -53,6 +53,8 @@ ShellRoot {
   property string confirmSelection:   "confirm"
   property bool   openedAsSubmenu:    false
   property string performanceProfile: ""
+  property bool   menuCalculatorEnabled: true
+  property bool   menuWebSearchEnabled:  true
 
   // Derived item lists — recalculated whenever menuQuery or menuStack changes.
   readonly property var menuItems:           launcher.menuItems
@@ -223,12 +225,12 @@ ShellRoot {
       return currentMenuItems
 
     const matches = searchableMenuItems.filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-    const calculation = calculate(query)
+    const calculation = menuCalculatorEnabled ? calculate(query) : null
 
     if (calculation !== null)
       return matches.concat([{ name: query + " = " + calculation, icon: "󰃬", result: calculation, calculator: true }])
 
-    if (matches.length === 0)
+    if (matches.length === 0 && menuWebSearchEnabled)
       return [{ name: "Search: " + query, icon: "󰖟", query: query, googleSearch: true }]
 
     return matches
@@ -439,7 +441,7 @@ ShellRoot {
       root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
       statusProcess.running = false
-      statusProcess.command = ["bash", "-c", "$HOME/OS/quickshell/bar.sh"]
+      statusProcess.command = ["bash", "-c", "$HOME/OS/.config/shell/scripts/bar.sh"]
       statusProcess.running = true
 
       profileProcess.running = false

@@ -3,7 +3,7 @@ import Quickshell
 import Qt.labs.folderlistmodel
 
 // ─── Wallpaper picker window ─────────────────────────────────────────────────
-// Lists images from ~/OS/wallpapers. Selecting one runs wallpaper.sh which
+// Lists images from ~/OS/.config/wallpapers. Selecting one runs wallpaper.sh which
 // patches hyprpaper.nix and triggers a home-manager rebuild.
 FloatingWindow {
   id: wallpaper
@@ -28,14 +28,14 @@ FloatingWindow {
   // Invoke wallpaper.sh with the chosen path, then close the picker.
   function applyWallpaper(path) {
     if (!path || path === "") return
-    shell.runDetached("$HOME/OS/quickshell/wallpaper.sh " + shell.shellQuote(path))
+    shell.runDetached("$HOME/OS/.config/shell/scripts/wallpaper.sh " + shell.shellQuote(path))
     shell.wallpaperOpen = false
   }
 
   // ─── Image source ────────────────────────────────────────────────────────
   FolderListModel {
     id: wallpaperModel
-    folder: wallpaper.shell.homeDir + "/OS/wallpapers"
+    folder: wallpaper.shell.homeDir + "/OS/.config/wallpapers"
     nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
     showDirs: false
     sortField: FolderListModel.Name
@@ -75,7 +75,7 @@ FloatingWindow {
           anchors.left: parent.left
           anchors.leftMargin: 38
           anchors.verticalCenter: parent.verticalCenter
-          text: "~/OS/Wallpapers"
+          text: "~/OS/.config/wallpapers"
           color: wallpaper.shell.fg
           font.family: "monospace"
           font.pixelSize: 14

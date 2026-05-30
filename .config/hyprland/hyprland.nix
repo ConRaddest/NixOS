@@ -7,5 +7,5 @@
   };
 
   xdg.configFile."hypr/hyprland.lua".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/config/hyprland.lua";
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/.config/hyprland/hyprland.lua";
 }
