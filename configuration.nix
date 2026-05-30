@@ -32,6 +32,10 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Required for KVM/QEMU acceleration and later GPU passthrough checks.
+  boot.kernelParams = [ "intel_iommu=on" "iommu=pt" ];
+  boot.kernelModules = [ "kvm-intel" "tun" ];
+
   # ── System ─────────────────────────────────────────────────────────────── #
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
@@ -44,7 +48,7 @@
   users.users.cdt = {
     isNormalUser = true;
     description = "Connor du Toit";
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "kvm" "libvirtd" ];
   };
 
   security.sudo.wheelNeedsPassword = true;
@@ -95,8 +99,17 @@
   # ── Printing ───────────────────────────────────────────────────────────── #
   services.printing.enable = true;
 
-  # ── Docker ─────────────────────────────────────────────────────────────── #
+  # ── Virtualisation ─────────────────────────────────────────────────────── #
   virtualisation.docker.enable = true;
+
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm;
+      runAsRoot = false;
+    };
+  };
+  programs.virt-manager.enable = true;
 
   # ── Audio ──────────────────────────────────────────────────────────────── #
   services.pulseaudio.enable = false;
