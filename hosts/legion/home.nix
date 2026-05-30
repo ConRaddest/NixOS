@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 let
   font = {
@@ -46,6 +46,7 @@ in
     ../../.config/hypridle/hypridle.nix
     ../../.config/hyprpaper/hyprpaper.nix
     ../../.config/kitty/kitty.nix
+    ../../.config/ssh/ssh.nix
     ../../.config/btop/btop.nix
     ../../.config/vscode/vscode.nix
     ../../.config/starship/starship.nix

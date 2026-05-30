@@ -85,6 +85,8 @@ hl.bind("SUPER + E",             hl.dsp.exec_cmd("uwsm -- app nautilus"))
 hl.bind("SUPER + B",             hl.dsp.exec_cmd("uwsm -- app firefox"))
 hl.bind("SUPER + Grave",         hl.dsp.exec_cmd("uwsm -- app code"))
 
+-- WM
+
 -- Universal cut / copy / paste
 local pressed_shortcuts = {}
 
@@ -114,14 +116,16 @@ bind_shortcut_once("SUPER + C", "CTRL",  "Insert", "Universal copy")
 bind_shortcut_once("SUPER + V", "SHIFT", "Insert", "Universal paste")
 
 -- Window Controls
-hl.bind("SUPER + W",             hl.dsp.window.close())
-hl.bind("SUPER + F",             hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
-hl.bind("SUPER + Tab",           hl.dsp.focus({ workspace = "previous" }))
-hl.bind("SUPER + S",             hl.dsp.workspace.toggle_special("scratchpad"))
+hl.bind("SUPER + W",            hl.dsp.window.close())
+hl.bind("SUPER + J",            hl.dsp.layout("togglesplit"))
+hl.bind("SUPER + T",            hl.dsp.window.float({ action = "toggle" }))
+hl.bind("SUPER + F",            hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+hl.bind("SUPER + Tab",          hl.dsp.focus({ workspace = "previous" }))
+hl.bind("SUPER + S",            hl.dsp.workspace.toggle_special("scratchpad"))
 
 -- Resizing
-hl.bind("SUPER + mouse:272",     hl.dsp.window.drag(),   { mouse = true })
-hl.bind("SUPER + mouse:273",     hl.dsp.window.resize(), { mouse = true })
+hl.bind("SUPER + mouse:272",    hl.dsp.window.drag(),   { mouse = true })
+hl.bind("SUPER + mouse:273",    hl.dsp.window.resize(), { mouse = true })
 
 -- Workspaces
 for _, dir in ipairs({ "left", "right", "up", "down" }) do

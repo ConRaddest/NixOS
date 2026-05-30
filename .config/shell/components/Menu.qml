@@ -41,6 +41,8 @@ FloatingWindow {
     { name: "Windows",    icon: "󰖳", command: "windows-vm" },
     { name: "Terminal",   icon: "󰆍", command: "kitty" },
     { name: "Code",       icon: "󰨞", command: "code" },
+    { name: "1Password",  icon: "󰟵", command: "1password" },
+    { name: "Teams",      icon: "󰊻", command: "teams-for-linux" },
   ]
 
   readonly property var menuItems: [

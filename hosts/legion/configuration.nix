@@ -129,6 +129,7 @@
   };
 
   services.gnome.gnome-keyring.enable = true;
+  services.dbus.packages = [ pkgs.gcr ];
   security.pam.services.greetd.enableGnomeKeyring = true;
   security.pam.services.hyprlock = { };
 
@@ -199,7 +200,7 @@
     tldr
     tree
     unzip
-    teams
+    teams-for-linux
 
     # General Dev
     python3
@@ -207,10 +208,11 @@
     claude-code
     pi-coding-agent
     lazydocker
+    _1password-gui
+    _1password-cli
 
     # Virtualisation
     qemu
-    quickemu
 
     # Apps
     firefox
