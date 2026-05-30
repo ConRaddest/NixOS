@@ -8,3 +8,4 @@ dofile(config_dir .. "/config/settings.lua")
 dofile(config_dir .. "/config/animations.lua")
 dofile(config_dir .. "/config/keybindings.lua")
 dofile(config_dir .. "/config/windowrules.lua")
+

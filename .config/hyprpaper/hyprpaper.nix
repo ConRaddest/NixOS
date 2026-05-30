@@ -1,7 +1,7 @@
 { ... }:
 
 let
-  wallpaper = "/home/cdt/OS/.config/wallpapers/deer-sunset.png";
+  wallpaper = "/home/cdt/OS/.config/wallpapers/sunset-lake.png";
 in
 {
   services.hyprpaper = {

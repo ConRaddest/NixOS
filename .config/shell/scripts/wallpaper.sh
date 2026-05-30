@@ -18,12 +18,12 @@ fi
 wallpaper="$(readlink -f "$wallpaper")"
 
 # ─── Patch NixOS config ──────────────────────────────────────────────────────
-# Replace the wallpaper path in hyprpaper.nix in-place.
-sed -i "s|wallpaper = \"[^\"]*\";|wallpaper = \"$wallpaper\";|" \
+# Replace the path in the let-binding line of hyprpaper.nix.
+sed -i "s|^\(  wallpaper = \)\"[^\"]*\";|\1\"$wallpaper\";|" \
     "$HOME/OS/.config/hyprpaper/hyprpaper.nix"
 
 # ─── Rebuild ─────────────────────────────────────────────────────────────────
-# Run home-manager switch in a visible terminal so the user can follow progress.
-kitty --class nixos-refresh --title nixos-refresh -e bash -lc \
-    "home-manager switch --flake \$HOME/OS#\$USER; echo; read -rp 'Press Enter to close...'" &
+# Run nos-refresh in a floating terminal (nixos-refresh window rule makes it float).
+kitty --class nixos-refresh --title nixos-refresh -e bash -lic \
+    "nos-refresh; echo; read -rp 'Press Enter to close...'" &
 disown
