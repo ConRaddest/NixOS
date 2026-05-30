@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
-# 1. Package search
-# 2. Docker w/ Windows (QEMU)
 # 3. SSH key management (not 1Password)
 # 4. Wifi / Bluetooth UI
 # 5. LocalSend integration
@@ -201,6 +199,7 @@
     tldr
     tree
     unzip
+    teams
 
     # General Dev
     python3
