@@ -56,10 +56,10 @@
 
           fade_on_empty = false;
           placeholder_text = "Enter password...";
-          fail_text = "incorrect password";
+          fail_text = "Try again...";
 
-          font_family = "JetBrainsMono Nerd Font";
-          font_size = 16;
+          font_family = "JetBrainsMono Nerd Font Bold";
+          font_size = 18;
           font_color = "rgb(${builtins.substring 1 6 colors.fgDark})";
 
           inner_color = "rgb(${builtins.substring 1 6 colors.bg})";

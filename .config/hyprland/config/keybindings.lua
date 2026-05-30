@@ -76,6 +76,17 @@ for _, b in ipairs(media) do
   hl.bind(b[1], hl.dsp.exec_cmd(b[2]), { locked = true, repeating = true })
 end
 
+-- NixOS
+local function nos_terminal(klass, cmd)
+  return hl.dsp.exec_cmd(
+    "uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. "; echo; read -rp \"Press Enter to close...\"'"
+  )
+end
+
+hl.bind("CTRL + SHIFT + R", nos_terminal("nixos-refresh", "nos-refresh"))
+hl.bind("CTRL + SHIFT + B", nos_terminal("nixos-build",   "nos-build"))
+hl.bind("CTRL + SHIFT + U", nos_terminal("nixos-update",  "nos-update"))
+
 -- Screenshot
 hl.bind("Print", hl.dsp.exec_cmd(
   "mkdir -p ~/Pictures && " ..
