@@ -13,14 +13,11 @@
   # ── Boot ───────────────────────────────────────────────────────────────── #
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  # boot.consoleLogLevel = 0;
-  # boot.kernelParams = [ "quiet" "udev.log_level=3" ];
 
   # ── System ─────────────────────────────────────────────────────────────── #
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
   networking.networkmanager.wifi.backend = "iwd";
-  networking.wireless.iwd.enable = true;
   time.timeZone = "Africa/Johannesburg";
   i18n.defaultLocale = "en_ZA.UTF-8";
   services.xserver.xkb.layout = "za";
@@ -60,19 +57,7 @@
   services.udev.extraRules = ''
     ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
     ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
-    SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
   '';
-
-  systemd.services.rfkill-unblock-bluetooth = {
-    description = "Unblock Bluetooth rfkill";
-    after = [ "bluetooth.service" ];
-    wantedBy = [ "bluetooth.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.util-linux}/bin/rfkill unblock bluetooth";
-      RemainAfterExit = true;
-    };
-  };
 
   # ── Printing ───────────────────────────────────────────────────────────── #
   services.printing.enable = true;
@@ -90,7 +75,7 @@
     pulse.enable = true;
   };
 
-  # ── Hyprland ───────────────────────────────────────────────────────────── #
+  # ── Hyprland & Desktop Portals ─────────────────────────────────────────── #
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
@@ -100,24 +85,20 @@
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "uwsm start hyprland-uwsm.desktop";
+      command = "${pkgs.bash}/bin/bash --login -c 'uwsm start hyprland-uwsm.desktop'";
       user = "cdt";
     };
   };
 
   services.gnome.gnome-keyring.enable = true;
-  services.gnome.gcr-ssh-agent.enable = false;
   security.pam.services.greetd.enableGnomeKeyring = true;
   security.pam.services.hyprlock = { };
 
   environment.sessionVariables = {
-    MOZ_ENABLE_WAYLAND = "1";
-    NIXOS_OZONE_WL = "1";
     GTK_USE_PORTAL = "1";
-    QT_QPA_PLATFORM = "wayland";
   };
 
-  xdg.portal = {
+  services.xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
@@ -126,8 +107,6 @@
     config.common.default = [ "hyprland" "gtk" ];
     config.common."org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
     config.common."org.freedesktop.impl.portal.Settings" = [ "gtk" ];
-    config.common."org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
-    config.common."org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
   };
 
   # ── Fonts ──────────────────────────────────────────────────────────────── #
@@ -141,11 +120,10 @@
   ];
 
   # ── Packages ───────────────────────────────────────────────────────────── #
-  # kitty, btop, yazi, hypridle, hyprlock, hyprpaper are managed by home-manager
   environment.systemPackages = with pkgs; [
     # Hyprland utilities
     hyprpicker
-    polkit_gnome
+    lxqt.lxqt-policykit # Replaced polkit_gnome with a cleaner systemd-friendly agent
     grim
     slurp
     wl-clipboard
@@ -155,6 +133,7 @@
     playerctl
     brightnessctl
     home-manager
+    gtk3
 
     # Shell
     quickshell
