@@ -49,7 +49,7 @@ in
     ./config/btop.nix
     ./config/vscode.nix
     ./config/starship.nix
-    ./config/quickshell.nix
+    ./config/shell.nix
   ];
 
   home.username = "cdt";

@@ -4,9 +4,15 @@
   programs.bash = {
     enable = true;
     shellAliases = {
-      ls = "eza --icons";
-      ll = "eza -la --icons";
-      cd = "z";
+      ls  = "eza --icons";
+      ll  = "eza -la --icons";
+      cd  = "z";
+
+      # NixOS management
+      nos-refresh = "home-manager switch --flake $HOME/OS#$USER";
+      nos-build   = "sudo nixos-rebuild switch --flake $HOME/OS#$HOSTNAME";
+      nos-update  = "nix flake update --flake $HOME/OS && sudo nixos-rebuild switch --flake $HOME/OS#$HOSTNAME";
+      nos-check   = "sudo nixos-rebuild dry-run --flake $HOME/OS#$HOSTNAME";
     };
   };
 
