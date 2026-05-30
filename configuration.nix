@@ -13,6 +13,7 @@
   # ── Boot ───────────────────────────────────────────────────────────────── #
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelModules = [ "btusb" ];
 
   # ── System ─────────────────────────────────────────────────────────────── #
   networking.hostName = "nixos";
@@ -31,9 +32,8 @@
 
   security.sudo.wheelNeedsPassword = true;
   security.polkit.enable = true;
-  programs.ssh.startAgent = true;
 
-  # ── Hardware ───────────────────────────────────────────────────────────── #
+  # ── Graphics ───────────────────────────────────────────────────────────── #
   hardware.graphics.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
@@ -43,17 +43,33 @@
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
-  systemd.services.systemd-rfkill.enable = false;
-  systemd.sockets.systemd-rfkill.enable = false;
-  services.blueman.enable = false;
+  # ── Bluetooth ───────────────────────────────────────────────────────────── #
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
+  # Unblock bluetooth on system startup
+  systemd.services.bluetooth-unblock = {
+    description = "Unblock Bluetooth with rfkill";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "bluetooth.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.util-linux}/bin/rfkill unblock bluetooth";
+    };
+  };
 
   # ── Power ──────────────────────────────────────────────────────────────── #
   services.power-profiles-daemon.enable = true;
   services.thermald.enable = true;
   services.upower.enable = true;
-  services.logind.settings.Login.HandlePowerKey = "ignore";
+  services.logind.settings.Login = {
+    HandlePowerKey = "ignore";
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
+    HandleLidSwitchDocked = "ignore";
+  };
   services.udev.extraRules = ''
     ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
     ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
@@ -74,6 +90,7 @@
     alsa.support32Bit = true;
     pulse.enable = true;
   };
+
 
   # ── Hyprland & Desktop Portals ─────────────────────────────────────────── #
   programs.hyprland = {
@@ -96,9 +113,14 @@
 
   environment.sessionVariables = {
     GTK_USE_PORTAL = "1";
+    MOZ_ENABLE_WAYLAND = "1";
+    NIXOS_OZONE_WL = "1";
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_DESKTOP = "Hyprland";
+    XDG_SESSION_TYPE = "wayland";
   };
 
-  services.xdg.portal = {
+  xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
@@ -133,7 +155,6 @@
     playerctl
     brightnessctl
     home-manager
-    gtk3
 
     # Shell
     quickshell

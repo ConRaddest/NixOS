@@ -240,21 +240,43 @@ ShellRoot {
 
   readonly property string terminal: "kitty"
 
-  // Uses array form to avoid all shell quoting; bash -lic expands aliases.
   function launchTerminal(klass, title, cmd, pause) {
     const shellCmd = pause ? cmd + "; echo; read -rp 'Press Enter to close...'" : cmd
-    launchProcess.command = [terminal, "--class", klass, "--title", title, "-e", "bash", "-lic", shellCmd]
+    const terminalCmd = "exec " + terminal
+      + " --class " + shellQuote(klass)
+      + " --title " + shellQuote(title)
+      + " -e bash -lic " + shellQuote(shellCmd)
+    const finalCmd = "uwsm app -- bash -lc " + shellQuote(terminalCmd)
+
+    launchProcess.command = ["hyprctl", "dispatch", "hl.dsp.exec_cmd(" + luaQuote(finalCmd) + ")"]
     launchProcess.running = true
   }
 
-  // Spawns a command fully detached so it outlives the shell process.
+  // Ask Hyprland to spawn apps so process creation follows the compositor's
+  // normal exec path instead of inheriting Quickshell's QProcess scope.
   function runDetached(command) {
-    launchProcess.command = ["bash", "-lc", "setsid " + command + " >/dev/null 2>&1 &"]
+    const trimmed = command.trim()
+    const shellMeta = /[|&;<>()`$\\\n]/.test(trimmed)
+    const finalCmd = trimmed.startsWith("uwsm app")
+      ? trimmed
+      : shellMeta
+        ? "uwsm app -- bash -lc " + shellQuote(trimmed)
+        : "uwsm app -- " + trimmed
+
+    launchProcess.command = ["hyprctl", "dispatch", "hl.dsp.exec_cmd(" + luaQuote(finalCmd) + ")"]
     launchProcess.running = true
+  }
+
+  function luaQuote(text) {
+    return "\"" + String(text)
+      .replace(/\\/g, "\\\\")
+      .replace(/\"/g, "\\\"")
+      .replace(/\n/g, "\\n")
+      + "\""
   }
 
   function shellQuote(text) {
-    return "'" + String(text).replace(/'/g, "'\\'''") + "'"
+    return "'" + String(text).replace(/'/g, "'\\''") + "'"
   }
 
   function escapeHtml(text) {

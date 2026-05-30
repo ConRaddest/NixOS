@@ -1,11 +1,11 @@
-{ pkgs, font, ... }:
+{ config, pkgs, font, ... }:
 
 {
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;
-    argvSettings."password-store" = "basic";
     profiles.default.extensions = [ pkgs.vscode-extensions.enkia.tokyo-night ];
+
     profiles.default.userSettings = {
       "workbench.colorTheme" = "Tokyo Night";
       "editor.fontFamily" = "'${font.mono}', monospace";
@@ -16,7 +16,12 @@
       "explorer.confirmDelete" = false;
       "files.simpleDialog.enable" = false;
       "git.confirmSync" = false;
-      "files.autoGuessEncoding" = false;
+    };
+
+    argvSettings = {
+      "password-store" = "basic";
+      "enable-crash-reporter" = true;
+	    "crash-reporter-id" = "d82ab34d-9a94-4552-98fc-23b1e3f0737b";
     };
   };
 }

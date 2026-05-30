@@ -9,6 +9,10 @@ end)
 -- Monitor
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
+-- Disable the laptop panel while the lid is closed, and restore it when opened.
+hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,disable"), { locked = true })
+hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1"), { locked = true })
+
 hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })
 hl.workspace_rule({ workspace = "2", monitor = "eDP-1", default = true })
 hl.workspace_rule({ workspace = "3", monitor = "eDP-1", default = true })
@@ -35,6 +39,12 @@ hl.config({
     rounding = 0,
     active_opacity = 0.98,
     inactive_opacity = 0.95,
+    blur = {
+      enabled = true,
+      special = true,
+      size = 6,
+      passes = 2,
+    },
   },
   animations = { enabled = true },
   dwindle = { preserve_split = true },
@@ -51,8 +61,9 @@ local animations = {
   { leaf = "windows",    speed = 4,  bezier = "fast" },
   { leaf = "windowsOut", speed = 4,  bezier = "fast" },
   { leaf = "border",     speed = 8,  bezier = "fast" },
-  { leaf = "fade",       speed = 4,  bezier = "fast" },
-  { leaf = "workspaces", speed = 4,  bezier = "fast" },
+  { leaf = "fade",             speed = 4,  bezier = "fast" },
+  { leaf = "workspaces",       speed = 4,  bezier = "fast" },
+  { leaf = "specialWorkspace", speed = 4,  bezier = "fast", style = "slidevert" },
 }
 
 for _, animation in ipairs(animations) do
@@ -61,20 +72,30 @@ for _, animation in ipairs(animations) do
 end
 
 -- Keybinds
-hl.bind("SUPER + Space",         hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Apps"))
+-- Launchers
 hl.bind("SUPER + SHIFT + Space", hl.dsp.exec_cmd("qs ipc call launcher open"))
+hl.bind("SUPER + Space",         hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Apps"))
 hl.bind("SUPER + ALT + Space",   hl.dsp.exec_cmd("qs ipc call launcher openSubmenu System"))
-hl.bind("SUPER + Return",        hl.dsp.exec_cmd("kitty"))
-hl.bind("SUPER + E",             hl.dsp.exec_cmd("nautilus"))
+hl.bind("XF86PowerOff",          hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Power"), { locked = true })
+
+-- Apps
+hl.bind("SUPER + Return",        hl.dsp.exec_cmd("uwsm -- app kitty"))
+hl.bind("SUPER + E",             hl.dsp.exec_cmd("uwsm -- app nautilus"))
+hl.bind("SUPER + B",             hl.dsp.exec_cmd("uwsm -- app firefox"))
+hl.bind("SUPER + Grave",         hl.dsp.exec_cmd("uwsm -- app code"))
+
+-- Window Controls
 hl.bind("SUPER + W",             hl.dsp.window.close())
 hl.bind("SUPER + F",             hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind("SUPER + T",             hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + Tab",           hl.dsp.focus({ workspace = "previous" }))
-hl.bind("XF86PowerOff",          hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Power"), { locked = true })
+hl.bind("SUPER + S",             hl.dsp.workspace.toggle_special("scratchpad"))
 
+-- Resizing
 hl.bind("SUPER + mouse:272",     hl.dsp.window.drag(),   { mouse = true })
 hl.bind("SUPER + mouse:273",     hl.dsp.window.resize(), { mouse = true })
 
+-- Workspaces
 for _, dir in ipairs({ "left", "right", "up", "down" }) do
   hl.bind("SUPER + " .. dir,             hl.dsp.focus({ direction = dir }))
   hl.bind("SUPER + SHIFT + " .. dir,     hl.dsp.window.move({ direction = dir }))
@@ -104,12 +125,14 @@ hl.bind("Print", hl.dsp.exec_cmd(
   "grim -g \"$(slurp)\" \"$file\" && printf '%s' \"$file\" | wl-copy"
 ))
 
--- Floating panes launched from the status bar.
+-- Floating panes
+-- Managers
 local managers = {
   "wallpaper-picker",
   "wifi-manager",
   "bluetooth-manager",
   "performance-monitor",
+  "audio-manager",
   "nixos-refresh",
   "nixos-build",
   "nixos-update",
@@ -124,6 +147,7 @@ for _, name in ipairs(managers) do
   })
 end
 
+-- Shell launcher
 local launchers = {
   "shell-launcher",
 }
@@ -143,6 +167,7 @@ hl.window_rule({
   size = { 800, 600 },
 })
 
+-- File pickers
 local file_explorers = {
   "xdg-desktop-portal-gtk",
   "org.gnome.Nautilus",

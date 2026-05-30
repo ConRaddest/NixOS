@@ -115,26 +115,29 @@ FloatingWindow {
   }
 
   readonly property var curatedAppItems: [
-    { name: "Browser",    icon: "󰈹", desktop: "firefox" },
-    { name: "Files",      icon: "󰉋", desktop: "org.gnome.Nautilus" },
-    { name: "LocalSend",  icon: "󰒍", desktop: "LocalSend" },
-    { name: "Terminal",   icon: "󰆍", desktop: "kitty" },
-    { name: "Code",       icon: "󰨞", desktop: "code" },
+    { name: "Firefox",    icon: "󰈹", command: "firefox" },
+    { name: "Nautilus",      icon: "󰉋", command: "nautilus" },
+    { name: "LocalSend",  icon: "󰒍", command: "localsend_app" },
+    { name: "Terminal",   icon: "󰆍", command: "kitty" },
+    { name: "Code",       icon: "󰨞", command: "code" },
   ]
 
   readonly property var menuItems: [
     { name: "Apps", icon: "󰀻", items: dynamicApps ? dynamicAppItems : curatedAppItems },
 
     { name: "System", icon: "󰒓", items: [
-      { name: "Refresh",    icon: "󰑐", terminal: { klass: "nixos-refresh", title: "nixos-refresh", cmd: "nos-refresh", pause: true } },
-      { name: "Build",      icon: "󰔷", terminal: { klass: "nixos-build",   title: "nixos-build",   cmd: "nos-build",   pause: true } },
-      { name: "Update",     icon: "󰚰", terminal: { klass: "nixos-update",  title: "nixos-update",  cmd: "nos-update",  pause: true } },
-      { name: "Check",      icon: "󰁨", terminal: { klass: "nixos-check",   title: "nixos-check",   cmd: "nos-check",   pause: true } },
       { name: "Wallpaper",  icon: "󰸉", command: "qs ipc call wallpaper open" },
       { name: "Wi-Fi",      icon: "󰖩", terminal: { klass: "wifi-manager",        title: "wifi-manager",        cmd: "impala" } },
       { name: "Bluetooth",  icon: "󰂯", terminal: { klass: "bluetooth-manager",   title: "bluetooth-manager",   cmd: "bluetui" } },
       { name: "Audio",      icon: "󰕾", terminal: { klass: "audio-manager",       title: "audio-manager",       cmd: "wiremix" } },
-      { name: "Status",     icon: "󰓅", terminal: { klass: "performance-monitor", title: "performance-monitor", cmd: "btop" } },
+      { name: "Status",     icon: "", terminal: { klass: "performance-monitor", title: "performance-monitor", cmd: "btop" } },
+    ] },
+
+    { name: "NixOS", icon: "󱄅", items: [
+      { name: "Build",      icon: "󰔷", terminal: { klass: "nixos-build",   title: "nixos-build",   cmd: "nos-build",   pause: true } },
+      { name: "Update",     icon: "", terminal: { klass: "nixos-update",  title: "nixos-update",  cmd: "nos-update",  pause: true } },
+      { name: "Sync",       icon: "󰑐", terminal: { klass: "nixos-refresh", title: "nixos-refresh", cmd: "nos-refresh", pause: true } },
+      { name: "Check",      icon: "", terminal: { klass: "nixos-check",   title: "nixos-check",   cmd: "nos-check",   pause: true } },
     ] },
 
     { name: "Power", icon: "󰐥", items: [

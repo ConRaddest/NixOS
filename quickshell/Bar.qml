@@ -61,19 +61,24 @@ PanelWindow {
     return null
   }
 
-  // Collect workspace IDs visible on this monitor (occupied + active).
+  // Collect normal workspace IDs visible on this monitor (occupied + active).
+  // Hyprland exposes special/scratchpad workspaces as negative IDs; hide those
+  // from the bar instead of rendering values like -98.
   readonly property var monitorWorkspaceIds: {
     const ids = []
     for (const ws of Hyprland.workspaces.values) {
-      if (ws.monitor?.name === bar.screen.name && !ids.includes(ws.id))
+      if (ws.id > 0 && ws.monitor?.name === bar.screen.name && !ids.includes(ws.id))
         ids.push(ws.id)
     }
     const active = bar.hyprMonitor?.activeWorkspace?.id
-    if (active && !ids.includes(active)) ids.push(active)
+    if (active > 0 && !ids.includes(active)) ids.push(active)
     return ids.sort((a, b) => a - b)
   }
 
-  readonly property int monitorActiveWorkspace: bar.hyprMonitor?.activeWorkspace?.id || 0
+  readonly property int monitorActiveWorkspace: {
+    const active = bar.hyprMonitor?.activeWorkspace?.id || 0
+    return active > 0 ? active : 0
+  }
 
   // ─── Background ──────────────────────────────────────────────────────────
   Rectangle {
