@@ -6,8 +6,9 @@ container="Windows"
 compose_file="${HOME}/.config/windows/docker-compose.yaml"
 
 printf '\033[1;36mStarting Windows VM...\033[0m\n\n'
+echo "Starting Windows container..."
 docker rm -f "$container" >/dev/null 2>&1 || true
-docker compose --file "$compose_file" up -d >/dev/null
+docker compose --progress quiet --file "$compose_file" up -d >/dev/null
 
 echo "Waiting for Windows to be ready..."
 ready=false
@@ -27,7 +28,6 @@ if [[ "$ready" != "true" ]]; then
   exit 1
 fi
 
-echo "Windows is ready — connecting..."
 connected=false
 for _ in $(seq 1 30); do
   setsid windows-vm-rdp >/dev/null 2>&1 &
@@ -38,7 +38,7 @@ for _ in $(seq 1 30); do
     break
   fi
   wait "$rdp_pid" 2>/dev/null || true
-  printf "\rWaiting for RDP service..."
+  echo "Windows is ready — attempting to start session..."
   sleep 3
 done
 printf "\r\033[K"

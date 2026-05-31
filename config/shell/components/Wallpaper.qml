@@ -1,18 +1,15 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Qt.labs.folderlistmodel
 
 // ─── Wallpaper picker window ─────────────────────────────────────────────────
-// Lists images from the config repo's wallpapers directory. Selecting one runs wallpaper.sh which
-// patches hyprpaper.nix and triggers a home-manager rebuild.
 FloatingWindow {
   id: wallpaper
 
   required property var shell
 
-  // Tracks whichever item is highlighted in the list for the live preview.
-  property string selectedPath: wallpaperList.currentItem ? wallpaperList.currentItem.filePath : ""
+  property string query: ""
+  property var wallpaperItems: []
 
   visible: shell.wallpaperOpen
   title: "wallpaper-picker"
@@ -20,176 +17,69 @@ FloatingWindow {
   implicitHeight: 460
   color: shell.bg
 
-  // Strip directory prefix to get just the filename for display.
+  Process { id: wallpaperProcess }
+
+  Process {
+    id: fetchProcess
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const lines = this.text.trim().split("\n").filter(l => l.trim() !== "")
+        wallpaper.wallpaperItems = lines.map(path => ({
+          path: path,
+          name: wallpaper.fileName(path),
+          icon: "󰉏",
+        }))
+      }
+    }
+  }
+
   function fileName(path) {
     const parts = String(path).split("/")
     return parts[parts.length - 1]
   }
 
-  Process {
-    id: wallpaperProcess
+  function displayPath(path) {
+    const home = String(shell.homeDir).replace(/^file:\/\//, "")
+    return String(path).replace(home, "~")
   }
 
-  // Invoke wallpaper.sh with the chosen path, then close the picker.
-  function applyWallpaper(path) {
-    if (!path || path === "") return
-    wallpaperProcess.command = [shell.configDir + "/config/shell/scripts/wallpaper.sh", path]
+  function applyWallpaper(item) {
+    if (!item || !item.path) return
+    wallpaperProcess.command = [shell.configDir + "/config/shell/scripts/wallpaper.sh", item.path]
     wallpaperProcess.running = true
     shell.wallpaperOpen = false
   }
 
-  // ─── Image source ────────────────────────────────────────────────────────
-  FolderListModel {
-    id: wallpaperModel
-    folder: wallpaper.shell.configDir + "/wallpapers"
-    nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
-    showDirs: false
-    sortField: FolderListModel.Name
+  function refresh() {
+    fetchProcess.running = false
+    fetchProcess.command = ["bash", "-c", "find " + shell.shellQuote(shell.configDir + "/wallpapers") + " -maxdepth 1 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\) | sort"]
+    fetchProcess.running = true
   }
 
-  // ─── UI ──────────────────────────────────────────────────────────────────
-  Rectangle {
+  ListPreviewPicker {
+    id: picker
     anchors.fill: parent
-    color: wallpaper.shell.bg
+    shell: wallpaper.shell
+    searchIcon: "󰍉"
+    query: wallpaper.query
+    items: wallpaper.wallpaperItems
+    itemText: function(item) { return item.name }
+    itemIcon: function(item) { return item.icon }
+    itemMatches: function(item, q) { return item.name.toLowerCase().includes(q) }
+    imageSource: function(item) { return item ? "file://" + item.path : "" }
 
-    Column {
-      anchors.fill: parent
-      anchors.margins: 10
-      spacing: 10
+    onQueryEdited: query => wallpaper.query = query
+    onAccepted: item => wallpaper.applyWallpaper(item)
+    onBack: wallpaper.shell.wallpaperOpen = false
+  }
 
-      // ─── Header bar ─────────────────────────────────────────────────────
-      Rectangle {
-        width: parent.width
-        height: 34
-        radius: 5
-        color: "transparent"
-        border.color: wallpaper.shell.surfaceLight
-        border.width: 2
-
-        Text {
-          anchors.left: parent.left
-          anchors.leftMargin: 10
-          anchors.verticalCenter: parent.verticalCenter
-          text: "󰸉"
-          color: wallpaper.shell.accent
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: 14
-          font.weight: Font.Bold
-        }
-
-        Text {
-          anchors.left: parent.left
-          anchors.leftMargin: 38
-          anchors.verticalCenter: parent.verticalCenter
-          text: wallpaper.shell.configDir + "/wallpapers"
-          color: wallpaper.shell.fg
-          font.family: "monospace"
-          font.pixelSize: 14
-          font.weight: Font.Bold
-        }
-      }
-
-      // ─── List + preview ──────────────────────────────────────────────────
-      Row {
-        width: parent.width
-        height: parent.height - 34 - parent.spacing
-        spacing: 10
-
-        // File list — keyboard navigable, enter to apply
-        Rectangle {
-          width: 280
-          height: parent.height
-          radius: 5
-          color: "transparent"
-          border.color: wallpaper.shell.surfaceLight
-          border.width: 2
-
-          ListView {
-            id: wallpaperList
-            anchors.fill: parent
-            anchors.margins: 6
-            clip: true
-            model: wallpaperModel
-            currentIndex: 0
-            focus: wallpaper.shell.wallpaperOpen
-
-            Keys.onEscapePressed: wallpaper.shell.wallpaperOpen = false
-            Keys.onDownPressed: currentIndex = Math.min(currentIndex + 1, count - 1)
-            Keys.onUpPressed: currentIndex = Math.max(currentIndex - 1, 0)
-            Keys.onReturnPressed: if (currentItem) wallpaper.applyWallpaper(currentItem.filePath)
-
-            delegate: Rectangle {
-              required property string fileName
-              required property string filePath
-              required property int index
-
-              width: ListView.view.width
-              height: 28
-              color: ListView.isCurrentItem ? wallpaper.shell.hover : "transparent"
-
-              Row {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                spacing: 10
-
-                Text {
-                  width: 18
-                  text: "󰉏"
-                  color: wallpaper.shell.accent
-                  font.family: "JetBrainsMono Nerd Font"
-                  font.pixelSize: 14
-                  font.weight: Font.Bold
-                  horizontalAlignment: Text.AlignHCenter
-                }
-
-                Text {
-                  text: fileName
-                  color: ListView.isCurrentItem ? wallpaper.shell.fg : "#b7bbcc"
-                  font.family: "monospace"
-                  font.pixelSize: 14
-                  font.weight: Font.Bold
-                  elide: Text.ElideRight
-                  width: 220
-                }
-              }
-
-              MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: wallpaperList.currentIndex = index
-                onClicked: wallpaper.applyWallpaper(filePath)
-              }
-            }
-          }
-        }
-
-        // Live preview — updates as the list selection moves
-        Rectangle {
-          width: parent.width - 280 - parent.spacing
-          height: parent.height
-          radius: 5
-          color: "transparent"
-          border.color: wallpaper.shell.surfaceLight
-          border.width: 2
-
-          Image {
-            anchors.fill: parent
-            anchors.margins: 8
-            source: wallpaper.selectedPath ? "file://" + wallpaper.selectedPath : ""
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            cache: false
-          }
-        }
-      }
+  onVisibleChanged: {
+    if (visible) {
+      query = ""
+      refresh()
+      picker.inputItem.forceActiveFocus()
     }
   }
 
-  // ─── Lifecycle ───────────────────────────────────────────────────────────
-  onVisibleChanged: if (visible) wallpaperList.forceActiveFocus()
-
-  // Hyprland's killactive (SUPER+W) bypasses QML state, so sync wallpaperOpen
-  // back to false when the window is closed by any means.
   onClosed: wallpaper.shell.wallpaperOpen = false
 }

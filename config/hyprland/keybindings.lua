@@ -95,7 +95,7 @@ hl.bind("CTRL + SHIFT + U", nos_terminal("nixos-update",  "nos-update"))
 
 -- Screenshot
 hl.bind("Print", hl.dsp.exec_cmd(
-  "mkdir -p ~/Pictures && " ..
-  "file=\"$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png\" && " ..
-  "grim -g \"$(slurp)\" \"$file\" && printf '%s' \"$file\" | wl-copy"
+  "mkdir -p ~/Screenshots && " ..
+  "file=\"$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png\" && " ..
+  "grim -g \"$(slurp)\" \"$file\" && wl-copy --type image/png < \"$file\""
 ))

@@ -2,6 +2,8 @@
 -- Managers
 local managers = {
   "wallpaper-picker",
+  "screenshot-picker",
+  "shell-clipboard",
   "wifi-manager",
   "bluetooth-manager",
   "performance-monitor",
@@ -27,7 +29,6 @@ end
 -- Shell launcher
 local launchers = {
   "shell-launcher",
-  "shell-clipboard",
 }
 for _, name in ipairs(launchers) do
   hl.window_rule({

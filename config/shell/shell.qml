@@ -37,15 +37,18 @@ ShellRoot {
 
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
-  // Screen used by launcher-adjacent popups such as clipboard. The launcher
-  // window itself is intentionally not bound to this on first map, so Hyprland
-  // can place it on the currently active workspace.
+  // Screen/monitor used by the launcher. It is resolved from Hyprland's active
+  // workspace immediately before opening, then reinforced with a Hyprland move
+  // after mapping to avoid Quickshell's first-window fallback to eDP-1.
   property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
+  property string launcherMonitorName: ""
+  property string launcherWorkspaceName: ""
   property string pendingLauncherSubmenu: ""
 
   // ─── Menu state ──────────────────────────────────────────────────────────
   property bool   menuOpen:           false
   property bool   wallpaperOpen:      false
+  property bool   screenshotsOpen:    false
   property bool   screenShareOpen:    false
   property bool   clipboardOpen:      false
   property string menuQuery:          ""
@@ -139,14 +142,32 @@ ShellRoot {
   function activeWorkspaceScreen(workspaceText) {
     try {
       const workspace = JSON.parse(String(workspaceText || "{}"))
+      if (workspace.monitor) launcherMonitorName = workspace.monitor
+      if (workspace.name) launcherWorkspaceName = workspace.name
       const screen = screenForName(workspace.monitor)
       if (screen) return screen
     } catch (e) {}
 
     const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
+    if (focusedName !== "") launcherMonitorName = focusedName
     return screenForName(focusedName)
       || launcherScreen
       || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
+  }
+
+  function forceLauncherToActiveWorkspace() {
+    if (launcherWorkspaceName === "") return
+    launcherPlacementProcess.running = false
+    launcherPlacementProcess.command = ["bash", "-c",
+      "ws=" + shellQuote(launcherWorkspaceName) + "; "
+      + "for i in $(seq 1 20); do "
+      + "hyprctl dispatch 'hl.dsp.window.move({workspace=\"'\"$ws\"'\", window=\"title:shell-launcher\", silent=true})' >/dev/null 2>&1 && "
+      + "hyprctl dispatch 'hl.dsp.focus({window=\"title:shell-launcher\"})' >/dev/null 2>&1 && "
+      + "hyprctl dispatch 'hl.dsp.window.center({window=\"title:shell-launcher\"})' >/dev/null 2>&1 && exit 0; "
+      + "sleep 0.05; "
+      + "done; true"
+    ]
+    launcherPlacementProcess.running = true
   }
 
   function openLauncherOnActiveWorkspace(submenuName) {
@@ -170,7 +191,10 @@ ShellRoot {
     }
 
     pendingLauncherSubmenu = ""
-    Qt.callLater(function() { root.menuOpen = true })
+    Qt.callLater(function() {
+      root.menuOpen = true
+      Qt.callLater(root.forceLauncherToActiveWorkspace)
+    })
   }
 
   onMenuOpenChanged: {
@@ -287,9 +311,10 @@ ShellRoot {
   }
 
   function closeMenu() {
-    menuOpen       = false
-    wallpaperOpen  = false
-    clipboardOpen  = false
+    menuOpen        = false
+    wallpaperOpen   = false
+    screenshotsOpen = false
+    clipboardOpen   = false
     resetMenu()
   }
 
@@ -400,6 +425,7 @@ ShellRoot {
   // ─── Processes ───────────────────────────────────────────────────────────
 
   Process { id: launchProcess }
+  Process { id: launcherPlacementProcess }
 
   Process {
     id: launcherMonitorProcess
@@ -470,6 +496,15 @@ ShellRoot {
   }
 
   IpcHandler {
+    target: "screenshots"
+    function open(): void   { root.closeMenu(); root.screenshotsOpen = true }
+    function toggle(): void {
+      if (root.screenshotsOpen) root.screenshotsOpen = false
+      else { root.closeMenu(); root.screenshotsOpen = true }
+    }
+  }
+
+  IpcHandler {
     target: "clipboard"
     function open(): void   { root.closeMenu(); root.clipboardOpen = true }
     function toggle(): void {
@@ -503,5 +538,6 @@ ShellRoot {
   Menu        { id: launcher;        shell: root }
   Clipboard   { id: clipboardWindow; shell: root }
   Screenshare { id: screenShare;     shell: root }
-  Wallpaper { shell: root }
+  Screenshots { shell: root }
+  Wallpaper   { shell: root }
 }

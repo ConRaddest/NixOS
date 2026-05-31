@@ -4,12 +4,12 @@
   programs.btop = {
     enable = true;
     settings = {
-      color_theme = "tokyo-night";
+      color_theme = "current";
       vim_keys = true;
     };
   };
 
-  xdg.configFile."btop/themes/tokyo-night.theme".text = ''
+  xdg.configFile."btop/themes/current.theme".text = ''
     theme[main_bg]="${colors.bg}"
     theme[main_fg]="${colors.fg}"
     theme[title]="${colors.fg}"

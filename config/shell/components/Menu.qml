@@ -10,9 +10,7 @@ FloatingWindow {
   property alias menuInputItem: menu.inputItem
   property alias menuListItem: menu.listItem
 
-  // Do not bind this to shell.launcherScreen: on Quickshell's first map that
-  // can still be the initial eDP-1 fallback. Let Hyprland map/center the
-  // floating launcher on the currently active workspace instead.
+  screen: shell.launcherScreen
   visible: shell.menuOpen
   title: "shell-launcher"
   implicitWidth: 600
@@ -41,10 +39,10 @@ FloatingWindow {
     { name: "Nautilus",   icon: "󰉋", command: "nautilus" },
     { name: "LocalSend",  icon: "󰒍", command: "localsend_app" },
     { name: "Windows",    icon: "󰖳", command: "windows-vm" },
-    { name: "Terminal",   icon: "󰆍", command: "kitty" },
     { name: "Code",       icon: "󰨞", command: "code" },
-    { name: "1Password",  icon: "󰟵", command: "1password" },
-    { name: "Teams",      icon: "󰊻", command: "teams-for-linux" },
+    { name: "1Password",  icon: "󰌾", command: "1password" },
+    { name: "Teams",      icon: "󰍡", command: "teams-for-linux" },
+    { name: "Docker",     icon: "", terminal: { klass: "lazy-docker", title: "lazy-docker", cmd: "lazydocker" } },
   ]
 
   readonly property var menuItems: [
@@ -59,9 +57,10 @@ FloatingWindow {
     ] },
 
     { name: "System", icon: "󰒓", items: [
-      { name: "Wallpaper",  icon: "󰸉", command: "qs ipc call wallpaper open" },
-      { name: "Clipboard",  icon: "󰅎", command: "qs ipc call clipboard open" },
-      { name: "Wi-Fi",      icon: "󰖩", terminal: { klass: "wifi-manager",        title: "wifi-manager",        cmd: "impala" } },
+      { name: "Wallpaper",    icon: "󰸉", command: "qs ipc call wallpaper open" },
+      { name: "Clipboard",    icon: "󰅎", command: "qs ipc call clipboard open" },
+      { name: "Screenshots",  icon: "󰹑", command: "qs ipc call screenshots open" },
+      { name: "Wi-Fi",        icon: "󰖩", terminal: { klass: "wifi-manager",        title: "wifi-manager",        cmd: "impala" } },
       { name: "Bluetooth",  icon: "󰂯", terminal: { klass: "bluetooth-manager",   title: "bluetooth-manager",   cmd: "bluetui" } },
       { name: "Audio",      icon: "󰕾", terminal: { klass: "audio-manager",       title: "audio-manager",       cmd: "wiremix" } },
       { name: "Status",     icon: "", terminal: { klass: "performance-monitor", title: "performance-monitor", cmd: "btop" } },
@@ -77,14 +76,14 @@ FloatingWindow {
     { name: "Power", icon: "󰐥", items: [
       { name: "Lock",     icon: "󰌾", command: "hyprlock" },
       { name: "Logout",   icon: "󰍃", command: "uwsm stop",          confirm: true },
-      { name: "Restart",  icon: "󰜉", command: "systemctl reboot",   confirm: true },
+      { name: "Reboot",   icon: "󰜉", command: "systemctl reboot",   confirm: true },
       { name: "Shutdown", icon: "󰐥", command: "systemctl poweroff", confirm: true },
     ] },
 
-    { name: "Speed", icon: "󰓅", items: [
-      { name: "High",   icon: "󱐋", command: "powerprofilesctl set performance" },
-      { name: "Normal", icon: "󰾅", command: "powerprofilesctl set balanced" },
-      { name: "Low",    icon: "󰌪", command: "powerprofilesctl set power-saver" },
+    { name: "Profile", icon: "󰓅", items: [
+      { name: "Performance",   icon: "󱐋", command: "powerprofilesctl set performance" },
+      { name: "Balance", icon: "󰾅", command: "powerprofilesctl set balanced" },
+      { name: "Power Saver",    icon: "󰌪", command: "powerprofilesctl set power-saver" },
     ] },
   ]
 
