@@ -1,7 +1,7 @@
-{ colors, configDir, ... }:
+{ config, colors, ... }:
 
 let
-  wallpaper = "${configDir}/wallpapers/sunset-lake.png";
+  wallpaper = "${config.xdg.stateHome}/nixos-config/current-wallpaper";
 in
 {
   programs.hyprlock = {

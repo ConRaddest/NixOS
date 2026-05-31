@@ -1,16 +1,15 @@
-{ colors, pkgs, configDir, ... }:
+{ self, colors, pkgs, ... }:
 
 let
   mkNosScript = name: script:
     pkgs.writeShellScriptBin name ''
-      export OS_CONFIG_DIR=${pkgs.lib.escapeShellArg configDir}
       exec ${pkgs.bash}/bin/bash ${script} "$@"
     '';
 
-  nos-refresh = mkNosScript "nos-refresh" ../config/starship/scripts/nos-refresh.sh;
-  nos-build   = mkNosScript "nos-build"   ../config/starship/scripts/nos-build.sh;
-  nos-update  = mkNosScript "nos-update"  ../config/starship/scripts/nos-update.sh;
-  nos-check   = mkNosScript "nos-check"   ../config/starship/scripts/nos-check.sh;
+  nos-refresh = mkNosScript "nos-refresh" "${self}/config/starship/scripts/nos-refresh.sh";
+  nos-build   = mkNosScript "nos-build"   "${self}/config/starship/scripts/nos-build.sh";
+  nos-update  = mkNosScript "nos-update"  "${self}/config/starship/scripts/nos-update.sh";
+  nos-check   = mkNosScript "nos-check"   "${self}/config/starship/scripts/nos-check.sh";
 in
 {
   home.packages = [
@@ -54,7 +53,7 @@ in
         format = "[$path]($style) ";
       };
 
-      git_branch = { 
+      git_branch = {
         symbol = "";
         style = "${colors.blue}";
         format = "[$symbol$branch]($style) ";

@@ -1,10 +1,12 @@
-{ config, pkgs, colors, font, configDir, ... }:
+{ self, config, pkgs, colors, font, ... }:
 
+let
+  stateDir = "${config.xdg.stateHome}/nixos-config";
+in
 {
   home.packages = [ pkgs.quickshell ];
 
-  # The only file Nix generates — injects color, font, and config path tokens from home.nix.
-  # Everything else in the config repo is a plain editable file.
+  # The only file Nix generates — injects theme tokens and portable resource/state paths.
   xdg.configFile."quickshell/Theme.qml".text = ''
     import QtQuick
 
@@ -18,23 +20,26 @@
       readonly property string surfaceLight: "${colors.surfaceLight}"
       readonly property string selection:    "${colors.selection}"
       readonly property string monoFont:     "${font.mono}"
-      readonly property string configDir:    "${configDir}"
+
+      readonly property string flakeDir:     "${self}"
+      readonly property string configDir:    "${self}/config"
+      readonly property string wallpaperDir: "${self}/wallpapers"
+      readonly property string stateDir:     "${stateDir}"
     }
   '';
 
-  # All quickshell source files live in the config repo and are symlinked here.
-  xdg.configFile."quickshell/shell.qml" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/config/shell/shell.qml";
-  };
+  xdg.configFile."quickshell/shell.qml".source =
+    "${self}/config/shell/shell.qml";
 
-  xdg.configFile."quickshell/components" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/config/shell/components";
-    recursive = true;
-  };
+  xdg.configFile."quickshell/components".source =
+    "${self}/config/shell/components";
+
+  xdg.configFile."quickshell/scripts".source =
+    "${self}/config/shell/scripts";
 
   xdg.configFile."hypr/xdph.conf".text = ''
     screencopy {
-      custom_picker_binary = ${configDir}/config/shell/scripts/screenshare.sh
+      custom_picker_binary = ${self}/config/shell/scripts/screenshare.sh
     }
   '';
 }

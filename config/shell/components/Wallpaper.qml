@@ -45,14 +45,14 @@ FloatingWindow {
 
   function applyWallpaper(item) {
     if (!item || !item.path) return
-    wallpaperProcess.command = [shell.configDir + "/config/shell/scripts/wallpaper.sh", item.path]
+    wallpaperProcess.command = [shell.configDir + "/shell/scripts/wallpaper.sh", item.path]
     wallpaperProcess.running = true
     shell.wallpaperOpen = false
   }
 
   function refresh() {
     fetchProcess.running = false
-    fetchProcess.command = ["bash", "-c", "find " + shell.shellQuote(shell.configDir + "/wallpapers") + " -maxdepth 1 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\) | sort"]
+    fetchProcess.command = ["bash", "-c", "find " + shell.shellQuote(shell.wallpaperDir) + " -maxdepth 1 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\) | sort"]
     fetchProcess.running = true
   }
 

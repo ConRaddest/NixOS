@@ -1,8 +1,6 @@
-{ pkgs, ... }:
+{ ... }:
 
 let
-  configDir = "/home/cdt/nixos-config";
-
   font = {
     name = "Cantarell";
     size = 11;
@@ -36,33 +34,16 @@ let
     purple   = "#9d7cd8";
   };
 in
-
 {
-  _module.args = { inherit font colors configDir; };
+  _module.args = { inherit font colors; };
 
   imports = [
-    ../../modules/firefox.nix
-    ../../modules/theme.nix
-    ../../modules/hyprland.nix
-    ../../modules/hyprlock.nix
-    ../../modules/hypridle.nix
-    ../../modules/hyprpaper.nix
-    ../../modules/kitty.nix
-    ../../modules/ssh.nix
-    ../../modules/btop.nix
-    ../../modules/vscode.nix
-    ../../modules/starship.nix
-    ../../modules/shell.nix
-    ../../modules/windows.nix
+    ../../modules/home
   ];
 
   home.username = "cdt";
   home.homeDirectory = "/home/cdt";
   home.stateVersion = "26.05";
-
-  home.sessionVariables = {
-    OS_CONFIG_DIR = configDir;
-  };
 
   programs.home-manager.enable = true;
 }

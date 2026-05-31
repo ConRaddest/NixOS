@@ -10,7 +10,7 @@
   };
 
   outputs =
-    { nixpkgs, home-manager, ... }:
+    inputs@{ self, nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -18,16 +18,21 @@
         config.allowUnfree = true;
       };
 
+      specialArgs = {
+        inherit inputs;
+        self = self.outPath;
+      };
+
       legion = nixpkgs.lib.nixosSystem {
-        inherit system;
+        inherit system specialArgs;
         modules = [
-          ./hosts/legion/hardware.nix
-          ./hosts/legion/configuration.nix
+          ./hosts/legion/default.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "hm-backup";
+            home-manager.extraSpecialArgs = specialArgs;
             home-manager.users.cdt = import ./hosts/legion/home.nix;
           }
         ];
@@ -41,6 +46,7 @@
 
       homeConfigurations."cdt" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        extraSpecialArgs = specialArgs;
         modules = [ ./hosts/legion/home.nix ];
       };
     };
