@@ -2,7 +2,7 @@
 
 {
   flake.lib.homeModules.starship =
-    { self, colors, pkgs, ... }:
+    { self, colors, pkgs, homeDirectory, ... }:
 
     let
       mkNosScript = name: script:
@@ -22,6 +22,8 @@
         nos-update
         nos-check
       ];
+
+      home.sessionVariables.OS_CONFIG_DIR = "${homeDirectory}/nixos-config";
 
       programs.bash = {
         enable = true;
