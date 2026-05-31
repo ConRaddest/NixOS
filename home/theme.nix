@@ -12,6 +12,14 @@
     {
       home.packages = [ pkgs.xdg-desktop-portal-gtk ];
 
+      home.pointerCursor = {
+        name = "Adwaita";
+        package = pkgs.adwaita-icon-theme;
+        size = 24;
+        gtk.enable = true;
+        hyprcursor.enable = true;
+      };
+
       gtk = {
         enable = true;
         theme = {
@@ -103,14 +111,6 @@
         font-name = "${font.name} ${toString font.size}";
         document-font-name = "${font.name} ${toString font.size}";
         monospace-font-name = "${font.mono} ${toString font.monoSize}";
-      };
-
-      home.pointerCursor = {
-        name = "Adwaita";
-        package = pkgs.adwaita-icon-theme;
-        size = 24;
-        gtk.enable = true;
-        hyprcursor.enable = true;
       };
     };
 }

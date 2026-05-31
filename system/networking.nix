@@ -1,6 +1,6 @@
 {
   flake.systemModules.networking =
-    { pkgs, ... }:
+    { ... }:
 
     {
       # Use iwd directly, managed from impala/iwctl. Do not run NetworkManager at
@@ -22,11 +22,5 @@
 
       # DNS for iwd's built-in network configuration.
       services.resolved.enable = true;
-
-      # Disable WiFi power management — the driver was sending deauth (reason 4,
-      # from_ap: false) every few minutes, causing periodic disconnects.
-      services.udev.extraRules = ''
-        ACTION=="add", SUBSYSTEM=="net", KERNEL=="wl*", RUN+="${pkgs.iw}/bin/iw dev %k set power_save off"
-      '';
     };
 }
