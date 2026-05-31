@@ -30,10 +30,33 @@
   # Required for Dockerized QEMU/Windows acceleration and networking.
   boot.kernelModules = [ "kvm-intel" "tun" ];
 
+  # Intel Wireless-AC 9560 stability: avoid Wi-Fi power saving disconnects.
+  boot.extraModprobeConfig = ''
+    options iwlwifi power_save=0 uapsd_disable=1
+  '';
+
   # ── System ─────────────────────────────────────────────────────────────── #
   networking.hostName = "legion";
-  networking.networkmanager.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
+
+  # Use iwd directly, managed from impala/iwctl. Do not run NetworkManager at
+  # the same time, otherwise NM and impala/iwd can fight over reconnects.
+  networking.networkmanager.enable = false;
+  networking.useDHCP = false;
+  networking.wireless.iwd = {
+    enable = true;
+    settings = {
+      Settings.AutoConnect = true;
+      General.EnableNetworkConfiguration = true;
+      Network = {
+        EnableIPv6 = true;
+        NameResolvingService = "systemd";
+      };
+    };
+  };
+
+  # DNS for iwd's built-in network configuration.
+  services.resolved.enable = true;
+
   time.timeZone = "Africa/Johannesburg";
   i18n.defaultLocale = "en_ZA.UTF-8";
   services.xserver.xkb.layout = "za";
