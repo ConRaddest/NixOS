@@ -12,14 +12,22 @@
     wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
   };
 
-  outputs = inputs:
+  outputs =
+    inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
       { lib, ... }:
       {
         imports = [
-          (inputs.import-tree ./modules)
+          (inputs.import-tree ./system)
+          (inputs.import-tree ./home)
           (inputs.import-tree ./hosts)
         ];
+
+        options.flake.systemModules = lib.mkOption {
+          type = lib.types.lazyAttrsOf lib.types.raw;
+          default = { };
+          description = "NixOS system modules exported by this flake.";
+        };
 
         options.flake.lib.homeModules = lib.mkOption {
           type = lib.types.lazyAttrsOf lib.types.raw;

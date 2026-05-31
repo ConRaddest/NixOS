@@ -7,9 +7,9 @@ This repo uses the dendritic `flake-parts` + `import-tree` pattern: host files a
 To add a new machine:
 
 1. Create `hosts/<hostname>/default.nix`.
-2. Create `hosts/<hostname>/hardware.nix` that exports `flake.nixosModules.<hostname>Hardware`.
-3. In `hosts/<hostname>/default.nix`, define that host's local settings, compose modules via `self.nixosModules.*` / `self.lib.homeModules.*`, and export:
-   - `flake.nixosModules.<hostname>Configuration`
+2. Create `hosts/<hostname>/hardware.nix` that exports `flake.systemModules.<hostname>Hardware`.
+3. In `hosts/<hostname>/default.nix`, define that host's local settings, compose modules via `self.systemModules.*` / `self.lib.homeModules.*`, and export:
+   - `flake.systemModules.<hostname>Configuration`
    - `flake.nixosConfigurations.<hostname>`
    - optionally `flake.homeConfigurations.<user>`
 
@@ -18,7 +18,6 @@ Host-specific values such as username, full name, home directory, system archite
 Path model:
 
 - `self` points at the immutable flake source in the Nix store.
-- `assets/` contains static resources installed by Home Manager.
+- `config/` contains static resources installed by Home Manager.
 - `wallpapers/` contains static wallpaper files.
-- `~/.local/state/nixos-config/` contains mutable runtime state, such as the current wallpaper symlink.
-- `OS_CONFIG_DIR` is only needed by scripts that mutate/update the real Git checkout.
+- `~/.local/state/nos/` contains mutable runtime state, such as the current wallpaper symlink.
