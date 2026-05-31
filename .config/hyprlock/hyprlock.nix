@@ -1,5 +1,8 @@
-{ colors, ... }:
+{ colors, configDir, ... }:
 
+let
+  wallpaper = "${configDir}/.config/wallpapers/sunset-lake.png";
+in
 {
   programs.hyprlock = {
     enable = true;
@@ -11,14 +14,12 @@
       };
 
       general = {
-        disable_loading_bar = true;
         hide_cursor = true;
-        no_fade_in = false;
       };
 
       background = [
         {
-          path = "screenshot";
+          path = wallpaper;
           blur_passes = 3;
           blur_size = 8;
         }
@@ -59,7 +60,6 @@
           fail_text = "Try again...";
 
           font_family = "JetBrainsMono Nerd Font Bold";
-          font_size = 18;
           font_color = "rgb(${builtins.substring 1 6 colors.fgDark})";
 
           inner_color = "rgb(${builtins.substring 1 6 colors.bg})";

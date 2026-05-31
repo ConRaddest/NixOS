@@ -1,7 +1,7 @@
-{ config, ... }:
+{ config, configDir, ... }:
 
 {
   home.file.".ssh/config" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/OS/.config/ssh/config";
+    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/.config/ssh/config";
   };
 }

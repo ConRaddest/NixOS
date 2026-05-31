@@ -2,6 +2,8 @@
 set -euo pipefail
 
 # ─── Usage ───────────────────────────────────────────────────────────────────
+: "${OS_CONFIG_DIR:?OS_CONFIG_DIR is not set}"
+
 wallpaper="${1:-}"
 
 if [[ -z "$wallpaper" ]]; then
@@ -14,13 +16,28 @@ if [[ ! -f "$wallpaper" ]]; then
     exit 1
 fi
 
-# Resolve symlinks so the path stored in hyprpaper.nix is always absolute.
+# Resolve symlinks and keep paths inside the repo relative to configDir so the
+# repo can move without needing to patch generated absolute paths later.
 wallpaper="$(readlink -f "$wallpaper")"
+if [[ "$wallpaper" == "$OS_CONFIG_DIR"/* ]]; then
+    nix_wallpaper='${configDir}'"${wallpaper#"$OS_CONFIG_DIR"}"
+else
+    nix_wallpaper="$wallpaper"
+fi
 
 # ─── Patch NixOS config ──────────────────────────────────────────────────────
 # Replace the path in the let-binding line of hyprpaper.nix.
-sed -i "s|^\(  wallpaper = \)\"[^\"]*\";|\1\"$wallpaper\";|" \
-    "$HOME/OS/.config/hyprpaper/hyprpaper.nix"
+python3 - "$OS_CONFIG_DIR/.config/hyprpaper/hyprpaper.nix" "$nix_wallpaper" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+wallpaper = sys.argv[2]
+text = path.read_text()
+text = re.sub(r'(?m)^(  wallpaper = ")[^"]*(";)$', r'\1' + wallpaper + r'\2', text, count=1)
+path.write_text(text)
+PY
 
 # ─── Rebuild ─────────────────────────────────────────────────────────────────
 # Run nos-refresh in a floating terminal (nixos-refresh window rule makes it float).

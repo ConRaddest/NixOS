@@ -17,9 +17,6 @@
   programs.kitty = {
     enable = true;
     keybindings = {
-      # Match Hyprland's universal shortcuts:
-      # SUPER+X -> Shift+Delete, SUPER+C -> Ctrl+Insert, SUPER+V -> Shift+Insert.
-      # Terminals cannot truly "cut" scrollback, so Shift+Delete copies selection.
       "shift+delete" = "copy_to_clipboard";
       "ctrl+insert" = "copy_to_clipboard";
       "shift+insert" = "paste_from_clipboard";

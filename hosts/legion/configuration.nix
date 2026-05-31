@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 # ── still to do: ────────────────────────────────────────────────────────────────── #
-
+# 1. inconsistent universal copy paste
 # 6. Firewall / network hardening
 # 8. Backup strategy
 # 10. Default apps / MIME associations
@@ -207,6 +207,9 @@
     lazydocker
     _1password-gui
     _1password-cli
+
+    # Screensaver
+    cmatrix
 
     # Virtualisation
     qemu

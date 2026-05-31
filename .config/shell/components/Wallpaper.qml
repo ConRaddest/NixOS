@@ -4,7 +4,7 @@ import Quickshell.Io
 import Qt.labs.folderlistmodel
 
 // ─── Wallpaper picker window ─────────────────────────────────────────────────
-// Lists images from ~/OS/.config/wallpapers. Selecting one runs wallpaper.sh which
+// Lists images from the config repo's wallpapers directory. Selecting one runs wallpaper.sh which
 // patches hyprpaper.nix and triggers a home-manager rebuild.
 FloatingWindow {
   id: wallpaper
@@ -33,7 +33,7 @@ FloatingWindow {
   // Invoke wallpaper.sh with the chosen path, then close the picker.
   function applyWallpaper(path) {
     if (!path || path === "") return
-    wallpaperProcess.command = [shell.homeDir + "/OS/.config/shell/scripts/wallpaper.sh", path]
+    wallpaperProcess.command = [shell.configDir + "/.config/shell/scripts/wallpaper.sh", path]
     wallpaperProcess.running = true
     shell.wallpaperOpen = false
   }
@@ -41,7 +41,7 @@ FloatingWindow {
   // ─── Image source ────────────────────────────────────────────────────────
   FolderListModel {
     id: wallpaperModel
-    folder: wallpaper.shell.homeDir + "/OS/.config/wallpapers"
+    folder: wallpaper.shell.configDir + "/.config/wallpapers"
     nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
     showDirs: false
     sortField: FolderListModel.Name
@@ -81,7 +81,7 @@ FloatingWindow {
           anchors.left: parent.left
           anchors.leftMargin: 38
           anchors.verticalCenter: parent.verticalCenter
-          text: "~/OS/.config/wallpapers"
+          text: wallpaper.shell.configDir + "/.config/wallpapers"
           color: wallpaper.shell.fg
           font.family: "monospace"
           font.pixelSize: 14

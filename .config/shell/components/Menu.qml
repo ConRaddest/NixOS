@@ -10,7 +10,9 @@ FloatingWindow {
   property alias menuInputItem: menu.inputItem
   property alias menuListItem: menu.listItem
 
-  screen: shell.launcherScreen
+  // Do not bind this to shell.launcherScreen: on Quickshell's first map that
+  // can still be the initial eDP-1 fallback. Let Hyprland map/center the
+  // floating launcher on the currently active workspace instead.
   visible: shell.menuOpen
   title: "shell-launcher"
   implicitWidth: 600

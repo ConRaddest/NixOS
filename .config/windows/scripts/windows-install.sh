@@ -1,10 +1,12 @@
 set -euo pipefail
 
+: "${OS_CONFIG_DIR:?OS_CONFIG_DIR is not set}"
+
 if [[ "${WINDOWS_INSTALL_IN_TERMINAL:-0}" != "1" ]]; then
   exec kitty \
     --class windows-install \
     --title windows-install \
-    -e bash -lc "WINDOWS_INSTALL_IN_TERMINAL=1 windows-install; echo; read -rp 'Press Enter to close...'"
+    -e bash -lc "WINDOWS_INSTALL_IN_TERMINAL=1 windows-install"
 fi
 
 container="Windows"
@@ -21,14 +23,14 @@ fi
 
 if ! [[ -f "$compose_file" ]]; then
   echo "error: missing compose file: $compose_file" >&2
-  echo "Run: home-manager switch --flake ~/OS#cdt" >&2
+  echo "Run: home-manager switch --flake $OS_CONFIG_DIR#cdt" >&2
   exit 1
 fi
 
 echo "Windows VM install"
 echo
 
-echo "Modify ~/OS/.config/windows/docker-compose.yaml to change vm settings..."
+echo "Modify $OS_CONFIG_DIR/.config/windows/docker-compose.yaml to change vm settings..."
 
 username="$(grep -E '^      USERNAME:' "$compose_file" | sed -E 's/^ *USERNAME: *"?([^" ]+)"?.*/\1/' | tail -1)"
 password="$(grep -E '^      PASSWORD:' "$compose_file" | sed -E 's/^ *PASSWORD: *"?([^" ]+)"?.*/\1/' | tail -1)"
@@ -67,5 +69,6 @@ docker compose --file "$compose_file" up -d
 echo
 echo "Windows installer is starting."
 echo "Installer viewer: http://localhost:8006"
-echo "After Windows finishes installing, Apps → Windows opens a dynamic RDP window."
-echo "Manual RDP: windows-vm-rdp $username"
+echo "After Windows finishes installing, Apps → Windows opens a the vm."
+echo
+read -rp "Press Enter to close..."

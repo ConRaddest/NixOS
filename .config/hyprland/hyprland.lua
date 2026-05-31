@@ -1,7 +1,8 @@
-local config_dir = os.getenv("HOME") .. "/OS/.config/hyprland"
+local repo_dir = os.getenv("OS_CONFIG_DIR")
+local config_dir = repo_dir .. "/.config/hyprland"
 
--- Keep this file as the entrypoint loaded by Hyprland.
--- Section files live next to it and are imported from the writable ~/OS repo.
+-- Development entrypoint. The active ~/.config/hypr/hyprland.lua is generated
+-- by home-manager from configDir so Hyprland startup does not depend on env vars.
 dofile(config_dir .. "/config/_startup.lua")
 dofile(config_dir .. "/config/monitors.lua")
 dofile(config_dir .. "/config/settings.lua")

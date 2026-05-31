@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 let
+  configDir = "/home/cdt/OS";
+
   font = {
     name = "Cantarell";
     size = 11;
@@ -36,7 +38,7 @@ let
 in
 
 {
-  _module.args = { inherit font colors; };
+  _module.args = { inherit font colors configDir; };
 
   imports = [
     ../../.config/firefox/firefox.nix
@@ -57,6 +59,10 @@ in
   home.username = "cdt";
   home.homeDirectory = "/home/cdt";
   home.stateVersion = "26.05";
+
+  home.sessionVariables = {
+    OS_CONFIG_DIR = configDir;
+  };
 
   programs.home-manager.enable = true;
 }

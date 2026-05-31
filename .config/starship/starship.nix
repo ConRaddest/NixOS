@@ -1,18 +1,25 @@
-{ colors, ... }:
+{ colors, pkgs, ... }:
 
+let
+  nos-refresh = pkgs.writeShellScriptBin "nos-refresh" (builtins.readFile ./scripts/nos-refresh.sh);
+  nos-build   = pkgs.writeShellScriptBin "nos-build"   (builtins.readFile ./scripts/nos-build.sh);
+  nos-update  = pkgs.writeShellScriptBin "nos-update"  (builtins.readFile ./scripts/nos-update.sh);
+  nos-check   = pkgs.writeShellScriptBin "nos-check"   (builtins.readFile ./scripts/nos-check.sh);
+in
 {
+  home.packages = [
+    nos-refresh
+    nos-build
+    nos-update
+    nos-check
+  ];
+
   programs.bash = {
     enable = true;
     shellAliases = {
       ls  = "eza --icons";
       ll  = "eza -la --icons";
       cd  = "z";
-
-      # NixOS management
-      nos-refresh = "home-manager switch --flake $HOME/OS#$USER";
-      nos-build   = "sudo nixos-rebuild switch --flake $HOME/OS#$HOSTNAME";
-      nos-update  = "nix flake update --flake $HOME/OS && sudo nixos-rebuild switch --flake $HOME/OS#$HOSTNAME";
-      nos-check   = "sudo nixos-rebuild dry-run --flake $HOME/OS#$HOSTNAME";
     };
   };
 

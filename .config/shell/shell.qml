@@ -24,6 +24,7 @@ ShellRoot {
   readonly property string surfaceLight: theme.surfaceLight
   readonly property string selection:    theme.selection
   readonly property string monoFont:     theme.monoFont
+  readonly property string configDir:    theme.configDir
 
   // ─── Bar state ───────────────────────────────────────────────────────────
   // Updated every second by bar.sh via statusProcess.
@@ -36,9 +37,9 @@ ShellRoot {
 
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
-  // Screen used by the launcher. It is set from the cursor position immediately
-  // before opening so first boot does not default the floating window to the
-  // left-most monitor.
+  // Screen used by launcher-adjacent popups such as clipboard. The launcher
+  // window itself is intentionally not bound to this on first map, so Hyprland
+  // can place it on the currently active workspace.
   property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
   property string pendingLauncherSubmenu: ""
 
@@ -126,38 +127,39 @@ ShellRoot {
     return false
   }
 
-  function screenForPoint(px, py) {
+  function screenForName(name) {
+    if (!name) return null
     for (const screen of Quickshell.screens) {
-      if (px >= screen.x && px < screen.x + screen.width
-          && py >= screen.y && py < screen.y + screen.height)
+      if (screen.name === name)
         return screen
     }
+    return null
+  }
+
+  function activeWorkspaceScreen(workspaceText) {
+    try {
+      const workspace = JSON.parse(String(workspaceText || "{}"))
+      const screen = screenForName(workspace.monitor)
+      if (screen) return screen
+    } catch (e) {}
 
     const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
-    if (focusedName !== "") {
-      for (const screen of Quickshell.screens) {
-        if (screen.name === focusedName)
-          return screen
-      }
-    }
-
-    return launcherScreen || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
+    return screenForName(focusedName)
+      || launcherScreen
+      || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
   }
 
-  function openLauncherAtCursor(submenuName) {
+  function openLauncherOnActiveWorkspace(submenuName) {
     closeMenu()
     pendingLauncherSubmenu = submenuName || ""
-    launcherCursorProcess.running = false
-    launcherCursorProcess.command = ["bash", "-c", "hyprctl cursorpos 2>/dev/null || true"]
-    launcherCursorProcess.running = true
+    launcherMonitorProcess.running = false
+    launcherMonitorProcess.command = ["bash", "-c", "hyprctl activeworkspace -j 2>/dev/null || printf '{}'"]
+    launcherMonitorProcess.running = true
   }
 
-  function finishOpenLauncher(cursorText) {
-    const match = String(cursorText).match(/(-?\d+)\s*,\s*(-?\d+)/)
-    if (match) {
-      const screen = screenForPoint(Number(match[1]), Number(match[2]))
-      if (screen) launcherScreen = screen
-    }
+  function finishOpenLauncher(workspaceText) {
+    const screen = activeWorkspaceScreen(workspaceText)
+    if (screen) launcherScreen = screen
 
     if (pendingLauncherSubmenu !== "") {
       let path = []
@@ -168,7 +170,7 @@ ShellRoot {
     }
 
     pendingLauncherSubmenu = ""
-    menuOpen = true
+    Qt.callLater(function() { root.menuOpen = true })
   }
 
   onMenuOpenChanged: {
@@ -400,7 +402,7 @@ ShellRoot {
   Process { id: launchProcess }
 
   Process {
-    id: launcherCursorProcess
+    id: launcherMonitorProcess
     stdout: StdioCollector {
       onStreamFinished: root.finishOpenLauncher(this.text)
     }
@@ -441,7 +443,7 @@ ShellRoot {
       root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
       statusProcess.running = false
-      statusProcess.command = ["bash", "-c", "$HOME/OS/.config/shell/scripts/bar.sh"]
+      statusProcess.command = ["bash", "-c", root.configDir + "/.config/shell/scripts/bar.sh"]
       statusProcess.running = true
 
       profileProcess.running = false
@@ -478,12 +480,12 @@ ShellRoot {
 
   IpcHandler {
     target: "launcher"
-    function open(): void { root.openLauncherAtCursor("") }
+    function open(): void { root.openLauncherOnActiveWorkspace("") }
     function toggle(): void {
       if (root.menuOpen) root.closeMenu()
-      else root.openLauncherAtCursor("")
+      else root.openLauncherOnActiveWorkspace("")
     }
-    function openSubmenu(targetName: string): void { root.openLauncherAtCursor(targetName) }
+    function openSubmenu(targetName: string): void { root.openLauncherOnActiveWorkspace(targetName) }
   }
 
   // ─── Windows ─────────────────────────────────────────────────────────────
