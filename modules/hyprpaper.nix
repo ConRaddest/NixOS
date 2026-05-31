@@ -1,7 +1,7 @@
 { configDir, ... }:
 
 let
-  wallpaper = "${configDir}/.config/wallpapers/sunset-lake.png";
+  wallpaper = "${configDir}/wallpapers/sunset-lake.png";
 in
 {
   services.hyprpaper = {

@@ -30,7 +30,7 @@ fi
 echo "Windows VM install"
 echo
 
-echo "Modify $OS_CONFIG_DIR/.config/windows/docker-compose.yaml to change vm settings..."
+echo "Modify $OS_CONFIG_DIR/config/windows/docker-compose.yaml to change vm settings..."
 
 username="$(grep -E '^      USERNAME:' "$compose_file" | sed -E 's/^ *USERNAME: *"?([^" ]+)"?.*/\1/' | tail -1)"
 password="$(grep -E '^      PASSWORD:' "$compose_file" | sed -E 's/^ *PASSWORD: *"?([^" ]+)"?.*/\1/' | tail -1)"

@@ -1,10 +1,16 @@
-{ colors, pkgs, ... }:
+{ colors, pkgs, configDir, ... }:
 
 let
-  nos-refresh = pkgs.writeShellScriptBin "nos-refresh" (builtins.readFile ./scripts/nos-refresh.sh);
-  nos-build   = pkgs.writeShellScriptBin "nos-build"   (builtins.readFile ./scripts/nos-build.sh);
-  nos-update  = pkgs.writeShellScriptBin "nos-update"  (builtins.readFile ./scripts/nos-update.sh);
-  nos-check   = pkgs.writeShellScriptBin "nos-check"   (builtins.readFile ./scripts/nos-check.sh);
+  mkNosScript = name: script:
+    pkgs.writeShellScriptBin name ''
+      export OS_CONFIG_DIR=${pkgs.lib.escapeShellArg configDir}
+      exec ${pkgs.bash}/bin/bash ${script} "$@"
+    '';
+
+  nos-refresh = mkNosScript "nos-refresh" ../config/starship/scripts/nos-refresh.sh;
+  nos-build   = mkNosScript "nos-build"   ../config/starship/scripts/nos-build.sh;
+  nos-update  = mkNosScript "nos-update"  ../config/starship/scripts/nos-update.sh;
+  nos-check   = mkNosScript "nos-check"   ../config/starship/scripts/nos-check.sh;
 in
 {
   home.packages = [

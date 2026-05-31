@@ -9,6 +9,7 @@ local managers = {
   "windows-install",
   "windows-uninstall",
   "windows-credentials",
+  "windows-vm-start",
   "nixos-refresh",
   "nixos-build",
   "nixos-update",

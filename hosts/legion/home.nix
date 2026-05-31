@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  configDir = "/home/cdt/OS";
+  configDir = "/home/cdt/nixos-config";
 
   font = {
     name = "Cantarell";
@@ -41,19 +41,19 @@ in
   _module.args = { inherit font colors configDir; };
 
   imports = [
-    ../../.config/firefox/firefox.nix
-    ../../.config/theme/theme.nix
-    ../../.config/hyprland/hyprland.nix
-    ../../.config/hyprlock/hyprlock.nix
-    ../../.config/hypridle/hypridle.nix
-    ../../.config/hyprpaper/hyprpaper.nix
-    ../../.config/kitty/kitty.nix
-    ../../.config/ssh/ssh.nix
-    ../../.config/btop/btop.nix
-    ../../.config/vscode/vscode.nix
-    ../../.config/starship/starship.nix
-    ../../.config/shell/shell.nix
-    ../../.config/windows/windows.nix
+    ../../modules/firefox.nix
+    ../../modules/theme.nix
+    ../../modules/hyprland.nix
+    ../../modules/hyprlock.nix
+    ../../modules/hypridle.nix
+    ../../modules/hyprpaper.nix
+    ../../modules/kitty.nix
+    ../../modules/ssh.nix
+    ../../modules/btop.nix
+    ../../modules/vscode.nix
+    ../../modules/starship.nix
+    ../../modules/shell.nix
+    ../../modules/windows.nix
   ];
 
   home.username = "cdt";

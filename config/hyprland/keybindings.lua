@@ -14,32 +14,38 @@ hl.bind("SUPER + Grave",         hl.dsp.exec_cmd("uwsm -- app code"))
 -- WM
 
 -- Universal cut / copy / paste
-local pressed_shortcuts = {}
+local universal_shortcut_pressed = {}
 
 local function send_shortcut_once(mods, key)
-  -- Avoid hl.dsp.send_shortcut here: it can leave synthetic keys pressed in
-  -- some clients. Send an explicit press and release instead.
+  -- Clear any stale synthetic state, then send a short, real-looking tap.
+  hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
   hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
   hl.timer(function()
     hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
-  end, { timeout = 25, type = "oneshot" })
+  end, { timeout = 90, type = "oneshot" })
 end
 
-local function bind_shortcut_once(bind, mods, key, desc)
+local function bind_universal_shortcut(bind, mods, key, desc)
   hl.bind(bind, function()
-    if pressed_shortcuts[bind] then return end
-    pressed_shortcuts[bind] = true
+    if universal_shortcut_pressed[bind] then return end
+    universal_shortcut_pressed[bind] = true
     send_shortcut_once(mods, key)
+
+    -- Safety reset in case Hyprland misses the release event during focus churn.
+    hl.timer(function()
+      universal_shortcut_pressed[bind] = false
+      hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
+    end, { timeout = 1200, type = "oneshot" })
   end, { desc = desc })
 
   hl.bind(bind, function()
-    pressed_shortcuts[bind] = false
+    universal_shortcut_pressed[bind] = false
   end, { release = true })
 end
 
-bind_shortcut_once("SUPER + X", "SHIFT", "Delete", "Universal cut")
-bind_shortcut_once("SUPER + C", "CTRL",  "Insert", "Universal copy")
-bind_shortcut_once("SUPER + V", "SHIFT", "Insert", "Universal paste")
+bind_universal_shortcut("SUPER + X", "SHIFT", "Delete", "Universal cut")
+bind_universal_shortcut("SUPER + C", "CTRL",  "Insert", "Universal copy")
+bind_universal_shortcut("SUPER + V", "SHIFT", "Insert", "Universal paste")
 
 -- Window Controls
 hl.bind("SUPER + W",            hl.dsp.window.close())

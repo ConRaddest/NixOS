@@ -24,17 +24,17 @@
 
   # All quickshell source files live in the config repo and are symlinked here.
   xdg.configFile."quickshell/shell.qml" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/.config/shell/shell.qml";
+    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/config/shell/shell.qml";
   };
 
   xdg.configFile."quickshell/components" = {
-    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/.config/shell/components";
+    source = config.lib.file.mkOutOfStoreSymlink "${configDir}/config/shell/components";
     recursive = true;
   };
 
   xdg.configFile."hypr/xdph.conf".text = ''
     screencopy {
-      custom_picker_binary = ${configDir}/.config/shell/scripts/screenshare.sh
+      custom_picker_binary = ${configDir}/config/shell/scripts/screenshare.sh
     }
   '';
 }

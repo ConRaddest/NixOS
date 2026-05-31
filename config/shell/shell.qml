@@ -443,7 +443,7 @@ ShellRoot {
       root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
       statusProcess.running = false
-      statusProcess.command = ["bash", "-c", root.configDir + "/.config/shell/scripts/bar.sh"]
+      statusProcess.command = ["bash", "-c", root.configDir + "/config/shell/scripts/bar.sh"]
       statusProcess.running = true
 
       profileProcess.running = false

@@ -27,7 +27,7 @@ fi
 
 # ─── Patch NixOS config ──────────────────────────────────────────────────────
 # Replace the path in the let-binding line of hyprpaper.nix.
-python3 - "$OS_CONFIG_DIR/.config/hyprpaper/hyprpaper.nix" "$nix_wallpaper" <<'PY'
+python3 - "$OS_CONFIG_DIR/modules/hyprpaper.nix" "$nix_wallpaper" <<'PY'
 import re
 import sys
 from pathlib import Path
