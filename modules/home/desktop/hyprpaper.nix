@@ -1,36 +1,42 @@
-{ self, config, ... }:
+{ ... }:
 
-let
-  stateDir = "${config.xdg.stateHome}/nixos-config";
-  currentWallpaper = "${stateDir}/current-wallpaper";
-  defaultWallpaper = "${self}/wallpapers/sunset-lake.png";
-in
 {
-  home.activation.ensureCurrentWallpaper = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "${stateDir}"
+  flake.lib.homeModules.hyprpaper =
+    { self, config, ... }:
 
-    if [ ! -e "${currentWallpaper}" ]; then
-      ln -s "${defaultWallpaper}" "${currentWallpaper}"
-    fi
-  '';
+    let
+      stateDir = "${config.xdg.stateHome}/nixos-config";
+      currentWallpaper = "${stateDir}/current-wallpaper";
+      defaultWallpaper = "${self}/wallpapers/sunset-lake.png";
+    in
+    {
+      home.activation.ensureCurrentWallpaper = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+        mkdir -p "${stateDir}"
 
-  services.hyprpaper = {
-    enable = true;
+        if [ ! -e "${currentWallpaper}" ]; then
+          ln -s "${defaultWallpaper}" "${currentWallpaper}"
+        fi
+      '';
 
-    settings = {
-      splash = false;
+      services.hyprpaper = {
+        enable = true;
 
-      preload = [
-        currentWallpaper
-      ];
+        settings = {
+          splash = false;
 
-      wallpaper = [
-        {
-          monitor = ""; # Empty string applies to all monitors
-          path = currentWallpaper;
-          fit_mode = "cover";
-        }
-      ];
-    };
-  };
+          preload = [
+            currentWallpaper
+          ];
+
+          wallpaper = [
+            {
+              monitor = ""; # Empty string applies to all monitors
+              path = currentWallpaper;
+              fit_mode = "cover";
+            }
+          ];
+        };
+      };
+    }
+;
 }

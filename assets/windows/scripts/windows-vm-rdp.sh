@@ -16,7 +16,7 @@ if [[ -f "$config_file" ]]; then
   source "$config_file"
 fi
 
-user="${1:-${USERNAME:-cdt}}"
+user="${1:-${USERNAME:-}}"
 pass="${PASSWORD:-}"
 args_file="$(mktemp --tmpdir windows-vm-rdp.XXXXXX)"
 chmod 600 "$args_file"

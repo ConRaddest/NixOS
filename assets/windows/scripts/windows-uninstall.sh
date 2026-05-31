@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
 if [[ "${WINDOWS_UNINSTALL_IN_TERMINAL:-0}" != "1" ]]; then

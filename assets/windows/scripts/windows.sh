@@ -54,8 +54,8 @@ prompt_credentials() {
     -e bash -lc '
       set -euo pipefail
       config_file="$HOME/VMs/windows/config.env"
-      read -rp "Windows username [cdt]: " user
-      user="${user:-cdt}"
+      read -rp "Windows username []: " user
+      user="${user:-}"
       read -rsp "Windows password: " pass
       echo
       mkdir -p "$(dirname "$config_file")"

@@ -1,38 +1,44 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
-  environment.systemPackages = with pkgs; [
-    # Hyprland utilities / desktop integration
-    hyprpicker
-    lxqt.lxqt-policykit
-    grim
-    slurp
-    wl-clipboard
-    pamixer
-    wiremix
-    libnotify
-    playerctl
-    brightnessctl
-    cliphist
+  flake.nixosModules.packages =
+    { pkgs, ... }:
 
-    # Shell / system integration
-    home-manager
-    quickshell
+    {
+      environment.systemPackages = with pkgs; [
+        # Hyprland utilities / desktop integration
+        hyprpicker
+        lxqt.lxqt-policykit
+        grim
+        slurp
+        wl-clipboard
+        pamixer
+        wiremix
+        libnotify
+        playerctl
+        brightnessctl
+        cliphist
 
-    # Bluetooth / Wi-Fi
-    bluetui
-    impala
-    iwd
+        # Shell / system integration
+        home-manager
+        quickshell
 
-    # Virtualisation
-    qemu
+        # Bluetooth / Wi-Fi
+        bluetui
+        impala
+        iwd
 
-    # Secrets
-    _1password-gui
-    _1password-cli
+        # Virtualisation
+        qemu
 
-    # System tools
-    pciutils
-    usbutils
-  ];
+        # Secrets
+        _1password-gui
+        _1password-cli
+
+        # System tools
+        pciutils
+        usbutils
+      ];
+    }
+;
 }

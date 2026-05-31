@@ -25,7 +25,7 @@ ShellRoot {
   readonly property string selection:    theme.selection
   readonly property string monoFont:     theme.monoFont
   readonly property string flakeDir:     theme.flakeDir
-  readonly property string configDir:    theme.configDir
+  readonly property string assetDir:     theme.assetDir
   readonly property string wallpaperDir: theme.wallpaperDir
   readonly property string stateDir:     theme.stateDir
 
@@ -472,7 +472,7 @@ ShellRoot {
       root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
       statusProcess.running = false
-      statusProcess.command = ["bash", "-c", root.configDir + "/shell/scripts/bar.sh"]
+      statusProcess.command = ["bash", "-c", root.assetDir + "/shell/scripts/bar.sh"]
       statusProcess.running = true
 
       profileProcess.running = false

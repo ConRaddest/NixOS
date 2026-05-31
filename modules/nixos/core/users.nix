@@ -1,12 +1,18 @@
 { ... }:
 
 {
-  users.users.cdt = {
-    isNormalUser = true;
-    description = "Connor du Toit";
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "kvm" ];
-  };
+  flake.nixosModules.users =
+    { username, fullName, ... }:
 
-  security.sudo.wheelNeedsPassword = true;
-  security.polkit.enable = true;
+    {
+      users.users.${username} = {
+        isNormalUser = true;
+        description = fullName;
+        extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "kvm" ];
+      };
+
+      security.sudo.wheelNeedsPassword = true;
+      security.polkit.enable = true;
+    }
+;
 }

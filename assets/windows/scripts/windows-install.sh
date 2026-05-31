@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
 : "${OS_CONFIG_DIR:?OS_CONFIG_DIR is not set}"
@@ -23,18 +24,18 @@ fi
 
 if ! [[ -f "$compose_file" ]]; then
   echo "error: missing compose file: $compose_file" >&2
-  echo "Run: home-manager switch --flake $OS_CONFIG_DIR#cdt" >&2
+  echo "Run: home-manager switch --flake $OS_CONFIG_DIR#" >&2
   exit 1
 fi
 
 echo "Windows VM install"
 echo
 
-echo "Modify $OS_CONFIG_DIR/config/windows/docker-compose.yaml to change vm settings..."
+echo "Modify $OS_CONFIG_DIR/assets/windows/docker-compose.yaml to change vm settings..."
 
 username="$(grep -E '^      USERNAME:' "$compose_file" | sed -E 's/^ *USERNAME: *"?([^" ]+)"?.*/\1/' | tail -1)"
 password="$(grep -E '^      PASSWORD:' "$compose_file" | sed -E 's/^ *PASSWORD: *"?([^" ]+)"?.*/\1/' | tail -1)"
-username="${username:-cdt}"
+username="${username:-}"
 password="${password:-admin}"
 
 if docker ps -a --format '{{.Names}}' | grep -qx "$container"; then

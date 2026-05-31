@@ -1,5 +1,11 @@
 { ... }:
 
 {
-  virtualisation.docker.enable = true;
+  flake.nixosModules.docker =
+    { ... }:
+
+    {
+      virtualisation.docker.enable = true;
+    }
+;
 }

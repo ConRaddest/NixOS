@@ -45,7 +45,7 @@ FloatingWindow {
 
   function applyWallpaper(item) {
     if (!item || !item.path) return
-    wallpaperProcess.command = [shell.configDir + "/shell/scripts/wallpaper.sh", item.path]
+    wallpaperProcess.command = [shell.assetDir + "/shell/scripts/wallpaper.sh", item.path]
     wallpaperProcess.running = true
     shell.wallpaperOpen = false
   }

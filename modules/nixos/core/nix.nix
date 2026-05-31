@@ -1,13 +1,19 @@
 { ... }:
 
 {
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  flake.nixosModules.nix =
+    { ... }:
 
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 10d";
-  };
+    {
+      nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  nixpkgs.config.allowUnfree = true;
+      nix.gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 10d";
+      };
+
+      nixpkgs.config.allowUnfree = true;
+    }
+;
 }

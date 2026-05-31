@@ -7,47 +7,35 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
+    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
   };
 
-  outputs =
-    inputs@{ self, nixpkgs, home-manager, ... }:
-    let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-
-      specialArgs = {
-        inherit inputs;
-        self = self.outPath;
-      };
-
-      legion = nixpkgs.lib.nixosSystem {
-        inherit system specialArgs;
-        modules = [
-          ./hosts/legion/default.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "hm-backup";
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.cdt = import ./hosts/legion/home.nix;
-          }
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+      { lib, ... }:
+      {
+        imports = [
+          (inputs.import-tree ./modules)
+          (inputs.import-tree ./hosts)
         ];
-      };
-    in
-    {
-      nixosConfigurations = {
-        legion = legion;
-        nixos = legion;
-      };
 
-      homeConfigurations."cdt" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        extraSpecialArgs = specialArgs;
-        modules = [ ./hosts/legion/home.nix ];
-      };
-    };
+        options.flake.lib.homeModules = lib.mkOption {
+          type = lib.types.lazyAttrsOf lib.types.raw;
+          default = { };
+          description = "Home Manager modules exported by this flake.";
+        };
+
+        config = {
+          systems = [ "x86_64-linux" ];
+
+          perSystem =
+            { pkgs, ... }:
+            {
+              formatter = pkgs.nixfmt;
+            };
+        };
+      }
+    );
 }
