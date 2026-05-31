@@ -80,7 +80,7 @@ FloatingWindow {
       { name: "Shutdown", icon: "󰐥", command: "systemctl poweroff", confirm: true },
     ] },
 
-    { name: "Profile", icon: "󰓅", items: [
+    { name: "Profile", icon: "󰁹", items: [
       { name: "Performance",   icon: "󱐋", command: "powerprofilesctl set performance" },
       { name: "Balance", icon: "󰾅", command: "powerprofilesctl set balanced" },
       { name: "Power Saver",    icon: "󰌪", command: "powerprofilesctl set power-saver" },
