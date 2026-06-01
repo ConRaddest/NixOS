@@ -13,6 +13,21 @@ hl.monitor({
   scale = 1,
 })
 
+-- Fallbacks for docks, missing external displays, or monitor name/mode changes.
+hl.monitor({
+  output = "eDP-1",
+  mode = "preferred",
+  position = "0x0",
+  scale = 1,
+})
+
+hl.monitor({
+  output = "",
+  mode = "preferred",
+  position = "auto",
+  scale = 1,
+})
+
 hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })
 hl.workspace_rule({ workspace = "2", monitor = "eDP-1", default = true })
 hl.workspace_rule({ workspace = "3", monitor = "eDP-1", default = true })

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${OS_CONFIG_DIR:?OS_CONFIG_DIR is not set}"
+NOS_DIR="/home/cdt/.local/nos"
+export NOS_DIR
 
 if [[ "${WINDOWS_INSTALL_IN_TERMINAL:-0}" != "1" ]]; then
   exec kitty \
@@ -24,14 +25,14 @@ fi
 
 if ! [[ -f "$compose_file" ]]; then
   echo "error: missing compose file: $compose_file" >&2
-  echo "Run: home-manager switch --flake $OS_CONFIG_DIR#" >&2
+  echo "Run: home-manager switch --flake $NOS_DIR#" >&2
   exit 1
 fi
 
 echo "Windows VM install"
 echo
 
-echo "Modify $OS_CONFIG_DIR/config/windows/docker-compose.yaml to change vm settings..."
+echo "Modify $NOS_DIR/config/windows/docker-compose.yaml to change vm settings..."
 
 username="$(grep -E '^      USERNAME:' "$compose_file" | sed -E 's/^ *USERNAME: *"?([^" ]+)"?.*/\1/' | tail -1)"
 password="$(grep -E '^      PASSWORD:' "$compose_file" | sed -E 's/^ *PASSWORD: *"?([^" ]+)"?.*/\1/' | tail -1)"

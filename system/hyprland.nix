@@ -14,7 +14,6 @@
       services.gnome.gnome-keyring.enable = true;
       services.dbus.packages = [ pkgs.gcr ];
       security.pam.services.greetd.enableGnomeKeyring = true;
-      security.pam.services.hyprlock = { };
 
       environment.sessionVariables = {
         GTK_USE_PORTAL = "1";
