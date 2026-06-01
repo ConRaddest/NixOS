@@ -47,7 +47,7 @@ ShellRoot {
 
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
-  property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
+  property var launcherScreen: null
   property string pendingLauncherSubmenu: ""
 
   // ─── Menu state ──────────────────────────────────────────────────────────
@@ -160,7 +160,7 @@ ShellRoot {
       }
     }
 
-    root.menuOpen = true
+    Qt.callLater(() => root.menuOpen = true)
   }
 
   onMenuOpenChanged: {

@@ -2,7 +2,6 @@
 hl.window_rule({
   match = { title = "shell-launcher" },
   float = true,
-  center = true,
   size = { 450, 400 },
 })
 
