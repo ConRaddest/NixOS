@@ -49,6 +49,7 @@ ShellRoot {
 
   property var launcherScreen: null
   property string pendingLauncherSubmenu: ""
+  property string pendingLauncherMonitor: ""
 
   // ─── Menu state ──────────────────────────────────────────────────────────
   property bool   menuOpen:           false
@@ -151,6 +152,7 @@ ShellRoot {
     const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
     const screen = screenForName(focusedName) || launcherScreen || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
     if (screen) launcherScreen = screen
+    pendingLauncherMonitor = focusedName
 
     if (submenuName) {
       let path = []
@@ -387,6 +389,23 @@ ShellRoot {
       if (index !== text.length || !isFinite(value)) return null
       return Number(value.toFixed(10)).toString()
     } catch (e) { return null }
+  }
+
+  // ─── Launcher monitor correction ─────────────────────────────────────────
+  // When the launcher window first maps, Hyprland places it on whichever
+  // monitor it picks (often the integrated one). We intercept the openwindow
+  // IPC event and immediately move it to the monitor that was focused when
+  // the launcher was requested.
+
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) {
+      if (!root.pendingLauncherMonitor) return
+      if (event.name !== "openwindow") return
+      if (!event.data.endsWith(",shell-launcher")) return
+      Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
+      root.pendingLauncherMonitor = ""
+    }
   }
 
   // ─── Processes ───────────────────────────────────────────────────────────
