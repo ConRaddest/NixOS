@@ -421,8 +421,10 @@ ShellRoot {
     id: launcherMoveTimer
     interval: 300
     onTriggered: {
-      if (!root.pendingLauncherMonitor) return
-      Hyprland.dispatch("hl.dsp.focus({window=\"shell-launcher\"})")
+      if (!root.pendingLauncherMonitor || !root.menuOpen) return
+      // Only act if the launcher is actually the active window — never touch other windows.
+      const active = Hyprland.activeToplevel
+      if (!active || active.title !== "shell-launcher") return
       Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
       Hyprland.dispatch("hl.dsp.window.center()")
       root.pendingLauncherMonitor = ""
