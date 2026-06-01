@@ -5,9 +5,10 @@
     { self, config, ... }:
 
     let
+      theme = import "${self}/themes/current.nix";
       stateDir = "${config.xdg.stateHome}/nos";
       currentWallpaper = "${stateDir}/current-wallpaper";
-      defaultWallpaper = "${self}/wallpapers/sunset-lake.png";
+      defaultWallpaper = "${self}/themes/${theme.id}/wallpapers/${theme.wallpaper}";
     in
     {
       home.activation.ensureCurrentWallpaper = config.lib.dag.entryAfter [ "writeBoundary" ] ''

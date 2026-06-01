@@ -102,7 +102,7 @@ FloatingWindow {
     id: picker
     anchors.fill: parent
     shell: clipboardWindow.shell
-    searchIcon: "󰅎"
+    searchIcon: "󰍉"
     query: clipboardWindow.clipQuery
     items: clipboardWindow.clipItems
     itemText: function(item) { return item.display }

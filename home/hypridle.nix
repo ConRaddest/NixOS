@@ -4,6 +4,10 @@
   flake.lib.homeModules.hypridle =
     { ... }:
 
+    let
+      dpmsOff = "hyprctl eval 'hl.dispatch(hl.dsp.dpms({ action = \"disable\" }))'";
+      dpmsOn = "hyprctl eval 'hl.dispatch(hl.dsp.dpms({ action = \"enable\" }))'";
+    in
     {
       services.hypridle = {
         enable = true;
@@ -11,22 +15,18 @@
           general = {
             lock_cmd = "hyprlock";
             before_sleep_cmd = "hyprlock";
-            after_sleep_cmd = "hyprctl dispatch dpms on";
+            after_sleep_cmd = dpmsOn;
           };
+
           listener = [
             {
               timeout = 300;
-              on-timeout = "brightnessctl set 20%";
-              on-resume = "brightnessctl set 100%";
+              on-timeout = dpmsOff;
+              on-resume = dpmsOn;
             }
             {
               timeout = 600;
               on-timeout = "hyprlock";
-            }
-            {
-              timeout = 900;
-              on-timeout = "hyprctl dispatch dpms off";
-              on-resume = "hyprctl dispatch dpms on";
             }
           ];
         };

@@ -5,6 +5,7 @@
     {
       config,
       pkgs,
+      self,
       colors,
       font,
       ...
@@ -12,6 +13,7 @@
 
     let
       nos = "${config.home.homeDirectory}/.local/nos";
+      theme = import "${self}/themes/current.nix";
       stateDir = "${config.xdg.stateHome}/nos";
       sym = config.lib.file.mkOutOfStoreSymlink;
     in
@@ -35,7 +37,8 @@
 
           readonly property string flakeDir:     "${nos}"
           readonly property string assetDir:     "${nos}/config"
-          readonly property string wallpaperDir: "${nos}/wallpapers"
+          readonly property string wallpaperDir: "${nos}/themes/${theme.id}/wallpapers"
+          readonly property string themeDir:     "${nos}/themes"
           readonly property string stateDir:     "${stateDir}"
         }
       '';

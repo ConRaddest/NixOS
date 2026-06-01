@@ -27,6 +27,7 @@ ShellRoot {
   readonly property string flakeDir:     theme.flakeDir
   readonly property string assetDir:     theme.assetDir
   readonly property string wallpaperDir: theme.wallpaperDir
+  readonly property string themeDir:     theme.themeDir
   readonly property string stateDir:     theme.stateDir
 
   // ─── Bar state ───────────────────────────────────────────────────────────
@@ -59,6 +60,7 @@ ShellRoot {
   property bool   screenshotsOpen:    false
   property bool   screenShareOpen:    false
   property bool   clipboardOpen:      false
+  property bool   themeOpen:          false
   property string menuQuery:          ""
   property var    menuStack:          []
   property var    confirmItem:        null
@@ -323,6 +325,7 @@ ShellRoot {
     wallpaperOpen   = false
     screenshotsOpen = false
     clipboardOpen   = false
+    themeOpen       = false
     resetMenu()
   }
 
@@ -495,6 +498,12 @@ ShellRoot {
   // ─── IPC ─────────────────────────────────────────────────────────────────
 
   IpcHandler {
+    target: "theme"
+    function open(): void   { root.closeMenu(); root.themeOpen = true }
+    function toggle(): void { root.closeMenu(); root.themeOpen = !root.themeOpen }
+  }
+
+  IpcHandler {
     target: "wallpaper"
     function open(): void   { root.closeMenu(); root.wallpaperOpen = true }
     function toggle(): void { root.closeMenu(); root.wallpaperOpen = !root.wallpaperOpen }
@@ -570,6 +579,7 @@ ShellRoot {
     }
   }
 
+  ThemePicker { shell: root }
   Menu        { id: launcher;        shell: root }
   Clipboard   { id: clipboardWindow; shell: root }
   Screenshare { id: screenShare;     shell: root }

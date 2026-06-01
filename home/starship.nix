@@ -23,6 +23,7 @@
       nos-update = mkNosScript "nos-update" "${self}/config/starship/scripts/nos-update.sh";
       nos-check = mkNosScript "nos-check" "${self}/config/starship/scripts/nos-check.sh";
       nos-fmt = mkNosScript "nos-fmt" "${self}/config/starship/scripts/nos-fmt.sh";
+      nos-theme = mkNosScript "nos-theme" "${self}/config/starship/scripts/nos-theme.sh";
     in
     {
       home.packages = [
@@ -31,6 +32,7 @@
         nos-update
         nos-check
         nos-fmt
+        nos-theme
       ];
 
       programs.bash = {

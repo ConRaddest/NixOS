@@ -2,6 +2,8 @@
 -- Managers
 local managers = {
   "wallpaper-picker",
+  "theme-picker",
+  "theme-apply",
   "screenshot-picker",
   "shell-clipboard",
   "wifi-manager",

@@ -58,6 +58,7 @@ FloatingWindow {
 
     { name: "System", icon: "󰒓", items: [
       { name: "Wallpaper",    icon: "󰸉", command: "qs ipc call wallpaper open" },
+      { name: "Theme",        icon: "󰏘", command: "qs ipc call theme open" },
       { name: "Clipboard",    icon: "󰅎", command: "qs ipc call clipboard open" },
       { name: "Screenshots",  icon: "󰹑", command: "qs ipc call screenshots open" },
       { name: "Wi-Fi",        icon: "󰖩", terminal: { klass: "wifi-manager",        title: "wifi-manager",        cmd: "impala" } },

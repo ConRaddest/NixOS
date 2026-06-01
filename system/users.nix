@@ -2,12 +2,18 @@
 
 {
   flake.systemModules.users =
-    { username, fullName, ... }:
+    {
+      pkgs,
+      username,
+      fullName,
+      ...
+    }:
 
     {
       users.users.${username} = {
         isNormalUser = true;
         description = fullName;
+        shell = pkgs.bash;
         extraGroups = [
           "wheel"
           "networkmanager"
@@ -19,6 +25,7 @@
       };
 
       security.sudo.wheelNeedsPassword = true;
+      security.sudo.extraConfig = "Defaults pwfeedback";
       security.polkit.enable = true;
     };
 }

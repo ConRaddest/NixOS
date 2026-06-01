@@ -21,5 +21,6 @@ wallpaper="$(readlink -f "$wallpaper")"
 ln -sfn "$wallpaper" "$current_wallpaper"
 
 if command -v hyprctl >/dev/null 2>&1; then
-    hyprctl hyprpaper reload ,"$current_wallpaper" || true
+    hyprctl hyprpaper preload "$wallpaper" >/dev/null 2>&1 || true
+    hyprctl hyprpaper wallpaper ",$wallpaper"
 fi
