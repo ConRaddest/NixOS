@@ -24,6 +24,25 @@
       };
 
       # DNS for iwd's built-in network configuration.
-      services.resolved.enable = true;
+      services.resolved = {
+        enable = true;
+        fallbackDns = [
+          "1.1.1.1"
+          "8.8.8.8"
+        ];
+      };
+
+      networking.hosts = {
+        "127.0.0.1" = [
+          "management-local.pmis.servicesseta.org.za"
+          "partner-local.pmis.servicesseta.org.za"
+          "learner-local.pmis.servicesseta.org.za"
+        ];
+        "::1" = [
+          "management-local.pmis.servicesseta.org.za"
+          "partner-local.pmis.servicesseta.org.za"
+          "learner-local.pmis.servicesseta.org.za"
+        ];
+      };
     };
 }

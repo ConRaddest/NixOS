@@ -78,7 +78,7 @@ for ws = 1, 9 do
 end
 
 -- Media / brightness keys
-local osd = os.getenv("HOME") .. "/.local/nos/config/shell/scripts/osd.sh"
+local osd = os.getenv("HOME") .. "/NixOS/config/shell/scripts/osd.sh"
 
 local media = {
   { "XF86AudioRaiseVolume",  "bash " .. osd .. " volume up" },

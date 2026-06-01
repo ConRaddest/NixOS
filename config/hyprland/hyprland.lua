@@ -1,4 +1,4 @@
-local config_dir = os.getenv("HOME") .. "/.local/nos/config/hyprland"
+local config_dir = os.getenv("HOME") .. "/NixOS/config/hyprland"
 
 dofile(config_dir .. "/_startup.lua")
 dofile(config_dir .. "/monitors.lua")

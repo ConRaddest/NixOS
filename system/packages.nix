@@ -50,6 +50,9 @@
         # system packages
         pciutils
         usbutils
+
+        # nautilus trash support
+        gvfs
       ];
     };
 }

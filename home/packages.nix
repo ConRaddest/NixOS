@@ -37,6 +37,8 @@
         teams-for-linux
         python3
         nodejs
+        dotnet-sdk_10
+        mkcert
         claude-code
         pi-coding-agent
         lazydocker

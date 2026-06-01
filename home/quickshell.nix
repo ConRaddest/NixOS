@@ -12,7 +12,7 @@
     }:
 
     let
-      nos = "${config.home.homeDirectory}/.local/nos";
+      nos = "${config.home.homeDirectory}/NixOS";
       theme = import "${self}/themes/current.nix";
       stateDir = "${config.xdg.stateHome}/nos";
       sym = config.lib.file.mkOutOfStoreSymlink;

@@ -122,13 +122,14 @@ PanelWindow {
           required property int modelData
 
           readonly property bool active: (Hyprland.focusedWorkspace?.id || 0) === modelData
+          readonly property bool monitorActive: !active && bar.monitorActiveWorkspace === modelData
 
           width: 22
           height: 22
           radius: 6
           color: active ? bar.shell.bgElevated : "transparent"
-          border.color: active ? bar.shell.fg : "transparent"
-          border.width: active ? 1 : 0
+          border.color: active ? bar.shell.fg : (monitorActive ? bar.shell.fgSubtle : "transparent")
+          border.width: (active || monitorActive) ? 1 : 0
 
           Text {
             anchors.centerIn: parent

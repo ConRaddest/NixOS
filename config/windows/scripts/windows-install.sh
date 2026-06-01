@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-NOS_DIR="/home/cdt/.local/nos"
+NOS_DIR="$HOME/NixOS"
 export NOS_DIR
 
 if [[ "${WINDOWS_INSTALL_IN_TERMINAL:-0}" != "1" ]]; then

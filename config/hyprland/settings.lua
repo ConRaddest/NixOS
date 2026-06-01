@@ -23,7 +23,7 @@ hl.config({
     },
   },
   animations = { enabled = true },
-  dwindle = { preserve_split = true },
+  dwindle = { preserve_split = false },
   misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
 })
 
@@ -31,4 +31,5 @@ hl.config({
 hl.device({
     name = "msft0001:01-06cb:cd5f-touchpad",
     accel_profile = "adaptive",
+    natural_scroll = true,
 })

@@ -13,6 +13,6 @@
       home.packages = [ pkgs.inotify-tools ];
 
       xdg.configFile."hypr/hyprland.lua".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.local/nos/config/hyprland/hyprland.lua";
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/config/hyprland/hyprland.lua";
     };
 }

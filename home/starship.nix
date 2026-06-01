@@ -13,7 +13,7 @@
       mkNosScript =
         name: script:
         pkgs.writeShellScriptBin name ''
-          export NOS_DIR="$HOME/.local/nos"
+          export NOS_DIR="$HOME/NixOS"
           export PATH="${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
@@ -35,6 +35,11 @@
         nos-theme
       ];
 
+      home.sessionVariables = {
+        QT_QPA_PLATFORM = "wayland";
+        QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      };
+
       programs.bash = {
         enable = true;
         shellAliases = {
@@ -42,6 +47,11 @@
           ll = "eza -la --icons";
           cd = "z";
         };
+        initExtra = ''
+          if [ -f "$HOME/.local/secrets" ]; then
+            source "$HOME/.local/secrets"
+          fi
+        '';
       };
 
       programs.zoxide = {
