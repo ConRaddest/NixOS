@@ -47,7 +47,7 @@ fi
 # ─── Bluetooth ───────────────────────────────────────────────────────────────
 if command -v bluetoothctl &>/dev/null && \
    bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
-    BLUETOOTH_ICON="󰂯"
+    BLUETOOTH_ICON=""
 else
     BLUETOOTH_ICON="󰂲"
 fi
@@ -83,10 +83,10 @@ fi
 # ─── Volume ──────────────────────────────────────────────────────────────────
 VOL_RAW=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || echo "Volume: 0.00")
 VOL=$(awk '{printf "%d", $2 * 100}' <<< "$VOL_RAW")
-if   echo "$VOL_RAW" | grep -q '\[MUTED\]'; then VOL_ICON="󰖁"
-elif [ "$VOL" -ge 67 ];                     then VOL_ICON="󰕾"
-elif [ "$VOL" -ge 34 ];                     then VOL_ICON="󰕾"
-else                                              VOL_ICON="󰕾"
+if   echo "$VOL_RAW" | grep -q '\[MUTED\]'; then VOL_ICON=""
+elif [ "$VOL" -ge 67 ];                     then VOL_ICON=""
+elif [ "$VOL" -ge 34 ];                     then VOL_ICON=""
+else                                              VOL_ICON=""
 fi
 VOLUME="${VOL_ICON}"
 

@@ -47,12 +47,7 @@ ShellRoot {
 
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
-  // Screen/monitor used by the launcher. It is resolved from Hyprland's active
-  // workspace immediately before opening, then reinforced with a Hyprland move
-  // after mapping to avoid Quickshell's first-window fallback to eDP-1.
   property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
-  property string launcherMonitorName: ""
-  property string launcherWorkspaceName: ""
   property string pendingLauncherSubmenu: ""
 
   // ─── Menu state ──────────────────────────────────────────────────────────
@@ -150,62 +145,22 @@ ShellRoot {
     return null
   }
 
-  function activeWorkspaceScreen(workspaceText) {
-    try {
-      const workspace = JSON.parse(String(workspaceText || "{}"))
-      if (workspace.monitor) launcherMonitorName = workspace.monitor
-      if (workspace.name) launcherWorkspaceName = workspace.name
-      const screen = screenForName(workspace.monitor)
-      if (screen) return screen
-    } catch (e) {}
-
-    const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
-    if (focusedName !== "") launcherMonitorName = focusedName
-    return screenForName(focusedName)
-      || launcherScreen
-      || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
-  }
-
-  function forceLauncherToActiveWorkspace() {
-    if (launcherWorkspaceName === "") return
-    launcherPlacementProcess.running = false
-    launcherPlacementProcess.command = ["bash", "-c",
-      "ws=" + shellQuote(launcherWorkspaceName) + "; "
-      + "for i in $(seq 1 20); do "
-      + "hyprctl dispatch 'hl.dsp.window.move({workspace=\"'\"$ws\"'\", window=\"title:shell-launcher\", silent=true})' >/dev/null 2>&1 && "
-      + "hyprctl dispatch 'hl.dsp.focus({window=\"title:shell-launcher\"})' >/dev/null 2>&1 && "
-      + "hyprctl dispatch 'hl.dsp.window.center({window=\"title:shell-launcher\"})' >/dev/null 2>&1 && exit 0; "
-      + "sleep 0.05; "
-      + "done; true"
-    ]
-    launcherPlacementProcess.running = true
-  }
-
   function openLauncherOnActiveWorkspace(submenuName) {
     closeMenu()
-    pendingLauncherSubmenu = submenuName || ""
-    launcherMonitorProcess.running = false
-    launcherMonitorProcess.command = ["bash", "-c", "hyprctl activeworkspace -j 2>/dev/null || printf '{}'"]
-    launcherMonitorProcess.running = true
-  }
 
-  function finishOpenLauncher(workspaceText) {
-    const screen = activeWorkspaceScreen(workspaceText)
+    const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
+    const screen = screenForName(focusedName) || launcherScreen || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
     if (screen) launcherScreen = screen
 
-    if (pendingLauncherSubmenu !== "") {
+    if (submenuName) {
       let path = []
-      if (findMenuPath(menuItems, pendingLauncherSubmenu, path)) {
+      if (findMenuPath(menuItems, submenuName, path)) {
         menuStack = path
         openedAsSubmenu = true
       }
     }
 
-    pendingLauncherSubmenu = ""
-    Qt.callLater(function() {
-      root.menuOpen = true
-      Qt.callLater(root.forceLauncherToActiveWorkspace)
-    })
+    root.menuOpen = true
   }
 
   onMenuOpenChanged: {
@@ -437,14 +392,6 @@ ShellRoot {
   // ─── Processes ───────────────────────────────────────────────────────────
 
   Process { id: launchProcess }
-  Process { id: launcherPlacementProcess }
-
-  Process {
-    id: launcherMonitorProcess
-    stdout: StdioCollector {
-      onStreamFinished: root.finishOpenLauncher(this.text)
-    }
-  }
 
   // Parses the pipe-delimited output of bar.sh into individual status fields.
   Process {
