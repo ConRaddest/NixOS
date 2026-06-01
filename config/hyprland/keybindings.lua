@@ -84,6 +84,7 @@ local media = {
   { "XF86AudioRaiseVolume",  "bash " .. osd .. " volume up" },
   { "XF86AudioLowerVolume",  "bash " .. osd .. " volume down" },
   { "XF86AudioMute",         "bash " .. osd .. " volume mute" },
+  { "XF86AudioMicMute",      "bash " .. osd .. " mic mute" },
   { "XF86MonBrightnessUp",   "bash " .. osd .. " brightness up" },
   { "XF86MonBrightnessDown", "bash " .. osd .. " brightness down" },
 }

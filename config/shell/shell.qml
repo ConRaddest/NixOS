@@ -37,6 +37,7 @@ ShellRoot {
   property string wifiText:      "󰖪"
   property string bluetoothText: "󰂲"
   property string batteryText:   "󰚥 AC"
+  property string volumeText:    "󰕾"
   property string timeText:      Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
   // ─── OSD state ───────────────────────────────────────────────────────────
@@ -457,6 +458,7 @@ ShellRoot {
           root.wifiText      = parts[2]
           root.bluetoothText = parts[3]
           root.batteryText   = parts[4]
+          if (parts.length >= 6) root.volumeText = parts[5]
         }
       }
     }

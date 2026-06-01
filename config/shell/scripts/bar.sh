@@ -4,7 +4,7 @@
 
 # ─── CPU ─────────────────────────────────────────────────────────────────────
 CPU_RAW=$(top -bn1 | awk '/^%Cpu/ {print $2+$4+$6}')
-CPU_USAGE=$(awk -v cpu="$CPU_RAW" 'BEGIN { printf "  %.1f%%", cpu }')
+CPU_USAGE=$(awk -v cpu="$CPU_RAW" 'BEGIN { printf "%.1f%%", cpu }')
 
 # Fallback: derive usage from idle time if the primary field returned nothing.
 if [ -z "$CPU_USAGE" ] || [ "$CPU_USAGE" = "0.0%" ]; then
@@ -13,7 +13,7 @@ if [ -z "$CPU_USAGE" ] || [ "$CPU_USAGE" = "0.0%" ]; then
 fi
 
 # ─── RAM ─────────────────────────────────────────────────────────────────────
-RAM_USAGE=$(free -m | awk '/Mem:/ { printf "  %0.1fG", $3/1024 }')
+RAM_USAGE=$(free -m | awk '/Mem:/ { printf "%0.1fG", $3/1024 }')
 
 # ─── Wi-Fi ───────────────────────────────────────────────────────────────────
 # Detect the wireless interface name and check if it is up.
@@ -75,10 +75,20 @@ if [ -d /sys/class/power_supply/BAT0 ]; then
             9)  GLYPH="󰂂" ;;  10) GLYPH="󰁹" ;;
         esac
     fi
-    BAT_ICON="${GLYPH} ${BAT_PCT}%"
+    BAT_ICON="${GLYPH}"
 else
-    BAT_ICON="󰚥 AC"
+    BAT_ICON="󰂅"
 fi
 
+# ─── Volume ──────────────────────────────────────────────────────────────────
+VOL_RAW=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || echo "Volume: 0.00")
+VOL=$(awk '{printf "%d", $2 * 100}' <<< "$VOL_RAW")
+if   echo "$VOL_RAW" | grep -q '\[MUTED\]'; then VOL_ICON="󰖁"
+elif [ "$VOL" -ge 67 ];                     then VOL_ICON="󰕾"
+elif [ "$VOL" -ge 34 ];                     then VOL_ICON="󰕾"
+else                                              VOL_ICON="󰕾"
+fi
+VOLUME="${VOL_ICON}"
+
 # ─── Output ──────────────────────────────────────────────────────────────────
-echo "${CPU_USAGE}|${RAM_USAGE}|${WIFI_ICON}|${BLUETOOTH_ICON}|${BAT_ICON}"
+echo "${CPU_USAGE}|${RAM_USAGE}|${WIFI_ICON}|${BLUETOOTH_ICON}|${BAT_ICON}|${VOLUME}"

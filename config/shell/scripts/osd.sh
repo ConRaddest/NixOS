@@ -1,24 +1,48 @@
 #!/usr/bin/env bash
-# osd.sh <volume|brightness> <up|down|mute>
-# Runs the appropriate command then sends the new value to the OSD via IPC.
+# osd.sh <volume|brightness|mic> <up|down|mute>
 set -euo pipefail
 
 type="$1"
 action="$2"
 
+vol_value() {
+  local raw
+  raw=$(wpctl get-volume "$1" 2>/dev/null || echo "Volume: 0.00")
+  awk '{printf "%d", $2 * 100}' <<< "$raw"
+}
+
+vol_muted() {
+  wpctl get-volume "$1" 2>/dev/null | grep -q '\[MUTED\]' && echo "true" || echo "false"
+}
+
 case "$type" in
   volume)
     case "$action" in
-      up)   pamixer -i 5 ;;
-      down) pamixer -d 5 ;;
-      mute) pamixer -t  ;;
+      up)   wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ ;;
+      down) wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- ;;
+      mute) wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle ;;
     esac
 
-    muted=$(pamixer --get-mute 2>/dev/null || echo "false")
-    value=$(pamixer --get-volume 2>/dev/null || echo "0")
+    muted=$(vol_muted @DEFAULT_AUDIO_SINK@)
+    value=$(vol_value @DEFAULT_AUDIO_SINK@)
 
-    if [ "$muted" = "true" ]; then icon="󰖁"
+    if [ "$muted" = "true" ]; then icon="󰖁"; value=0
     else                           icon="󰕾"
+    fi
+    ;;
+
+  mic)
+    case "$action" in
+      up)   wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+    || true ;;
+      down) wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-    || true ;;
+      mute) wpctl set-mute   @DEFAULT_AUDIO_SOURCE@ toggle || true ;;
+    esac
+
+    muted=$(vol_muted @DEFAULT_AUDIO_SOURCE@)
+    value=$(vol_value @DEFAULT_AUDIO_SOURCE@)
+
+    if [ "$muted" = "true" ]; then icon="󰍭"; value=0
+    else                           icon="󰍬"
     fi
     ;;
 
