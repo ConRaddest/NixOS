@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Emits one pipe-delimited line: CPU%|RAM_GiB|WIFI_ICON|BLUETOOTH_ICON|BATTERY
+# Emits one pipe-delimited line: CPU%|RAM_GiB|NET_ICON|BLUETOOTH_ICON|BATTERY|VOLUME
+# NET_ICON shows a LAN icon when ethernet is up, otherwise a Wi-Fi signal icon.
 # Consumed by the shell root's status process on a 1-second timer.
 
 # ─── CPU ─────────────────────────────────────────────────────────────────────
@@ -15,32 +16,51 @@ fi
 # ─── RAM ─────────────────────────────────────────────────────────────────────
 RAM_USAGE=$(free -m | awk '/Mem:/ { printf "%0.1fG", $3/1024 }')
 
-# ─── Wi-Fi ───────────────────────────────────────────────────────────────────
-# Detect the wireless interface name and check if it is up.
-WIFI_INTF=$(ip link | awk -F': ' '/wl/ {print $2}' | head -n 1)
-[ -z "$WIFI_INTF" ] && WIFI_INTF="wlan0"
-
-WIFI_UP="false"
-if [ -f "/sys/class/net/$WIFI_INTF/operstate" ] && \
-   [ "$(cat /sys/class/net/$WIFI_INTF/operstate)" = "up" ]; then
-    WIFI_UP="true"
-fi
-
-if [ "$WIFI_UP" != "true" ]; then
-    WIFI_ICON="󰤮"
-else
-    # Signal strength via NetworkManager; default to 100 if unavailable.
-    WIFI_SIGNAL=""
-    if command -v nmcli &>/dev/null; then
-        WIFI_SIGNAL=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1=="*"{print $2; exit}')
+# ─── LAN (Ethernet) ──────────────────────────────────────────────────────────
+LAN_STATE="none"   # none | plugged | up
+for intf in $(ls /sys/class/net/ 2>/dev/null | grep '^en'); do
+    operstate=$(cat /sys/class/net/$intf/operstate 2>/dev/null)
+    carrier=$(cat /sys/class/net/$intf/carrier 2>/dev/null)
+    if [ "$operstate" = "up" ]; then
+        LAN_STATE="up"
+        break
+    elif [ "$carrier" = "1" ] && [ "$LAN_STATE" != "up" ]; then
+        LAN_STATE="plugged"
     fi
-    : "${WIFI_SIGNAL:=100}"
+done
 
-    if   [ "$WIFI_SIGNAL" -ge 75 ]; then WIFI_ICON="󰤨"
-    elif [ "$WIFI_SIGNAL" -ge 50 ]; then WIFI_ICON="󰤥"
-    elif [ "$WIFI_SIGNAL" -ge 25 ]; then WIFI_ICON="󰤢"
-    elif [ "$WIFI_SIGNAL" -gt  0 ]; then WIFI_ICON="󰤟"
-    else                                  WIFI_ICON="󰤯"
+# ─── Wi-Fi ───────────────────────────────────────────────────────────────────
+if [ "$LAN_STATE" = "up" ]; then
+    WIFI_ICON="󰈁"
+elif [ "$LAN_STATE" = "plugged" ]; then
+    WIFI_ICON="󰈂"
+else
+    # Detect the wireless interface name and check if it is up.
+    WIFI_INTF=$(ip link | awk -F': ' '/wl/ {print $2}' | head -n 1)
+    [ -z "$WIFI_INTF" ] && WIFI_INTF="wlan0"
+
+    WIFI_UP="false"
+    if [ -f "/sys/class/net/$WIFI_INTF/operstate" ] && \
+       [ "$(cat /sys/class/net/$WIFI_INTF/operstate)" = "up" ]; then
+        WIFI_UP="true"
+    fi
+
+    if [ "$WIFI_UP" != "true" ]; then
+        WIFI_ICON="󰤮"
+    else
+        # Signal strength via NetworkManager; default to 100 if unavailable.
+        WIFI_SIGNAL=""
+        if command -v nmcli &>/dev/null; then
+            WIFI_SIGNAL=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1=="*"{print $2; exit}')
+        fi
+        : "${WIFI_SIGNAL:=100}"
+
+        if   [ "$WIFI_SIGNAL" -ge 75 ]; then WIFI_ICON="󰤨"
+        elif [ "$WIFI_SIGNAL" -ge 50 ]; then WIFI_ICON="󰤥"
+        elif [ "$WIFI_SIGNAL" -ge 25 ]; then WIFI_ICON="󰤢"
+        elif [ "$WIFI_SIGNAL" -gt  0 ]; then WIFI_ICON="󰤟"
+        else                                  WIFI_ICON="󰤯"
+        fi
     fi
 fi
 
