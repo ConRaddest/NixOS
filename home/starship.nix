@@ -48,8 +48,8 @@
           cd = "z";
         };
         initExtra = ''
-          if [ -f "$HOME/.local/secrets" ]; then
-            source "$HOME/.local/secrets"
+          if [ -f "$HOME/NixOS/secrets" ]; then
+            source "$HOME/NixOS/secrets"
           fi
         '';
       };
