@@ -84,6 +84,7 @@ PanelWindow {
   Rectangle {
     anchors.fill: parent
     color: bar.shell.bg
+    opacity: 0.85
 
     // ─── Left: launcher icon + workspace indicators ───────────────────────
     Row {

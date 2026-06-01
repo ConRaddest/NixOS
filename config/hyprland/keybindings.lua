@@ -99,7 +99,7 @@ local function nos_terminal(klass, cmd)
   )
 end
 
-hl.bind("CTRL + SHIFT + R", nos_terminal("nixos-refresh", "nos-refresh"))
+hl.bind("CTRL + SHIFT + R", nos_terminal("nixos-refresh", "nos-refresh --offline"))
 hl.bind("CTRL + SHIFT + B", nos_terminal("nixos-build",   "nos-build"))
 hl.bind("CTRL + SHIFT + U", nos_terminal("nixos-update",  "nos-update"))
 
