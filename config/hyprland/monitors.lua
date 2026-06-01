@@ -1,9 +1,17 @@
 -- Monitor
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
+hl.monitor({
+  output = "eDP-1",
+  mode = "1920x1080@60",
+  position = "0x0",
+  scale = 1,
+})
 
--- Disable the laptop panel while the lid is closed, and restore it when opened.
--- hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,disable"), { locked = true })
--- hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1"), { locked = true })
+hl.monitor({
+  output = "HDMI-A-1",
+  mode = "3440x1440@59.959",
+  position = "1920x0",
+  scale = 1,
+})
 
 hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })
 hl.workspace_rule({ workspace = "2", monitor = "eDP-1", default = true })

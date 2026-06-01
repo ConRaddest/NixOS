@@ -38,6 +38,11 @@ ShellRoot {
   property string batteryText:   "󰚥 AC"
   property string timeText:      Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
+  // ─── OSD state ───────────────────────────────────────────────────────────
+  property bool   osdVisible: false
+  property string osdIcon:    ""
+  property int    osdValue:   0
+
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
   // Screen/monitor used by the launcher. It is resolved from Hyprland's active
@@ -464,6 +469,12 @@ ShellRoot {
   // ─── Timer ───────────────────────────────────────────────────────────────
 
   Timer {
+    id: osdTimer
+    interval: 2000
+    onTriggered: root.osdVisible = false
+  }
+
+  Timer {
     interval: 1000
     running: true
     repeat: true
@@ -517,6 +528,18 @@ ShellRoot {
   }
 
   IpcHandler {
+    target: "osd"
+    // Expects a single "icon:value" string, e.g. "󰕾:75"
+    function trigger(data: string): void {
+      const sep = data.lastIndexOf(":")
+      root.osdIcon    = data.slice(0, sep)
+      root.osdValue   = parseInt(data.slice(sep + 1)) || 0
+      root.osdVisible = true
+      osdTimer.restart()
+    }
+  }
+
+  IpcHandler {
     target: "launcher"
     function open(): void { root.openLauncherOnActiveWorkspace("") }
     function toggle(): void {
@@ -532,6 +555,15 @@ ShellRoot {
   Variants {
     model: Quickshell.screens
     Bar {
+      required property var modelData
+      screen: modelData
+      shell: root
+    }
+  }
+
+  Variants {
+    model: Quickshell.screens
+    Osd {
       required property var modelData
       screen: modelData
       shell: root

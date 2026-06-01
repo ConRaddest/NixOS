@@ -1,0 +1,49 @@
+Setup checklist
+===============
+
+[x] Notifications daemon
+    No notification service is wired up. libnotify is present (for notify-send)
+    but nothing listens for notifications. Add a daemon (mako or swaync) to
+    home/ and start it from config/hyprland/_startup.lua.
+
+[x] OSD overlay
+    Volume and brightness keys call pamixer/brightnessctl but there is no
+    visual feedback. Add swayosd or wob, wire it into the media key bindings
+    in config/hyprland/keybindings.lua.
+
+[x] Qt theming
+    home/theme.nix styles GTK apps but leaves Qt unstyled. Add qt.enable,
+    qt.platformTheme, and qt.style to theme.nix so Qt apps match the rest
+    of the desktop.
+
+[x] Git user config
+    No programs.git module exists. The nos-* scripts commit via git and many
+    tools assume a configured user.name / user.email. Add a home/git.nix module.
+
+[x] Firefox profile path
+    home/firefox.nix hardcodes profile path td4m60gg.default. On a fresh
+    install Firefox generates a new random ID and the user.js is written to
+    the wrong place. Either switch to programs.firefox with profiles support,
+    or update the path after the first Firefox launch.
+
+[x] 1Password SSH agent
+    config/ssh/config points to ~/.1password/agent.sock but nothing in the
+    config enables the agent. After installing, open 1Password → Settings →
+    Developer and enable "Use the SSH agent".
+
+[X] Fingerprint unlock
+    hyprlock.nix enables fingerprint auth but the system has no fprintd
+    service and security.pam.services.hyprlock is empty. Add
+    services.fprintd.enable = true to a system module and configure PAM for
+    hyprlock, otherwise the fingerprint option silently does nothing.
+
+[x] VSCode file-icons extension
+    vscode.nix sets workbench.iconTheme = "file-icons" but the file-icons
+    extension is not in profiles.default.extensions. Add
+    pkgs.vscode-extensions.file-icons.file-icons (or the correct attribute)
+    to the extensions list.
+
+[x] Windows VM credentials
+    config/windows/docker-compose.yaml has default USERNAME: "Docker" and
+    PASSWORD: "admin". Change these before running windows-install, or the
+    VM will be created with public-knowledge credentials.

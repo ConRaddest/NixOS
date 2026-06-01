@@ -13,8 +13,6 @@
       programs.vscode = {
         enable = true;
         package = pkgs.vscode;
-        profiles.default.extensions = [ pkgs.vscode-extensions.enkia.tokyo-night ];
-
         profiles.default.keybindings = [
           # Hyprland's universal copy/paste sends Ctrl+Insert / Shift+Insert.
           # Disable VS Code's Insert toggle so synthetic Insert events don't flicker

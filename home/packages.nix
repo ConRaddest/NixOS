@@ -27,7 +27,6 @@
         claude-code
         pi-coding-agent
         lazydocker
-        firefox
         nautilus
         mpv
         imv

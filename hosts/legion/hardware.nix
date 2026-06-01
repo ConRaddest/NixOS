@@ -20,7 +20,7 @@
         "sd_mod"
       ];
       boot.initrd.kernelModules = [ ];
-      
+
       boot.kernelModules = [
         "kvm-intel" # Intel VT-x for virtualisation
         "tun" # virtual network interfaces for Docker/VMs

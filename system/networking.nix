@@ -17,6 +17,9 @@
             EnableIPv6 = true;
             NameResolvingService = "systemd";
           };
+          # Disable background scanning while connected — periodic scans can
+          # confuse some routers into thinking it's a new association attempt.
+          Scan.DisablePeriodicScan = true;
         };
       };
 

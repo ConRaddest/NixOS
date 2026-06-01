@@ -10,7 +10,20 @@
     }:
 
     {
-      home.packages = [ pkgs.xdg-desktop-portal-gtk ];
+      home.packages = with pkgs; [
+        xdg-desktop-portal-gtk
+        adwaita-qt
+        adwaita-qt6
+      ];
+
+      qt = {
+        enable = true;
+        platformTheme.name = "gtk";
+        style = {
+          name = "adwaita-dark";
+          package = pkgs.adwaita-qt;
+        };
+      };
 
       home.pointerCursor = {
         name = "Adwaita";

@@ -11,8 +11,6 @@ hl.bind("SUPER + E",             hl.dsp.exec_cmd("uwsm -- app nautilus"))
 hl.bind("SUPER + B",             hl.dsp.exec_cmd("uwsm -- app firefox"))
 hl.bind("SUPER + Grave",         hl.dsp.exec_cmd("uwsm -- app code"))
 
--- WM
-
 -- Universal cut / copy / paste
 local universal_shortcut_pressed = {}
 
@@ -59,6 +57,15 @@ hl.bind("SUPER + S",            hl.dsp.workspace.toggle_special("scratchpad"))
 hl.bind("SUPER + mouse:272",    hl.dsp.window.drag(),   { mouse = true })
 hl.bind("SUPER + mouse:273",    hl.dsp.window.resize(), { mouse = true })
 
+-- Laptop switches for managing integrated display safely
+hl.bind("switch:on:Lid Switch", function()
+    hl.monitor({ output = "eDP-1", disabled = true })
+end, { locked = true })
+
+hl.bind("switch:off:Lid Switch", function()
+    hl.monitor({ output = "eDP-1", disabled = false })
+end, { locked = true })
+
 -- Workspaces
 for _, dir in ipairs({ "left", "right", "up", "down" }) do
   hl.bind("SUPER + " .. dir,             hl.dsp.focus({ direction = dir }))
@@ -71,12 +78,14 @@ for ws = 1, 9 do
 end
 
 -- Media / brightness keys
+local osd = os.getenv("HOME") .. "/.local/nos/config/shell/scripts/osd.sh"
+
 local media = {
-  { "XF86AudioRaiseVolume",  "pamixer -i 5" },
-  { "XF86AudioLowerVolume",  "pamixer -d 5" },
-  { "XF86AudioMute",         "pamixer -t" },
-  { "XF86MonBrightnessUp",   "brightnessctl set 5%+" },
-  { "XF86MonBrightnessDown", "brightnessctl set 5%-" },
+  { "XF86AudioRaiseVolume",  "bash " .. osd .. " volume up" },
+  { "XF86AudioLowerVolume",  "bash " .. osd .. " volume down" },
+  { "XF86AudioMute",         "bash " .. osd .. " volume mute" },
+  { "XF86MonBrightnessUp",   "bash " .. osd .. " brightness up" },
+  { "XF86MonBrightnessDown", "bash " .. osd .. " brightness down" },
 }
 for _, b in ipairs(media) do
   hl.bind(b[1], hl.dsp.exec_cmd(b[2]), { locked = true, repeating = true })

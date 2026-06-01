@@ -168,7 +168,7 @@ PanelWindow {
         shell: bar.shell
         text: bar.shell.batteryText
         clickable: true
-        onClicked: bar.shell.runDetached("qs ipc call launcher openSubmenu Speed")
+        onClicked: bar.shell.runDetached("qs ipc call launcher openSubmenu Profile")
       }
     }
   }

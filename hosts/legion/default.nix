@@ -76,10 +76,12 @@ let
       self.lib.homeModules.hyprland
       self.lib.homeModules.hyprlock
       self.lib.homeModules.hyprpaper
+      self.lib.homeModules.mako
       self.lib.homeModules.theme
 
       self.lib.homeModules.btop
       self.lib.homeModules.firefox
+      self.lib.homeModules.git
       self.lib.homeModules.kitty
       self.lib.homeModules.ssh
       self.lib.homeModules.starship
@@ -143,6 +145,7 @@ in
         self.systemModules.printing
 
         self.systemModules.docker
+        self.systemModules.onepassword
         self.systemModules.packages
         self.systemModules.homeManager
       ];

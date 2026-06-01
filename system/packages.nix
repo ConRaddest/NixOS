@@ -47,10 +47,6 @@
         # windows vm
         qemu
 
-        # passwords / ssh management
-        _1password-gui
-        _1password-cli
-
         # system packages
         pciutils
         usbutils
