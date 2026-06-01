@@ -49,7 +49,6 @@ ShellRoot {
 
   property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
   property string pendingLauncherSubmenu: ""
-  property string pendingLauncherMonitor: ""
 
   // ─── Menu state ──────────────────────────────────────────────────────────
   property bool   menuOpen:           false
@@ -152,7 +151,6 @@ ShellRoot {
     const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
     const screen = screenForName(focusedName) || launcherScreen || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
     if (screen) launcherScreen = screen
-    pendingLauncherMonitor = focusedName
 
     if (submenuName) {
       let path = []
@@ -169,9 +167,7 @@ ShellRoot {
     if (menuOpen) {
       focusMenuInput()
       if (launcher.menuListItem) launcher.menuListItem.currentIndex = 0
-      if (root.pendingLauncherMonitor) launcherMoveTimer.restart()
     } else {
-      launcherMoveTimer.stop()
       resetMenu()
     }
   }
@@ -391,44 +387,6 @@ ShellRoot {
       if (index !== text.length || !isFinite(value)) return null
       return Number(value.toFixed(10)).toString()
     } catch (e) { return null }
-  }
-
-  // ─── Launcher monitor correction ─────────────────────────────────────────
-  // Hyprland places new floating windows on whichever monitor it picks at map
-  // time, ignoring Quickshell's screen hint. We correct this two ways:
-  //
-  // Fast path — activewindow event: fires when the launcher gains Hyprland
-  // focus. The launcher is then the active window so window.move works.
-  //
-  // Fallback timer (300 ms): in case Hyprland doesn't grant focus quickly
-  // enough, we explicitly re-focus by title then move and centre.
-
-  Connections {
-    target: Hyprland
-    function onRawEvent(event) {
-      if (!root.pendingLauncherMonitor) return
-      if (event.name !== "activewindow") return
-      // data format: "org.quickshell>>shell-launcher"
-      if (!event.data.endsWith(">>shell-launcher")) return
-      launcherMoveTimer.stop()
-      Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
-      Hyprland.dispatch("hl.dsp.window.center()")
-      root.pendingLauncherMonitor = ""
-    }
-  }
-
-  Timer {
-    id: launcherMoveTimer
-    interval: 300
-    onTriggered: {
-      if (!root.pendingLauncherMonitor || !root.menuOpen) return
-      // Only act if the launcher is actually the active window — never touch other windows.
-      const active = Hyprland.activeToplevel
-      if (!active || active.title !== "shell-launcher") return
-      Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
-      Hyprland.dispatch("hl.dsp.window.center()")
-      root.pendingLauncherMonitor = ""
-    }
   }
 
   // ─── Processes ───────────────────────────────────────────────────────────

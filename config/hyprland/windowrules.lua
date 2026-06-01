@@ -5,6 +5,31 @@ hl.window_rule({
   size = { 450, 400 },
 })
 
+-- Move the launcher to the correct monitor on every open.
+-- The window fully unmaps when closed, so window.open fires on each open.
+-- We track the user's last active monitor (excluding the launcher itself)
+-- and move the launcher there when it maps.
+local launcher_target_monitor = ""
+
+hl.on("window.active", function(w)
+  local title = w.title or ""
+  if title == "shell-launcher" then return end
+  local mon = w.monitor
+  if type(mon) == "string" then
+    launcher_target_monitor = mon
+  elseif mon ~= nil then
+    launcher_target_monitor = mon.name or ""
+  end
+end)
+
+hl.on("window.open", function(w)
+  local title = w.title or ""
+  if title ~= "shell-launcher" then return end
+  if launcher_target_monitor == "" then return end
+  hl.dispatch(hl.dsp.window.move({ monitor = launcher_target_monitor }))
+  hl.dispatch(hl.dsp.window.center())
+end)
+
 -- Managers
 local managers = {
   "wallpaper-picker",
