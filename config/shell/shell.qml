@@ -47,7 +47,7 @@ ShellRoot {
 
   readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
-  property var launcherScreen: null
+  property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
   property string pendingLauncherSubmenu: ""
   property string pendingLauncherMonitor: ""
 
@@ -162,14 +162,16 @@ ShellRoot {
       }
     }
 
-    Qt.callLater(() => root.menuOpen = true)
+    root.menuOpen = true
   }
 
   onMenuOpenChanged: {
     if (menuOpen) {
       focusMenuInput()
       if (launcher.menuListItem) launcher.menuListItem.currentIndex = 0
+      if (root.pendingLauncherMonitor) launcherMoveTimer.restart()
     } else {
+      launcherMoveTimer.stop()
       resetMenu()
     }
   }
@@ -392,19 +394,37 @@ ShellRoot {
   }
 
   // ─── Launcher monitor correction ─────────────────────────────────────────
-  // FloatingWindow is pre-mapped at startup (hidden), so openwindow never
-  // fires on first show. Instead we watch activewindow, which fires when the
-  // launcher gains focus after becoming visible. At that point the launcher
-  // is the active window, so we can safely move it to the intended monitor.
+  // Hyprland places new floating windows on whichever monitor it picks at map
+  // time, ignoring Quickshell's screen hint. We correct this two ways:
+  //
+  // Fast path — activewindow event: fires when the launcher gains Hyprland
+  // focus. The launcher is then the active window so window.move works.
+  //
+  // Fallback timer (300 ms): in case Hyprland doesn't grant focus quickly
+  // enough, we explicitly re-focus by title then move and centre.
 
   Connections {
     target: Hyprland
     function onRawEvent(event) {
       if (!root.pendingLauncherMonitor) return
       if (event.name !== "activewindow") return
-      // data format: "windowclass,windowtitle" (comma or >> separator depending on version)
-      if (!event.data.endsWith(",shell-launcher") && !event.data.endsWith(">>shell-launcher")) return
+      // data format: "org.quickshell>>shell-launcher"
+      if (!event.data.endsWith(">>shell-launcher")) return
+      launcherMoveTimer.stop()
       Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
+      Hyprland.dispatch("hl.dsp.window.center()")
+      root.pendingLauncherMonitor = ""
+    }
+  }
+
+  Timer {
+    id: launcherMoveTimer
+    interval: 300
+    onTriggered: {
+      if (!root.pendingLauncherMonitor) return
+      Hyprland.dispatch("hl.dsp.focus({window=\"shell-launcher\"})")
+      Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
+      Hyprland.dispatch("hl.dsp.window.center()")
       root.pendingLauncherMonitor = ""
     }
   }
