@@ -38,7 +38,7 @@ FloatingWindow {
     { name: "Firefox",    icon: "󰈹", command: "firefox" },
     { name: "Nautilus",   icon: "󰉋", command: "nautilus" },
     { name: "LocalSend",  icon: "󰒍", command: "localsend_app" },
-    { name: "Windows",    icon: "󰖳", command: "windows-vm" },
+    { name: "Windows",    icon: "", command: "windows-vm" },
     { name: "Code",       icon: "󰨞", command: "code" },
     { name: "1Password",  icon: "󰌾", command: "1password" },
     { name: "Teams",      icon: "󰍡", command: "teams-for-linux" },
@@ -49,11 +49,11 @@ FloatingWindow {
     { name: "Apps", icon: "󰀻", items: dynamicApps ? dynamicAppItems : curatedAppItems },
 
     { name: "Install", icon: "󰇚", items: [
-      { name: "Windows", icon: "󰖳", command: "windows-install" },
+      { name: "Windows", icon: "", command: "windows-install" },
     ] },
 
     { name: "Remove", icon: "󰆴", items: [
-      { name: "Windows", icon: "󰖳", command: "windows-uninstall", confirm: true },
+      { name: "Windows", icon: "", command: "windows-uninstall", confirm: true },
     ] },
 
     { name: "System", icon: "󰒓", items: [
@@ -67,7 +67,7 @@ FloatingWindow {
       { name: "Status",     icon: "", terminal: { klass: "performance-monitor", title: "performance-monitor", cmd: "btop" } },
     ] },
 
-    { name: "NixOS", icon: "󱄅", items: [
+    { name: "NixOS", icon: "", items: [
       { name: "Build",      icon: "󰔷", terminal: { klass: "nixos-build",   title: "nixos-build",   cmd: "nos-build",   pause: true } },
       { name: "Update",     icon: "", terminal: { klass: "nixos-update",  title: "nixos-update",  cmd: "nos-update",  pause: true } },
       { name: "Sync",       icon: "󰑐", terminal: { klass: "nixos-refresh", title: "nixos-refresh", cmd: "nos-refresh", pause: true } },

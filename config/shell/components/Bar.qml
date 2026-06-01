@@ -85,12 +85,35 @@ PanelWindow {
     anchors.fill: parent
     color: bar.shell.bg
 
-    // ─── Left: workspace indicators ───────────────────────────────────────
+    // ─── Left: launcher icon + workspace indicators ───────────────────────
     Row {
       anchors.left: parent.left
-      anchors.leftMargin: 14
+      anchors.leftMargin: 4
       anchors.verticalCenter: parent.verticalCenter
       spacing: 6
+
+      Rectangle {
+        width: 22
+        height: 22
+        radius: 6
+        color: launcherMouse.containsMouse ? bar.shell.bgElevated : "transparent"
+
+        Text {
+          anchors.centerIn: parent
+          text: "󰍜"
+          color: bar.shell.fgSubtle
+          font.family: bar.shell.monoFont
+          font.pixelSize: 13
+        }
+
+        MouseArea {
+          id: launcherMouse
+          anchors.fill: parent
+          hoverEnabled: true
+          cursorShape: Qt.PointingHandCursor
+          onClicked: bar.shell.openLauncherOnActiveWorkspace("")
+        }
+      }
 
       Repeater {
         model: bar.monitorWorkspaceIds
