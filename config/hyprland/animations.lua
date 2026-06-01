@@ -24,7 +24,7 @@ local animations = {
   { leaf = "windowsOut",       speed = 2, spring = "spring" },
   { leaf = "workspaces",       speed = 2, bezier = "fast" },
   { leaf = "specialWorkspace", speed = 2, bezier = "fast", style = "slidevert" },
-  { leaf = "fade",             speed = 5.0, bezier = "fast" },
+  { leaf = "fade",             speed = 1, bezier = "fast" },
 }
 
 -- 3. Initialization Loop
