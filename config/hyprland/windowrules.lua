@@ -1,4 +1,11 @@
--- Floating panes
+-- shell launcher
+hl.window_rule({
+  match = { title = "shell-launcher" },
+  float = true,
+  center = true,
+  size = { 450, 400 },
+})
+
 -- Managers
 local managers = {
   "wallpaper-picker",
@@ -19,39 +26,20 @@ local managers = {
   "nixos-update",
   "nixos-check",
 }
-for _, name in ipairs(managers) do
+for _, title in ipairs(managers) do
   hl.window_rule({
-    match = { title = name },
+    match = { title = title },
     float = true,
     center = true,
-    size = { 1100, 650 },
+    size = { 1300, 800 },
   })
 end
-
--- Shell launcher
-local launchers = {
-  "shell-launcher",
-}
-for _, name in ipairs(launchers) do
-  hl.window_rule({
-    match = { title = name },
-    float = true,
-    center = true,
-    size = { 450, 400 },
-  })
-end
-
-hl.window_rule({
-  match = { class = "1password", title = "1Password" },
-  float = true,
-  center = true,
-  size = { 1300, 800 },
-})
 
 -- File pickers
 local file_explorers = {
   "xdg-desktop-portal-gtk",
   "org.gnome.Nautilus",
+  "1password",
 }
 for _, class in ipairs(file_explorers) do
   hl.window_rule({
