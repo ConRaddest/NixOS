@@ -392,17 +392,18 @@ ShellRoot {
   }
 
   // ─── Launcher monitor correction ─────────────────────────────────────────
-  // When the launcher window first maps, Hyprland places it on whichever
-  // monitor it picks (often the integrated one). We intercept the openwindow
-  // IPC event and immediately move it to the monitor that was focused when
-  // the launcher was requested.
+  // FloatingWindow is pre-mapped at startup (hidden), so openwindow never
+  // fires on first show. Instead we watch activewindow, which fires when the
+  // launcher gains focus after becoming visible. At that point the launcher
+  // is the active window, so we can safely move it to the intended monitor.
 
   Connections {
     target: Hyprland
     function onRawEvent(event) {
       if (!root.pendingLauncherMonitor) return
-      if (event.name !== "openwindow") return
-      if (!event.data.endsWith(",shell-launcher")) return
+      if (event.name !== "activewindow") return
+      // data format: "windowclass,windowtitle" (comma or >> separator depending on version)
+      if (!event.data.endsWith(",shell-launcher") && !event.data.endsWith(">>shell-launcher")) return
       Hyprland.dispatch("hl.dsp.window.move({monitor=\"" + root.pendingLauncherMonitor + "\"})")
       root.pendingLauncherMonitor = ""
     }
