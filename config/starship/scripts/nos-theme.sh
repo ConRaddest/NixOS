@@ -18,7 +18,7 @@ fi
 
 printf '\033[1;36mApplying theme: %s\033[0m\n\n' "$name"
 ln -sf "${name}/theme.nix" "$themes_dir/current.nix"
-nos-refresh
+nos-refresh --offline
 
 # Apply the theme's default wallpaper after rebuild
 default_wallpaper=$(grep 'wallpaper = ' "$themes_dir/${name}/theme.nix" | head -1 | sed 's/.*"\(.*\)".*/\1/')
