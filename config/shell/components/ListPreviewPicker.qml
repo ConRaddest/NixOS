@@ -78,7 +78,7 @@ Rectangle {
       height: 42
       radius: 5
       color: "transparent"
-      border.color: picker.shell.surfaceLight
+      border.color: picker.shell.surface
       border.width: 2
 
       Text {
@@ -143,7 +143,7 @@ Rectangle {
         height: parent.height
         radius: 5
         color: "transparent"
-        border.color: picker.shell.surfaceLight
+        border.color: picker.shell.surface
         border.width: 2
 
         ListView {
@@ -240,7 +240,7 @@ Rectangle {
         height: parent.height
         radius: 5
         color: "transparent"
-        border.color: picker.shell.surfaceLight
+        border.color: picker.shell.surface
         border.width: 2
 
         Image {

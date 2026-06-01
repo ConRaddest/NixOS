@@ -21,7 +21,7 @@
 
           background-color = colors.bg;
           text-color = colors.fg;
-          border-color = colors.surfaceLight;
+          border-color = colors.surface;
           progress-color = "over ${colors.blue}";
         };
       };

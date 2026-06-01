@@ -54,10 +54,10 @@
               fail_text = "Try again...";
 
               font_family = "JetBrainsMono Nerd Font Bold";
-              font_color = "rgb(${builtins.substring 1 6 colors.fgDark})";
+              font_color = "rgb(${builtins.substring 1 6 colors.fgMuted})";
 
               inner_color = "rgb(${builtins.substring 1 6 colors.bg})";
-              outer_color = "rgb(${builtins.substring 1 6 colors.surfaceLight})";
+              outer_color = "rgb(${builtins.substring 1 6 colors.surface})";
               check_color = "rgb(${builtins.substring 1 6 colors.blue})";
               fail_color = "rgb(${builtins.substring 1 6 colors.red})";
               capslock_color = "rgb(${builtins.substring 1 6 colors.yellow})";

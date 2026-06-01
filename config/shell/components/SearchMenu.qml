@@ -51,7 +51,7 @@ Rectangle {
     width: 110
     height: 32
     color: selected || mouse.containsMouse ? shell.selection : "transparent"
-    border.color: selected || mouse.containsMouse ? shell.accent : shell.surfaceLight
+    border.color: selected || mouse.containsMouse ? shell.accent : shell.surface
     border.width: 2
 
     Text {
@@ -81,7 +81,7 @@ Rectangle {
       height: 42
       radius: 5
       color: "transparent"
-      border.color: menu.shell.surfaceLight
+      border.color: menu.shell.surface
       border.width: 2
 
       Text {
@@ -165,7 +165,7 @@ Rectangle {
       height: parent.height - 42 - parent.spacing
       radius: 5
       color: "transparent"
-      border.color: menu.shell.surfaceLight
+      border.color: menu.shell.surface
       border.width: 2
 
       ListView {

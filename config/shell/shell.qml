@@ -16,12 +16,12 @@ ShellRoot {
   Theme { id: theme }
 
   readonly property string bg:           theme.bg
-  readonly property string bgAlt:        theme.bgAlt
+  readonly property string bgElevated:   theme.bgElevated
   readonly property string fg:           theme.fg
-  readonly property string fgDim:        theme.fgDim
+  readonly property string fgSubtle:     theme.fgSubtle
   readonly property string accent:       theme.accent
   readonly property string hover:        theme.hover
-  readonly property string surfaceLight: theme.surfaceLight
+  readonly property string surface:      theme.surface
   readonly property string selection:    theme.selection
   readonly property string monoFont:     theme.monoFont
   readonly property string flakeDir:     theme.flakeDir

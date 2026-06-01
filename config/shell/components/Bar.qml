@@ -31,7 +31,7 @@ PanelWindow {
     width: label.implicitWidth + 14
     height: 24
     radius: 6
-    color: pill.clickable && mouse.containsMouse ? pill.shell.bgAlt : "transparent"
+    color: pill.clickable && mouse.containsMouse ? pill.shell.bgElevated : "transparent"
 
     Text {
       id: label
@@ -103,14 +103,14 @@ PanelWindow {
           width: 22
           height: 22
           radius: 6
-          color: active ? bar.shell.bgAlt : "transparent"
+          color: active ? bar.shell.bgElevated : "transparent"
           border.color: active ? bar.shell.fg : "transparent"
           border.width: active ? 1 : 0
 
           Text {
             anchors.centerIn: parent
             text: parent.modelData
-            color: parent.active ? bar.shell.fg : bar.shell.fgDim
+            color: parent.active ? bar.shell.fg : bar.shell.fgSubtle
             font.family: bar.shell.monoFont
             font.pixelSize: 13
           }

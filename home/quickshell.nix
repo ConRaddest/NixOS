@@ -26,12 +26,12 @@
 
         QtObject {
           readonly property string bg:           "${colors.bg}"
-          readonly property string bgAlt:        "${colors.bgAlt}"
+          readonly property string bgElevated:   "${colors.bgElevated}"
           readonly property string fg:           "${colors.fg}"
-          readonly property string fgDim:        "${colors.comment}"
+          readonly property string fgSubtle:     "${colors.fgSubtle}"
           readonly property string accent:       "${colors.blue}"
           readonly property string hover:        "${colors.hover}"
-          readonly property string surfaceLight: "${colors.surfaceLight}"
+          readonly property string surface:      "${colors.surface}"
           readonly property string selection:    "${colors.selection}"
           readonly property string monoFont:     "${font.mono}"
 

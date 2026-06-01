@@ -153,13 +153,13 @@ FloatingWindow {
           height: picker.tabsHeight
           radius: 5
           color: "transparent"
-          border.color: regionMouse.containsMouse ? picker.shell.accent : picker.shell.surfaceLight
+          border.color: regionMouse.containsMouse ? picker.shell.accent : picker.shell.surface
           border.width: 2
 
           Text {
             anchors.centerIn: parent
             text: "󰩭  Region"
-            color: regionMouse.containsMouse ? picker.shell.fg : picker.shell.fgDim
+            color: regionMouse.containsMouse ? picker.shell.fg : picker.shell.fgSubtle
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             font.weight: Font.Bold
@@ -190,7 +190,7 @@ FloatingWindow {
             width: picker.previewWidth
             height: picker.previewHeight
             radius: 6
-            color: mouse.containsMouse ? picker.shell.hover : picker.shell.surfaceLight
+            color: mouse.containsMouse ? picker.shell.hover : picker.shell.surface
             border.color: mouse.containsMouse ? picker.shell.accent : "transparent"
             border.width: mouse.containsMouse ? 2 : 0
 

@@ -22,7 +22,7 @@ PanelWindow {
   Rectangle {
     anchors.fill: parent
     color: osd.shell.bg
-    border.color: osd.shell.surfaceLight
+    border.color: osd.shell.surface
     border.width: 1
     radius: 6
 
@@ -48,7 +48,7 @@ PanelWindow {
         width: 160
         height: 4
         radius: 2
-        color: osd.shell.surfaceLight
+        color: osd.shell.surface
 
         Rectangle {
           width: parent.width * Math.max(0, Math.min(1, osd.shell.osdValue / 100))

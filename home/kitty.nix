@@ -43,18 +43,18 @@
           foreground = colors.fg;
           cursor = colors.blue;
           cursor_text_color = colors.bg;
-          selection_background = colors.bgAlt;
+          selection_background = colors.bgElevated;
           selection_foreground = colors.fg;
 
           # Normal colors
-          color0 = colors.bgDark;
+          color0 = colors.bgDeep;
           color1 = colors.red;
           color2 = colors.green;
           color3 = colors.yellow;
           color4 = colors.blue;
           color5 = colors.magenta;
           color6 = colors.cyan;
-          color7 = colors.fgDark;
+          color7 = colors.fgMuted;
 
           # Bright colors
           color8 = colors.black;
