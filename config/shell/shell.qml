@@ -80,10 +80,10 @@ ShellRoot {
     function enterMenuItem(item) {
         if (item.googleSearch) {
             runDetached("firefox 'https://www.google.com/search?q=" + encodeURIComponent(item.query) + "'");
-            closeMenu();
+            root.menuOpen = false;
         } else if (item.calculator) {
             runDetached("printf %s '" + item.result + "' | wl-copy");
-            closeMenu();
+            root.menuOpen = false;
         } else if (item.items) {
             const parentIndex = launcher.menuListItem.currentIndex;
             menuStack = menuStack.concat([Object.assign({}, item, {
@@ -94,18 +94,19 @@ ShellRoot {
         } else if (item.terminal) {
             const t = item.terminal;
             launchTerminal(t.klass, t.title, t.cmd, t.pause || false);
-            closeMenu();
+            root.menuOpen = false;
         } else if (item.desktop) {
-            const entry = DesktopEntries.byId(item.desktop);
-            if (entry)
+            const entry = DesktopEntries.byId(item.desktop) || (!String(item.desktop).endsWith(".desktop") ? DesktopEntries.byId(item.desktop + ".desktop") : null);
+            if (entry) {
                 entry.execute();
-            closeMenu();
+            }
+            root.menuOpen = false;
         } else if (item.command) {
             if (item.confirm)
                 confirmAction(item);
             else {
                 runDetached(item.command);
-                closeMenu();
+                root.menuOpen = false;
             }
         }
     }
@@ -115,7 +116,7 @@ ShellRoot {
         if (confirmItem) {
             cancelConfirm();
         } else if (openedAsSubmenu) {
-            closeMenu();
+            root.menuOpen = false;
         } else if (menuStack.length > 0) {
             const previousIndex = menuStack[menuStack.length - 1].parentIndex || 0;
             menuStack = menuStack.slice(0, menuStack.length - 1);
@@ -123,7 +124,7 @@ ShellRoot {
             resetMenuView();
             launcher.menuListItem.currentIndex = previousIndex;
         } else {
-            closeMenu();
+            root.menuOpen = false;
         }
     }
 
@@ -158,25 +159,6 @@ ShellRoot {
         return null;
     }
 
-    function openLauncherOnActiveWorkspace(submenuName) {
-        closeMenu();
-
-        const focusedName = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : "";
-        const screen = screenForName(focusedName) || launcherScreen || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null);
-        if (screen)
-            launcherScreen = screen;
-
-        if (submenuName) {
-            let path = [];
-            if (findMenuPath(menuItems, submenuName, path)) {
-                menuStack = path;
-                openedAsSubmenu = true;
-            }
-        }
-
-        root.menuOpen = true;
-    }
-
     onMenuOpenChanged: {
         if (menuOpen) {
             focusMenuInput();
@@ -203,7 +185,7 @@ ShellRoot {
     function runConfirm() {
         if (confirmItem && confirmItem.command) {
             runDetached(confirmItem.command);
-            closeMenu();
+            root.menuOpen = false;
         }
     }
 
@@ -315,19 +297,6 @@ ShellRoot {
         menuQuery = "";
         openedAsSubmenu = false;
         resetMenuView();
-    }
-
-    function closeMenu() {
-        menuOpen = false;
-        wallpaperOpen = false;
-        screenshotsOpen = false;
-        clipboardOpen = false;
-        themeOpen = false;
-        resetMenu();
-    }
-
-    function closeClipboard() {
-        clipboardOpen = false;
     }
 
     // ─── Utilities ───────────────────────────────────────────────────────────
@@ -521,31 +490,29 @@ ShellRoot {
     IpcHandler {
         target: "theme"
         function open(): void {
-            root.closeMenu();
+            if (root.themeOpen) {
+                root.themeOpen = false;
+            }
             root.themeOpen = true;
-        }
-        function toggle(): void {
-            root.closeMenu();
-            root.themeOpen = !root.themeOpen;
         }
     }
 
     IpcHandler {
         target: "wallpaper"
         function open(): void {
-            root.closeMenu();
+            if (root.wallpaperOpen) {
+                root.wallpaperOpen = false;
+            }
             root.wallpaperOpen = true;
-        }
-        function toggle(): void {
-            root.closeMenu();
-            root.wallpaperOpen = !root.wallpaperOpen;
         }
     }
 
     IpcHandler {
         target: "screenshare"
         function open(resultPath: string, sourcePath: string): void {
-            root.closeMenu();
+            if (root.screenShareOpen) {
+                root.screenShareOpen = false;
+            }
             screenShare.openPicker(resultPath, sourcePath);
         }
         function close(): void {
@@ -556,32 +523,20 @@ ShellRoot {
     IpcHandler {
         target: "screenshots"
         function open(): void {
-            root.closeMenu();
-            root.screenshotsOpen = true;
-        }
-        function toggle(): void {
-            if (root.screenshotsOpen)
+            if (root.screenshotsOpen) {
                 root.screenshotsOpen = false;
-            else {
-                root.closeMenu();
-                root.screenshotsOpen = true;
             }
+            root.screenshotsOpen = true;
         }
     }
 
     IpcHandler {
         target: "clipboard"
         function open(): void {
-            root.closeMenu();
-            root.clipboardOpen = true;
-        }
-        function toggle(): void {
-            if (root.clipboardOpen)
+            if (root.clipboardOpen) {
                 root.clipboardOpen = false;
-            else {
-                root.closeMenu();
-                root.clipboardOpen = true;
             }
+            root.clipboardOpen = true;
         }
     }
 
@@ -600,16 +555,26 @@ ShellRoot {
     IpcHandler {
         target: "launcher"
         function open(): void {
-            root.openLauncherOnActiveWorkspace("");
-        }
-        function toggle(): void {
-            if (root.menuOpen)
-                root.closeMenu();
-            else
-                root.openLauncherOnActiveWorkspace("");
+            if (root.menuOpen) {
+                root.menuOpen = false;
+            }
+
+            root.menuOpen = true;
         }
         function openSubmenu(targetName: string): void {
-            root.openLauncherOnActiveWorkspace(targetName);
+            if (root.menuOpen) {
+                root.menuOpen = false;
+            }
+
+            if (targetName) {
+                let path = [];
+                if (findMenuPath(menuItems, targetName, path)) {
+                    menuStack = path;
+                    openedAsSubmenu = true;
+                }
+            }
+
+            root.menuOpen = true;
         }
     }
 

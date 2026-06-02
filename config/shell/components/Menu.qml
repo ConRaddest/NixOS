@@ -20,7 +20,7 @@ FloatingWindow {
     // ─── Menu item data ──────────────────────────────────────────────────────
     // Set dynamicApps: true to populate Apps from all installed desktop entries
     // instead of the curated list below.
-    readonly property bool dynamicApps: true
+    readonly property bool dynamicApps: false
 
     readonly property var dynamicAppItems: {
         DesktopEntries.applicationsChanged;
@@ -38,7 +38,7 @@ FloatingWindow {
             command: "firefox"
         },
         {
-            name: "Nautilus",
+            name: "Files",
             icon: "󰉋",
             command: "nautilus"
         },
@@ -65,7 +65,7 @@ FloatingWindow {
         {
             name: "Teams",
             icon: "󰍡",
-            desktop: "teams-pwa.desktop"
+            desktop: "teams-pwa"
         },
         {
             name: "Docker",

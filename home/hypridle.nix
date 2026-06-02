@@ -8,14 +8,18 @@
       dpmsOff = "hyprctl dispatch 'hl.dsp.dpms({ action = \"disable\" })'";
       dpmsOn = "hyprctl dispatch 'hl.dsp.dpms({ action = \"enable\" })'";
       dpmsOnAfterResume = "sleep 2 && ${dpmsOn}";
+      lock = "pgrep -x hyprlock >/dev/null || hyprlock";
     in
     {
       services.hypridle = {
         enable = true;
         settings = {
           general = {
-            lock_cmd = "hyprlock";
-            before_sleep_cmd = "hyprlock";
+            # Do not start a second hyprlock if the session is already locked.
+            # Duplicate lock instances around suspend/resume have caused
+            # hyprlock crashes and Hyprland's error overlay on this machine.
+            lock_cmd = lock;
+            before_sleep_cmd = lock;
             # Give NVIDIA's resume path a moment before asking Hyprland to
             # modeset/turn outputs back on. Immediate DPMS-on can race resume.
             after_sleep_cmd = dpmsOnAfterResume;
@@ -29,7 +33,7 @@
             }
             {
               timeout = 600;
-              on-timeout = "hyprlock";
+              on-timeout = lock;
             }
             {
               timeout = 900;

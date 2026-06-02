@@ -1,4 +1,6 @@
 {
+  # 1 keyring not unlocked with system unlock
+
   description = "NixOS configuration";
 
   inputs = {

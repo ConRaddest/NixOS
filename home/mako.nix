@@ -17,7 +17,7 @@
           border-size = 2;
           icons = false;
           default-timeout = 5000;
-          ignore-timeout = false;
+          ignore-timeout = true;
 
           background-color = colors.bg;
           text-color = colors.fg;

@@ -46,7 +46,7 @@
           package = pkgs.adwaita-icon-theme;
         };
         font = {
-          name = font.name;
+          name = font.mono;
           size = font.size;
         };
         gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
@@ -160,8 +160,8 @@
           color-scheme = "prefer-dark";
           gtk-theme = "adw-gtk3-dark";
           icon-theme = "Adwaita";
-          font-name = "${font.name} ${toString font.size}";
-          document-font-name = "${font.name} ${toString font.size}";
+          font-name = "${font.mono} ${toString font.size}";
+          document-font-name = "${font.mono} ${toString font.size}";
           monospace-font-name = "${font.mono} ${toString font.monoSize}";
         };
 
