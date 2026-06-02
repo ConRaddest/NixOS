@@ -62,7 +62,6 @@ let
       self.lib.homeModules.kitty
       self.lib.homeModules.ssh
       self.lib.homeModules.starship
-      self.lib.homeModules.vscode
 
       self.lib.homeModules.quickshell
       self.lib.homeModules.windows

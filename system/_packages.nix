@@ -2,7 +2,10 @@
 
 {
   flake.systemModules.packages =
-    { pkgs, ... }:
+    {
+      pkgs,
+      ...
+    }:
 
     {
       environment.systemPackages = with pkgs; [

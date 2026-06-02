@@ -12,14 +12,17 @@ local managers = {
   "theme-apply",
   "screenshot-picker",
   "shell-clipboard",
+
   "wifi-manager",
   "bluetooth-manager",
   "performance-monitor",
   "audio-manager",
+
   "windows-install",
   "windows-uninstall",
   "windows-credentials",
   "windows-vm-start",
+
   "nixos-refresh",
   "nixos-build",
   "nixos-update",

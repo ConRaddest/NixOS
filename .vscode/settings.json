@@ -1,0 +1,12 @@
+{
+  "Lua.diagnostics.globals": [
+    "hl"
+  ],
+  "Lua.diagnostics.disable": [
+    "duplicate-doc-field",
+    "duplicate-doc-alias"
+  ],
+  "Lua.workspace.library": [
+    "${workspaceFolder}/.vscode/hyprland-lua.d.lua"
+  ]
+}

@@ -2,7 +2,11 @@
 
 {
   flake.lib.homeModules.packages =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
 
     {
       xdg.userDirs = {
@@ -19,33 +23,61 @@
       };
 
       home.packages = with pkgs; [
-        # Terminal / CLI
+        # version control
         git
+
+        # search
         ripgrep
         fd
+
+        # cli utilities
         jq
         bat
         eza
         zoxide
         fzf
-        fastfetch
         tldr
         tree
         unzip
 
-        # Apps / dev
-        teams-for-linux
+        # system info
+        fastfetch
+
+        # language servers
+        nixd
+        lua-language-server
+        qt6.qtdeclarative
+
+        # formatters
+        nixfmt
+        stylua
+
+        # editor
+        vscode
+
+        # runtimes
         python3
         nodejs
         dotnet-sdk_10
+
+        # dev tools
         mkcert
+        lazydocker
+
+        # ai agents
         claude-code
         pi-coding-agent
-        lazydocker
+
+        # communication
+        teams-for-linux
+        localsend
+
+        # file manager
         nautilus
+
+        # media
         mpv
         imv
-        localsend
       ];
     };
 }
