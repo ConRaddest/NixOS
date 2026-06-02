@@ -17,16 +17,20 @@
             EnableIPv6 = true;
             NameResolvingService = "systemd";
           };
-          # Disable background scanning while connected — periodic scans can
-          # confuse some routers into thinking it's a new association attempt.
-          Scan.DisablePeriodicScan = true;
+          # Keep periodic scans enabled while disconnected so iwd keeps looking
+          # for known networks and reconnects automatically after Wi-Fi drops.
+          Scan = {
+            DisablePeriodicScan = false;
+            InitialPeriodicScanInterval = 10;
+            MaximumPeriodicScanInterval = 60;
+          };
         };
       };
 
       # DNS for iwd's built-in network configuration.
       services.resolved = {
         enable = true;
-        fallbackDns = [
+        settings.Resolve.FallbackDNS = [
           "1.1.1.1"
           "8.8.8.8"
         ];

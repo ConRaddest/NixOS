@@ -16,7 +16,6 @@
         shell = pkgs.bash;
         extraGroups = [
           "wheel"
-          "networkmanager"
           "video"
           "audio"
           "docker"

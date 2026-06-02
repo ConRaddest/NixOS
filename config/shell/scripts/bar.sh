@@ -48,11 +48,14 @@ else
     if [ "$WIFI_UP" != "true" ]; then
         WIFI_ICON="󰤮"
     else
-        # Signal strength via NetworkManager; default to 100 if unavailable.
-        WIFI_SIGNAL=""
-        if command -v nmcli &>/dev/null; then
-            WIFI_SIGNAL=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1=="*"{print $2; exit}')
-        fi
+        # Signal strength from the kernel wireless stats; iwd manages Wi-Fi.
+        # /proc/net/wireless reports link quality out of 70 on common Linux drivers.
+        WIFI_SIGNAL=$(awk -v iface="$WIFI_INTF" '
+            $1 ~ iface":" {
+                gsub(/\./, "", $3)
+                printf "%d", ($3 / 70) * 100
+            }
+        ' /proc/net/wireless 2>/dev/null)
         : "${WIFI_SIGNAL:=100}"
 
         if   [ "$WIFI_SIGNAL" -ge 75 ]; then WIFI_ICON="󰤨"
