@@ -21,6 +21,9 @@ PanelWindow {
 
     visible: shell.osdVisible
 
+    readonly property bool isVolumeOsd: shell.osdIcon === "󰕾" || shell.osdIcon === "󰖁" || shell.osdIcon === "󰍬" || shell.osdIcon === "󰍭"
+    readonly property int maxValue: isVolumeOsd ? 150 : 100
+
     Rectangle {
         anchors.fill: parent
         color: osd.shell.bg
@@ -54,7 +57,7 @@ PanelWindow {
                 color: osd.shell.surface
 
                 Rectangle {
-                    width: parent.width * Math.max(0, Math.min(1, osd.shell.osdValue / 100))
+                    width: parent.width * Math.max(0, Math.min(1, osd.shell.osdValue / osd.maxValue))
                     height: parent.height
                     radius: parent.radius
                     color: osd.shell.accent

@@ -65,9 +65,15 @@ FloatingWindow {
 
     Process {
         id: previewProcess
+
+        property string itemId: ""
+
         stdout: StdioCollector {
             onStreamFinished: {
-                if (clipboardWindow.selectedItem && clipboardWindow.selectedItem.isImage) {
+                if (!clipboardWindow.selectedItem || clipboardWindow.selectedItem.id !== previewProcess.itemId)
+                    return;
+
+                if (clipboardWindow.selectedItem.isImage) {
                     clipboardWindow.previewImage = "file://" + this.text.trim() + "?t=" + Date.now();
                 } else {
                     clipboardWindow.previewText = this.text;
@@ -91,8 +97,13 @@ FloatingWindow {
         previewImage = "";
         previewProcess.running = false;
 
-        if (!item)
+        if (!item) {
+            previewProcess.itemId = "";
             return;
+        }
+
+        previewProcess.itemId = item.id;
+
         if (item.isImage) {
             const path = "/tmp/quickshell-clipboard-preview-" + item.id + ".png";
             previewProcess.command = ["bash", "-c", "printf '%s\n' " + shell.shellQuote(item.raw) + " | cliphist decode > " + shell.shellQuote(path) + " && printf '%s' " + shell.shellQuote(path)];

@@ -37,7 +37,7 @@ Rectangle {
     property alias listItem: list
     property alias inputItem: input
     readonly property var filteredItems: getFilteredItems()
-    readonly property var currentItem: filteredItems.length > 0 && list.currentIndex >= 0 ? filteredItems[list.currentIndex] : null
+    property var currentItem: null
 
     signal accepted(var item)
     signal selectedItemChanged(var item)
@@ -49,9 +49,19 @@ Rectangle {
     onItemsChanged: Qt.callLater(resetSelection)
     onQueryChanged: Qt.callLater(resetSelection)
 
+    function itemAtIndex(index) {
+        return index >= 0 && index < filteredItems.length ? filteredItems[index] : null;
+    }
+
+    function syncSelection() {
+        const item = itemAtIndex(list.currentIndex);
+        currentItem = item;
+        selectedItemChanged(item);
+    }
+
     function resetSelection() {
         list.currentIndex = filteredItems.length > 0 ? 0 : -1;
-        selectedItemChanged(currentItem);
+        syncSelection();
     }
 
     function getFilteredItems() {
@@ -170,7 +180,7 @@ Rectangle {
                     clip: true
                     model: picker.filteredItems
                     currentIndex: picker.filteredItems.length > 0 ? 0 : -1
-                    onCurrentIndexChanged: picker.selectedItemChanged(picker.currentItem)
+                    onCurrentIndexChanged: picker.syncSelection()
 
                     delegate: Rectangle {
                         required property var modelData
