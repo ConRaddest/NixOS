@@ -12,22 +12,21 @@ hl.config({
 		gaps_in = 5,
 		gaps_out = 10,
 		border_size = 0,
-
 		layout = "dwindle",
 	},
 	decoration = {
-		rounding = 0,
+		rounding = 12,
 		active_opacity = 0.93,
 		inactive_opacity = 0.90,
 		blur = {
 			enabled = true,
 			special = true,
-			size = 6,
+			size = 5,
 			passes = 2,
 		},
 	},
 	animations = { enabled = true },
-	dwindle = { preserve_split = true },
+	dwindle = { preserve_split = false },
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,

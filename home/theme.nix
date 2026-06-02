@@ -9,6 +9,33 @@
       ...
     }:
 
+    let
+      folderSvg = ''
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+          <path fill="${colors.bgLight}" d="M6 14c0-3.3 2.7-6 6-6h14c2.1 0 4.1 1.1 5.2 2.9L33 14h19c3.3 0 6 2.7 6 6v4H6z"/>
+          <path fill="${colors.primary}" d="M6 20c0-3.3 2.7-6 6-6h40c3.3 0 6 2.7 6 6v30c0 3.3-2.7 6-6 6H12c-3.3 0-6-2.7-6-6z"/>
+          <path fill="${colors.fgLight}" opacity="0.14" d="M10 22h48v8H6v-4c0-2.2 1.8-4 4-4z"/>
+          <path fill="${colors.bgDark}" opacity="0.18" d="M6 46h52v4c0 3.3-2.7 6-6 6H12c-3.3 0-6-2.7-6-6z"/>
+        </svg>
+      '';
+      folderIconNames = [
+        "folder"
+        "folder-open"
+        "folder-documents"
+        "folder-download"
+        "folder-downloads"
+        "folder-music"
+        "folder-pictures"
+        "folder-publicshare"
+        "folder-remote"
+        "folder-saved-search"
+        "folder-symbolic"
+        "folder-templates"
+        "folder-videos"
+        "user-desktop"
+        "user-home"
+      ];
+    in
     {
       home.packages = with pkgs; [
         xdg-desktop-portal-gtk
@@ -42,18 +69,18 @@
           package = pkgs.adw-gtk3;
         };
         iconTheme = {
-          name = "Adwaita";
+          name = "Nos";
           package = pkgs.adwaita-icon-theme;
         };
         font = {
-          name = font.mono;
+          name = font.system;
           size = font.size;
         };
         gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
         gtk4.extraConfig.gtk-application-prefer-dark-theme = true;
         gtk3.extraCss = ''
-          @define-color accent_color          ${colors.blue};
-          @define-color accent_bg_color       ${colors.blue};
+          @define-color accent_color          ${colors.primary};
+          @define-color accent_bg_color       ${colors.primary};
           @define-color accent_fg_color       ${colors.bg};
           @define-color destructive_color     ${colors.red};
           @define-color destructive_bg_color  ${colors.red};
@@ -68,27 +95,117 @@
           @define-color window_fg_color       ${colors.fg};
           @define-color view_bg_color         ${colors.bg};
           @define-color view_fg_color         ${colors.fg};
-          @define-color headerbar_bg_color    ${colors.bgDeep};
+          @define-color headerbar_bg_color    ${colors.bgDark};
           @define-color headerbar_fg_color    ${colors.fg};
-          @define-color headerbar_border_color ${colors.bgDeep};
-          @define-color headerbar_backdrop_color ${colors.bgDeep};
-          @define-color sidebar_bg_color      ${colors.bgDeep};
-          @define-color sidebar_fg_color      ${colors.fgMuted};
-          @define-color sidebar_backdrop_color ${colors.bgDeep};
-          @define-color sidebar_border_color  ${colors.bgDeep};
-          @define-color card_bg_color         ${colors.bgDeep};
+          @define-color headerbar_border_color ${colors.bgDark};
+          @define-color headerbar_backdrop_color ${colors.bgDark};
+          @define-color sidebar_bg_color      ${colors.bgDark};
+          @define-color sidebar_fg_color      ${colors.fgDark};
+          @define-color sidebar_backdrop_color ${colors.bgDark};
+          @define-color sidebar_border_color  ${colors.bgDark};
+          @define-color card_bg_color         ${colors.bgDark};
           @define-color card_fg_color         ${colors.fg};
-          @define-color popover_bg_color      ${colors.bgDeep};
+          @define-color popover_bg_color      ${colors.bgDark};
           @define-color popover_fg_color      ${colors.fg};
           @define-color dialog_bg_color       ${colors.bg};
           @define-color dialog_fg_color       ${colors.fg};
+
+          window,
+          dialog,
+          popover,
+          menu,
+          .background {
+            background-color: @window_bg_color;
+            color: @window_fg_color;
+          }
+
+          view,
+          .view,
+          list,
+          gridview,
+          columnview,
+          treeview,
+          textview text,
+          viewport,
+          scrolledwindow {
+            background-color: @view_bg_color;
+            color: @view_fg_color;
+          }
+
+          headerbar,
+          .titlebar {
+            background-color: @headerbar_bg_color;
+            color: @headerbar_fg_color;
+            border-color: @headerbar_border_color;
+          }
+
+          button,
+          buttonbox button,
+          messagedialog button,
+          window.dialog button {
+            background-image: none;
+            background-color: ${colors.bgDark};
+            color: @window_fg_color;
+            border-color: ${colors.bgDark};
+            box-shadow: none;
+          }
+
+          button:hover,
+          buttonbox button:hover,
+          messagedialog button:hover,
+          window.dialog button:hover {
+            background-image: none;
+            background-color: ${colors.bgLight};
+            color: @window_fg_color;
+            border-color: ${colors.fgDark};
+            box-shadow: none;
+          }
+
+          button:active,
+          button:checked,
+          buttonbox button:active,
+          messagedialog button:active,
+          window.dialog button:active {
+            background-image: none;
+            background-color: ${colors.bgLight};
+            color: @window_fg_color;
+            border-color: ${colors.fgDark};
+            box-shadow: none;
+          }
+
+          messagedialog,
+          messagedialog.background,
+          messagedialog box,
+          messagedialog grid,
+          window.dialog,
+          window.dialog .background {
+            background-color: @dialog_bg_color;
+            color: @dialog_fg_color;
+          }
+
+          messagedialog label,
+          window.dialog label {
+            color: @dialog_fg_color;
+          }
+
+          row:hover {
+            background-color: ${colors.bgLight};
+          }
+
+          row:selected,
+          list row:selected,
+          treeview:selected {
+            background-color: ${colors.bgLight};
+            color: @window_fg_color;
+          }
+
           decoration { border-radius: 0; }
           paned > separator { background-image: image(transparent); }
           paned > separator:backdrop { background-image: image(transparent); }
         '';
         gtk4.extraCss = ''
-          @define-color accent_color          ${colors.blue};
-          @define-color accent_bg_color       ${colors.blue};
+          @define-color accent_color          ${colors.primary};
+          @define-color accent_bg_color       ${colors.primary};
           @define-color accent_fg_color       ${colors.bg};
           @define-color destructive_color     ${colors.red};
           @define-color destructive_bg_color  ${colors.red};
@@ -103,19 +220,115 @@
           @define-color window_fg_color       ${colors.fg};
           @define-color view_bg_color         ${colors.bg};
           @define-color view_fg_color         ${colors.fg};
-          @define-color headerbar_bg_color    ${colors.bgDeep};
+          @define-color headerbar_bg_color    ${colors.bgDark};
           @define-color headerbar_fg_color    ${colors.fg};
-          @define-color headerbar_border_color ${colors.bgDeep};
-          @define-color headerbar_backdrop_color ${colors.bgDeep};
-          @define-color sidebar_bg_color      ${colors.bgDeep};
-          @define-color sidebar_fg_color      ${colors.fgMuted};
-          @define-color sidebar_backdrop_color ${colors.bgDeep};
-          @define-color card_bg_color         ${colors.bgDeep};
+          @define-color headerbar_border_color ${colors.bgDark};
+          @define-color headerbar_backdrop_color ${colors.bgDark};
+          @define-color sidebar_bg_color      ${colors.bgDark};
+          @define-color sidebar_fg_color      ${colors.fgDark};
+          @define-color sidebar_backdrop_color ${colors.bgDark};
+          @define-color card_bg_color         ${colors.bgDark};
           @define-color card_fg_color         ${colors.fg};
-          @define-color popover_bg_color      ${colors.bgDeep};
+          @define-color popover_bg_color      ${colors.bgDark};
           @define-color popover_fg_color      ${colors.fg};
           @define-color dialog_bg_color       ${colors.bg};
           @define-color dialog_fg_color       ${colors.fg};
+
+          window,
+          dialog,
+          popover,
+          menu,
+          .background {
+            background-color: @window_bg_color;
+            color: @window_fg_color;
+          }
+
+          view,
+          .view,
+          list,
+          gridview,
+          columnview,
+          textview text,
+          viewport,
+          scrolledwindow {
+            background-color: @view_bg_color;
+            color: @view_fg_color;
+          }
+
+          headerbar,
+          .titlebar {
+            background-color: @headerbar_bg_color;
+            color: @headerbar_fg_color;
+            border-color: @headerbar_border_color;
+          }
+
+          navigation-view,
+          navigation-sidebar,
+          sidebar,
+          .sidebar {
+            background-color: @sidebar_bg_color;
+            color: @sidebar_fg_color;
+          }
+
+          button,
+          buttonbox button,
+          messagedialog button,
+          window.dialog button {
+            background-image: none;
+            background-color: ${colors.bgDark};
+            color: @window_fg_color;
+            border-color: ${colors.bgDark};
+            box-shadow: none;
+          }
+
+          button:hover,
+          buttonbox button:hover,
+          messagedialog button:hover,
+          window.dialog button:hover {
+            background-image: none;
+            background-color: ${colors.bgLight};
+            color: @window_fg_color;
+            border-color: ${colors.fgDark};
+            box-shadow: none;
+          }
+
+          button:active,
+          button:checked,
+          buttonbox button:active,
+          messagedialog button:active,
+          window.dialog button:active {
+            background-image: none;
+            background-color: ${colors.bgLight};
+            color: @window_fg_color;
+            border-color: ${colors.fgDark};
+            box-shadow: none;
+          }
+
+          messagedialog,
+          messagedialog.background,
+          messagedialog box,
+          messagedialog grid,
+          window.dialog,
+          window.dialog .background {
+            background-color: @dialog_bg_color;
+            color: @dialog_fg_color;
+          }
+
+          messagedialog label,
+          window.dialog label {
+            color: @dialog_fg_color;
+          }
+
+          row:hover {
+            background-color: ${colors.bgLight};
+          }
+
+          row:selected,
+          list row:selected,
+          gridview child:selected {
+            background-color: ${colors.bgLight};
+            color: @window_fg_color;
+          }
 
           /* Nautilus trash/utility banners. AdwBanner's CSS node is `banner`. */
           window.view banner > revealer > widget,
@@ -150,18 +363,41 @@
           .toolbar button:hover,
           actionbar button:hover,
           infobar button:hover {
-            background-color: ${colors.hover};
+            background-color: ${colors.bgLight};
           }
         '';
       };
+
+      xdg.dataFile = {
+        "icons/Nos/index.theme".text = ''
+          [Icon Theme]
+          Name=Nos
+          Comment=Theme-aware folder icons with Adwaita fallback
+          Inherits=Adwaita,hicolor
+          Directories=scalable/places
+
+          [scalable/places]
+          Size=64
+          MinSize=16
+          MaxSize=512
+          Type=Scalable
+          Context=Places
+        '';
+      }
+      // builtins.listToAttrs (
+        map (name: {
+          name = "icons/Nos/scalable/places/${name}.svg";
+          value.text = folderSvg;
+        }) folderIconNames
+      );
 
       dconf.settings = {
         "org/gnome/desktop/interface" = {
           color-scheme = "prefer-dark";
           gtk-theme = "adw-gtk3-dark";
-          icon-theme = "Adwaita";
-          font-name = "${font.mono} ${toString font.size}";
-          document-font-name = "${font.mono} ${toString font.size}";
+          icon-theme = "Nos";
+          font-name = "${font.system} ${toString font.size}";
+          document-font-name = "${font.system} ${toString font.size}";
           monospace-font-name = "${font.mono} ${toString font.monoSize}";
         };
 

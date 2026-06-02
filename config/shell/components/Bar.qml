@@ -31,7 +31,7 @@ PanelWindow {
         width: label.implicitWidth + 14
         height: 24
         radius: 6
-        color: pill.clickable && mouse.containsMouse ? pill.shell.bgElevated : "transparent"
+        color: pill.clickable && mouse.containsMouse ? pill.shell.bgLight : "transparent"
 
         Text {
             id: label
@@ -86,7 +86,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: bar.shell.bg
-        opacity: 0.85
+        opacity: 0.90
 
         // ─── Left: launcher icon + workspace indicators ───────────────────────
         Row {
@@ -99,12 +99,12 @@ PanelWindow {
                 width: 22
                 height: 22
                 radius: 6
-                color: launcherMouse.containsMouse ? bar.shell.bgElevated : "transparent"
+                color: launcherMouse.containsMouse ? bar.shell.bgLight : "transparent"
 
                 Text {
                     anchors.centerIn: parent
                     text: "󰍜"
-                    color: bar.shell.fgSubtle
+                    color: bar.shell.fgDark
                     font.family: bar.shell.monoFont
                     font.pixelSize: 13
                 }
@@ -114,7 +114,7 @@ PanelWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: bar.shell.openLauncherOnActiveWorkspace("")
+                    onClicked: bar.shell.menuOpen = true
                 }
             }
 
@@ -130,14 +130,14 @@ PanelWindow {
                     width: 22
                     height: 22
                     radius: 6
-                    color: active ? bar.shell.bgElevated : "transparent"
-                    border.color: active ? bar.shell.fg : (monitorActive ? bar.shell.fgSubtle : "transparent")
+                    color: active ? bar.shell.bgLight : "transparent"
+                    border.color: active ? bar.shell.fg : (monitorActive ? bar.shell.fgDark : "transparent")
                     border.width: (active || monitorActive) ? 1 : 0
 
                     Text {
                         anchors.centerIn: parent
                         text: parent.modelData
-                        color: parent.active ? bar.shell.fg : bar.shell.fgSubtle
+                        color: parent.active ? bar.shell.fg : bar.shell.fgDark
                         font.family: bar.shell.monoFont
                         font.pixelSize: 13
                     }

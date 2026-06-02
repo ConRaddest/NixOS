@@ -26,13 +26,27 @@
 
         QtObject {
           readonly property string bg:           "${colors.bg}"
-          readonly property string bgElevated:   "${colors.bgElevated}"
+          readonly property string bgDark:       "${colors.bgDark}"
+          readonly property string bgLight:      "${colors.bgLight}"
+
           readonly property string fg:           "${colors.fg}"
-          readonly property string fgSubtle:     "${colors.fgSubtle}"
-          readonly property string accent:       "${colors.blue}"
-          readonly property string hover:        "${colors.hover}"
-          readonly property string surface:      "${colors.surface}"
-          readonly property string selection:    "${colors.selection}"
+          readonly property string fgDark:       "${colors.fgDark}"
+          readonly property string fgLight:      "${colors.fgLight}"
+
+          readonly property string primary:      "${colors.primary}"
+          readonly property string secondary:    "${colors.secondary}"
+          readonly property string tertiary:     "${colors.tertiary}"
+          readonly property string quaternary:   "${colors.quaternary}"
+
+          readonly property string black:        "${colors.black}"
+          readonly property string red:          "${colors.red}"
+          readonly property string orange:       "${colors.orange}"
+          readonly property string yellow:       "${colors.yellow}"
+          readonly property string green:        "${colors.green}"
+          readonly property string teal:         "${colors.teal}"
+          readonly property string blue:         "${colors.blue}"
+          readonly property string purple:       "${colors.purple}"
+
           readonly property string monoFont:     "${font.mono}"
 
           readonly property string flakeDir:     "${nos}"

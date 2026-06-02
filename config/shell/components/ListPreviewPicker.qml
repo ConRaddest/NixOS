@@ -83,7 +83,7 @@ Rectangle {
         let match = lowerValue.indexOf(lowerQuery, pos);
         while (match !== -1) {
             result += escapeHtml(value.slice(pos, match));
-            result += "<span style=\"color: " + shell.accent + "\">" + escapeHtml(value.slice(match, match + q.length)) + "</span>";
+            result += "<span style=\"color: " + shell.primary + "\">" + escapeHtml(value.slice(match, match + q.length)) + "</span>";
             pos = match + q.length;
             match = lowerValue.indexOf(lowerQuery, pos);
         }
@@ -104,7 +104,7 @@ Rectangle {
             height: 42
             radius: 5
             color: "transparent"
-            border.color: picker.shell.surface
+            border.color: picker.shell.bgLight
             border.width: 2
 
             Text {
@@ -114,8 +114,8 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 18
                 text: picker.searchIcon
-                color: picker.shell.accent
-                font.family: "JetBrainsMono Nerd Font"
+                color: picker.shell.primary
+                font.family: picker.shell.monoFont
                 font.pixelSize: 16
                 font.weight: Font.Bold
                 horizontalAlignment: Text.AlignHCenter
@@ -136,9 +136,9 @@ Rectangle {
                 verticalAlignment: TextInput.AlignVCenter
                 text: picker.query
                 color: picker.shell.fg
-                selectionColor: picker.shell.accent
-                selectedTextColor: picker.shell.bg
-                font.family: "monospace"
+                selectionColor: picker.shell.bgLight
+                selectedTextColor: picker.shell.fg
+                font.family: picker.shell.monoFont
                 font.pixelSize: 15
                 font.weight: Font.Bold
 
@@ -170,7 +170,7 @@ Rectangle {
                 height: parent.height
                 radius: 5
                 color: "transparent"
-                border.color: picker.shell.surface
+                border.color: picker.shell.bgLight
                 border.width: 2
 
                 ListView {
@@ -188,7 +188,7 @@ Rectangle {
 
                         width: ListView.view.width
                         height: 28
-                        color: ListView.isCurrentItem ? picker.shell.hover : "transparent"
+                        color: ListView.isCurrentItem ? picker.shell.bgLight : "transparent"
 
                         Row {
                             anchors.verticalCenter: parent.verticalCenter
@@ -199,8 +199,8 @@ Rectangle {
                             Text {
                                 width: 18
                                 text: picker.itemIcon(modelData)
-                                color: picker.shell.accent
-                                font.family: "JetBrainsMono Nerd Font"
+                                color: picker.shell.primary
+                                font.family: picker.shell.monoFont
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 horizontalAlignment: Text.AlignHCenter
@@ -210,7 +210,7 @@ Rectangle {
                                 text: picker.highlightedText(picker.itemText(modelData))
                                 textFormat: Text.RichText
                                 color: ListView.isCurrentItem ? picker.shell.fg : "#b7bbcc"
-                                font.family: "monospace"
+                                font.family: picker.shell.monoFont
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 elide: Text.ElideRight
@@ -236,7 +236,7 @@ Rectangle {
                 x: leftPane.width + 2
                 width: 6
                 height: parent.height
-                color: dividerMouse.containsMouse || dividerMouse.pressed ? picker.shell.accent : "transparent"
+                color: dividerMouse.containsMouse || dividerMouse.pressed ? picker.shell.primary : "transparent"
                 opacity: 0.65
 
                 property real dragStartX: 0
@@ -268,7 +268,7 @@ Rectangle {
                 height: parent.height
                 radius: 5
                 color: "transparent"
-                border.color: picker.shell.surface
+                border.color: picker.shell.bgLight
                 border.width: 2
 
                 Image {
@@ -294,7 +294,7 @@ Rectangle {
                         width: parent.width
                         text: picker.currentItem ? picker.previewText(picker.currentItem) : ""
                         color: picker.shell.fg
-                        font.family: "monospace"
+                        font.family: picker.shell.monoFont
                         font.pixelSize: 14
                         wrapMode: Text.Wrap
                     }

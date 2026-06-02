@@ -117,7 +117,7 @@ hl.bind("CTRL + SHIFT + U", nos_terminal("nixos-update", "nos-update"))
 
 -- Screenshot
 hl.bind(
-	"Print",
+	"SUPER + SHIFT + S",
 	hl.dsp.exec_cmd(
 		"mkdir -p ~/Screenshots && "
 			.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '

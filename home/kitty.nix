@@ -40,31 +40,31 @@
           open_url_with = "${config.home.homeDirectory}/.config/kitty/open-url.sh";
 
           background = colors.bg;
-          foreground = colors.terminal.foreground;
-          cursor = colors.terminal.cursor;
+          foreground = colors.fg;
+          cursor = colors.fg;
           cursor_text_color = colors.bg;
-          selection_background = colors.terminal.selectionBg;
-          selection_foreground = colors.terminal.selectionFg;
+          selection_background = colors.bgLight;
+          selection_foreground = colors.fg;
 
           # Normal colors
-          color0 = colors.terminal.c0;
-          color1 = colors.terminal.c1;
-          color2 = colors.terminal.c2;
-          color3 = colors.terminal.c3;
-          color4 = colors.terminal.c4;
-          color5 = colors.terminal.c5;
-          color6 = colors.terminal.c6;
-          color7 = colors.terminal.c7;
+          color0 = colors.black;
+          color1 = colors.red;
+          color2 = colors.green;
+          color3 = colors.yellow;
+          color4 = colors.blue;
+          color5 = colors.purple;
+          color6 = colors.teal;
+          color7 = colors.fgDark;
 
           # Bright colors
-          color8 = colors.terminal.c8;
-          color9 = colors.terminal.c9;
-          color10 = colors.terminal.c10;
-          color11 = colors.terminal.c11;
-          color12 = colors.terminal.c12;
-          color13 = colors.terminal.c13;
-          color14 = colors.terminal.c14;
-          color15 = colors.terminal.c15;
+          color8 = colors.bgLight;
+          color9 = colors.red;
+          color10 = colors.green;
+          color11 = colors.orange;
+          color12 = colors.primary;
+          color13 = colors.secondary;
+          color14 = colors.tertiary;
+          color15 = colors.fgLight;
         };
       };
     };

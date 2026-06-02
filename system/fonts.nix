@@ -6,7 +6,7 @@
 
     {
       fonts.packages = with pkgs; [
-        cantarell-fonts
+        adwaita-fonts
         noto-fonts
         noto-fonts-cjk-sans
         noto-fonts-color-emoji

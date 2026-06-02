@@ -43,39 +43,33 @@ let
   # Access them in any home module with: { font, colors, ... }:
 
   font = {
-    name = ""; # sans-serif UI font (e.g. "Cantarell")
+    system = ""; # system UI font (e.g. "Adwaita Sans")
     size = 11;
-    mono = ""; # monospace font for terminals/editors (e.g. "JetBrainsMono Nerd Font")
+    mono = ""; # monospace font for terminals/editors/shell (e.g. "JetBrainsMono Nerd Font")
     monoSize = 10;
   };
 
   colors = {
-    # Backgrounds
     bg = "";
     bgDark = "";
-    bgAlt = "";
+    bgLight = "";
 
-    # Foregrounds
     fg = "";
     fgDark = "";
-    fgDim = "";
+    fgLight = "";
 
-    # UI surfaces
-    hover = "";
-    comment = "";
-    selection = "";
-    surfaceLight = "";
+    primary = "";
+    secondary = "";
+    tertiary = "";
+    quaternary = "";
 
-    # Palette
     black = "";
     red = "";
     orange = "";
     yellow = "";
     green = "";
     teal = "";
-    cyan = "";
     blue = "";
-    magenta = "";
     purple = "";
   };
 

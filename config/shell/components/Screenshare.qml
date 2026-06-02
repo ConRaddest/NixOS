@@ -142,15 +142,15 @@ FloatingWindow {
                     width: 130
                     height: picker.tabsHeight
                     radius: 5
-                    color: picker.shell.hover
-                    border.color: picker.shell.accent
+                    color: picker.shell.bgLight
+                    border.color: picker.shell.primary
                     border.width: 2
 
                     Text {
                         anchors.centerIn: parent
                         text: "󰍹  Screen"
                         color: picker.shell.fg
-                        font.family: "JetBrainsMono Nerd Font"
+                        font.family: picker.shell.monoFont
                         font.pixelSize: 13
                         font.weight: Font.Bold
                     }
@@ -162,14 +162,14 @@ FloatingWindow {
                     height: picker.tabsHeight
                     radius: 5
                     color: "transparent"
-                    border.color: regionMouse.containsMouse ? picker.shell.accent : picker.shell.surface
+                    border.color: regionMouse.containsMouse ? picker.shell.primary : picker.shell.bgLight
                     border.width: 2
 
                     Text {
                         anchors.centerIn: parent
                         text: "󰩭  Region"
-                        color: regionMouse.containsMouse ? picker.shell.fg : picker.shell.fgSubtle
-                        font.family: "JetBrainsMono Nerd Font"
+                        color: regionMouse.containsMouse ? picker.shell.fg : picker.shell.fgDark
+                        font.family: picker.shell.monoFont
                         font.pixelSize: 13
                         font.weight: Font.Bold
                     }
@@ -199,8 +199,8 @@ FloatingWindow {
                         width: picker.previewWidth
                         height: picker.previewHeight
                         radius: 6
-                        color: mouse.containsMouse ? picker.shell.hover : picker.shell.surface
-                        border.color: mouse.containsMouse ? picker.shell.accent : "transparent"
+                        color: mouse.containsMouse ? picker.shell.bgLight : picker.shell.bgLight
+                        border.color: mouse.containsMouse ? picker.shell.primary : "transparent"
                         border.width: mouse.containsMouse ? 2 : 0
 
                         Image {

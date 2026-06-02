@@ -18,13 +18,27 @@ ShellRoot {
     }
 
     readonly property string bg: theme.bg
-    readonly property string bgElevated: theme.bgElevated
+    readonly property string bgDark: theme.bgDark
+    readonly property string bgLight: theme.bgLight
+
     readonly property string fg: theme.fg
-    readonly property string fgSubtle: theme.fgSubtle
-    readonly property string accent: theme.accent
-    readonly property string hover: theme.hover
-    readonly property string surface: theme.surface
-    readonly property string selection: theme.selection
+    readonly property string fgDark: theme.fgDark
+    readonly property string fgLight: theme.fgLight
+
+    readonly property string primary: theme.primary
+    readonly property string secondary: theme.secondary
+    readonly property string tertiary: theme.tertiary
+    readonly property string quaternary: theme.quaternary
+
+    readonly property string black: theme.black
+    readonly property string red: theme.red
+    readonly property string orange: theme.orange
+    readonly property string yellow: theme.yellow
+    readonly property string green: theme.green
+    readonly property string teal: theme.teal
+    readonly property string blue: theme.blue
+    readonly property string purple: theme.purple
+
     readonly property string monoFont: theme.monoFont
     readonly property string flakeDir: theme.flakeDir
     readonly property string assetDir: theme.assetDir
@@ -243,7 +257,7 @@ ShellRoot {
         return matches;
     }
 
-    // Wrap the query match in an accent-coloured span for the list delegate.
+    // Wrap the query match in a primary-coloured span for the list delegate.
     function highlightedText(text) {
         const value = String(text);
         const query = menuQuery.trim();
@@ -256,7 +270,7 @@ ShellRoot {
         let match = lowerValue.indexOf(lowerQuery, position);
         while (match !== -1) {
             result += escapeHtml(value.slice(position, match));
-            result += "<span style=\"color: " + accent + "\">" + escapeHtml(value.slice(match, match + query.length)) + "</span>";
+            result += "<span style=\"color: " + primary + "\">" + escapeHtml(value.slice(match, match + query.length)) + "</span>";
             position = match + query.length;
             match = lowerValue.indexOf(lowerQuery, position);
         }

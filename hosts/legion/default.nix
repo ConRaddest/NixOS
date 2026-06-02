@@ -34,7 +34,7 @@ let
   # ============================================================
 
   font = {
-    name = "Cantarell";
+    system = "Adwaita Sans";
     size = 11;
     mono = "JetBrainsMono Nerd Font";
     monoSize = 10;

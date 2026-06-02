@@ -9,26 +9,8 @@ hl.layer_rule({
 hl.window_rule({
 	match = { title = "shell-launcher" },
 	float = true,
-	size = { 450, 400 },
+	size = { 375, 400 },
 })
-
--- Teams/Chromium notification popups
--- These should normally go through mako via native notifications. If Chromium
--- or Teams still creates a small auxiliary window, keep it floating instead of
--- letting Hyprland tile it as a half-screen window.
-local teams_notification_titles = {
-	".*[Nn]otification.*",
-	".*[Tt]oast.*",
-}
-for _, title in ipairs(teams_notification_titles) do
-	hl.window_rule({
-		match = { class = "TeamsPWA", title = title },
-		float = true,
-		pin = true,
-		size = { 420, 140 },
-		move = { "100%-440", 24 },
-	})
-end
 
 -- Managers
 local managers = {
@@ -62,17 +44,24 @@ for _, title in ipairs(managers) do
 	})
 end
 
--- File pickers
-local file_explorers = {
+-- File pickers / file managers
+local themed_file_windows = {
 	"xdg-desktop-portal-gtk",
 	"org.gnome.Nautilus",
-	"1password",
 }
-for _, class in ipairs(file_explorers) do
+for _, class in ipairs(themed_file_windows) do
 	hl.window_rule({
 		match = { class = class },
 		float = true,
 		center = true,
 		size = { 1300, 800 },
+		opacity = "0.98 override",
 	})
 end
+
+hl.window_rule({
+	match = { class = "1password" },
+	float = true,
+	center = true,
+	size = { 1300, 800 },
+})

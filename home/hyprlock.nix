@@ -2,7 +2,12 @@
 
 {
   flake.lib.homeModules.hyprlock =
-    { config, colors, ... }:
+    {
+      config,
+      colors,
+      font,
+      ...
+    }:
 
     let
       wallpaper = "${config.xdg.stateHome}/nos/current-wallpaper";
@@ -30,7 +35,7 @@
             {
               text = "$TIME";
               color = rgb colors.fg;
-              font_family = "JetBrainsMono Nerd Font ExtraBold";
+              font_family = font.system;
               font_size = 70;
               halign = "center";
               valign = "center";
@@ -40,7 +45,7 @@
             {
               text = ''cmd[update:60000] date +"%A, %B %d"'';
               color = rgb colors.fg;
-              font_family = "JetBrainsMono Nerd Font Medium";
+              font_family = font.system;
               font_size = 18;
               halign = "center";
               valign = "center";
@@ -60,7 +65,7 @@
               placeholder_text = "󰌾  Password";
               fail_text = "󰅙  Try again";
 
-              font_family = "JetBrainsMono Nerd Font Medium";
+              font_family = font.mono;
               font_color = rgb colors.fg;
 
               inner_color = rgba colors.bg "88";

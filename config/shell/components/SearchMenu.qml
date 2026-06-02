@@ -61,15 +61,15 @@ Rectangle {
 
         width: 110
         height: 32
-        color: selected || mouse.containsMouse ? shell.selection : "transparent"
-        border.color: selected || mouse.containsMouse ? shell.accent : shell.surface
+        color: selected || mouse.containsMouse ? shell.bgLight : "transparent"
+        border.color: selected || mouse.containsMouse ? shell.primary : shell.bgLight
         border.width: 2
 
         Text {
             anchors.centerIn: parent
             text: button.text
             color: button.shell.fg
-            font.family: "monospace"
+            font.family: menu.shell.monoFont
             font.pixelSize: 14
             font.weight: Font.Bold
         }
@@ -92,7 +92,7 @@ Rectangle {
             height: 42
             radius: 5
             color: "transparent"
-            border.color: menu.shell.surface
+            border.color: menu.shell.bgLight
             border.width: 2
 
             Text {
@@ -102,8 +102,8 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 20
                 text: menu.searchIcon
-                color: menu.shell.accent
-                font.family: "JetBrainsMono Nerd Font"
+                color: menu.shell.primary
+                font.family: menu.shell.monoFont
                 font.pixelSize: 16
                 font.weight: Font.Bold
                 horizontalAlignment: Text.AlignHCenter
@@ -122,9 +122,9 @@ Rectangle {
                 focus: menu.focusWhenVisible
                 text: menu.query
                 color: menu.shell.fg
-                selectionColor: menu.shell.accent
-                selectedTextColor: menu.shell.bg
-                font.family: "monospace"
+                selectionColor: menu.shell.bgLight
+                selectedTextColor: menu.shell.fg
+                font.family: menu.shell.monoFont
                 font.pixelSize: 15
                 font.weight: Font.Bold
 
@@ -178,7 +178,7 @@ Rectangle {
             height: parent.height - 42 - parent.spacing
             radius: 5
             color: "transparent"
-            border.color: menu.shell.surface
+            border.color: menu.shell.bgLight
             border.width: 2
 
             ListView {
@@ -195,7 +195,7 @@ Rectangle {
 
                     width: ListView.view.width
                     height: 36
-                    color: ListView.isCurrentItem ? menu.shell.hover : "transparent"
+                    color: ListView.isCurrentItem ? menu.shell.bgLight : "transparent"
 
                     Row {
                         anchors.verticalCenter: parent.verticalCenter
@@ -214,8 +214,8 @@ Rectangle {
                                 anchors.centerIn: parent
                                 visible: !menu.itemIconPath(modelData)
                                 text: menu.itemIcon(modelData)
-                                color: menu.shell.accent
-                                font.family: "JetBrainsMono Nerd Font"
+                                color: menu.shell.primary
+                                font.family: menu.shell.monoFont
                                 font.pixelSize: 15
                                 font.weight: Font.Bold
                                 font.italic: menu.italicPredicate(modelData)
@@ -237,7 +237,7 @@ Rectangle {
                             text: menu.highlightedText(menu.itemText(modelData))
                             textFormat: Text.RichText
                             color: menu.shell.fg
-                            font.family: "monospace"
+                            font.family: menu.shell.monoFont
                             font.pixelSize: 15
                             font.weight: Font.Bold
                             font.italic: menu.italicPredicate(modelData)
@@ -271,7 +271,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Are you sure?"
                 color: menu.shell.fg
-                font.family: "monospace"
+                font.family: menu.shell.monoFont
                 font.pixelSize: 16
                 font.weight: Font.Bold
             }
