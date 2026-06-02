@@ -1,0 +1,34 @@
+[
+  {
+    "id": "teams",
+    "name": "Teams",
+    "url": "https://teams.cloud.microsoft/",
+    "icon": "icons/teams.png",
+    "launcher": true,
+    "glyph": "󰍡"
+  },
+  {
+    "id": "whatsapp",
+    "name": "WhatsApp",
+    "url": "https://web.whatsapp.com/",
+    "icon": "icons/whatsapp.png",
+    "launcher": true,
+    "glyph": "󰖣"
+  },
+  {
+    "id": "calendar",
+    "name": "Calendar",
+    "url": "https://calendar.google.com/calendar/u/0/r?pli=1",
+    "icon": "icons/calendar.png",
+    "launcher": true,
+    "glyph": "󰃭"
+  },
+  {
+    "id": "drive",
+    "name": "Drive",
+    "url": "https://drive.google.com/drive/my-drive",
+    "icon": "icons/drive.png",
+    "launcher": true,
+    "glyph": ""
+  }
+]

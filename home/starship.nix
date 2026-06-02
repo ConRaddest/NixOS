@@ -14,7 +14,7 @@
         name: script:
         pkgs.writeShellScriptBin name ''
           export NOS_DIR="$HOME/NixOS"
-          export PATH="${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:$PATH"
+          export PATH="${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.imagemagick}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
@@ -24,6 +24,7 @@
       nos-check = mkNosScript "nos-check" "${self}/config/starship/scripts/nos-check.sh";
       nos-fmt = mkNosScript "nos-fmt" "${self}/config/starship/scripts/nos-fmt.sh";
       nos-theme = mkNosScript "nos-theme" "${self}/config/starship/scripts/nos-theme.sh";
+      nos-webapp = mkNosScript "nos-webapp" "${self}/config/starship/scripts/nos-webapp.sh";
     in
     {
       home.packages = [
@@ -33,6 +34,7 @@
         nos-check
         nos-fmt
         nos-theme
+        nos-webapp
       ];
 
       home.sessionVariables = {

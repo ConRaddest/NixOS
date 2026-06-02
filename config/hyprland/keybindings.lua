@@ -54,6 +54,17 @@ hl.bind("SUPER + W", hl.dsp.window.close())
 hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
 hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+
+local single_window_aspect_enabled = true
+hl.bind("SUPER + M", function()
+	single_window_aspect_enabled = not single_window_aspect_enabled
+	if single_window_aspect_enabled then
+		hl.config({ layout = { single_window_aspect_ratio = { 16, 10 } } })
+	else
+		hl.config({ layout = { single_window_aspect_ratio = { 0, 0 } } })
+	end
+end, { desc = "Toggle single-window max width" })
+
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("scratchpad"))
 
@@ -110,6 +121,7 @@ local function nos_terminal(klass, cmd)
 end
 
 hl.bind("CTRL + SHIFT + H", hl.dsp.exec_cmd("hyprctl reload"))
+hl.bind("CTRL + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
 hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind("CTRL + SHIFT + R", nos_terminal("nixos-refresh", "nos-refresh --offline"))
 hl.bind("CTRL + SHIFT + B", nos_terminal("nixos-build", "nos-build"))

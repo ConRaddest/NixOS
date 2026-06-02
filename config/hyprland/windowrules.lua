@@ -34,6 +34,8 @@ local managers = {
 	"nixos-build",
 	"nixos-update",
 	"nixos-check",
+	"webapp-install",
+	"webapp-uninstall",
 }
 for _, title in ipairs(managers) do
 	hl.window_rule({
@@ -55,7 +57,7 @@ for _, class in ipairs(themed_file_windows) do
 		float = true,
 		center = true,
 		size = { 1300, 800 },
-		opacity = "0.98 override",
+		-- opacity = "0.98 override",
 	})
 end
 
@@ -64,4 +66,14 @@ hl.window_rule({
 	float = true,
 	center = true,
 	size = { 1300, 800 },
+})
+
+hl.window_rule({
+	-- Chromium derives app-mode classes from the URL, and Google Calendar may
+	-- include account/path details such as `__calendar_u_0_r`. Match only the
+	-- stable host prefix so this works across accounts and installs.
+	match = { class = "chrome-calendar\\.google\\.com.*" },
+	float = true,
+	center = true,
+	size = { 1900, 1100 },
 })

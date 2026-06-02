@@ -6,6 +6,7 @@
   colors = {
     # Original backgrounds: bg = "#1a1b26"; bgDark = "#16161e"; bgLight = "#292e42";
     bg = "#1a1b26";
+    # bg = "#1F1F23";
     bgDark = "#16161e";
     bgLight = "#292e42";
 

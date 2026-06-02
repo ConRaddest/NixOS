@@ -152,12 +152,29 @@ PanelWindow {
         }
 
         // ─── Center: clock ────────────────────────────────────────────────────
-        Text {
+        Rectangle {
             anchors.centerIn: parent
-            text: bar.shell.timeText
-            color: bar.shell.fg
-            font.family: bar.shell.monoFont
-            font.pixelSize: 13
+            width: clockText.implicitWidth + 14
+            height: 24
+            radius: 6
+            color: clockMouse.containsMouse ? bar.shell.bgLight : "transparent"
+
+            Text {
+                id: clockText
+                anchors.centerIn: parent
+                text: bar.shell.timeText
+                color: bar.shell.fg
+                font.family: bar.shell.monoFont
+                font.pixelSize: 13
+            }
+
+            MouseArea {
+                id: clockMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: bar.shell.launchDesktop("calendar-pwa")
+            }
         }
 
         // ─── Right: system status pills ───────────────────────────────────────

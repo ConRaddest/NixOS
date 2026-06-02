@@ -26,12 +26,15 @@ hl.config({
 		},
 	},
 	animations = { enabled = true },
+	layout = {
+		-- Disabled by default. Toggle with SUPER+M to constrain a single tiled
+		-- window to 16:9 on ultrawide workspaces.
+		single_window_aspect_ratio = { 16, 10 },
+	},
 	dwindle = { preserve_split = false },
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,
-		-- Let apps such as Firefox/Chromium focus their existing window when a
-		-- link is opened from another app, including switching to its workspace.
 		focus_on_activate = true,
 	},
 })

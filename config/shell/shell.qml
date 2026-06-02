@@ -110,10 +110,7 @@ ShellRoot {
             launchTerminal(t.klass, t.title, t.cmd, t.pause || false);
             root.menuOpen = false;
         } else if (item.desktop) {
-            const entry = DesktopEntries.byId(item.desktop) || (!String(item.desktop).endsWith(".desktop") ? DesktopEntries.byId(item.desktop + ".desktop") : null);
-            if (entry) {
-                entry.execute();
-            }
+            launchDesktop(item.desktop);
             root.menuOpen = false;
         } else if (item.command) {
             if (item.confirm)
@@ -316,6 +313,12 @@ ShellRoot {
     // ─── Utilities ───────────────────────────────────────────────────────────
 
     readonly property string terminal: "kitty"
+
+    function launchDesktop(id) {
+        const entry = DesktopEntries.byId(id) || (!String(id).endsWith(".desktop") ? DesktopEntries.byId(id + ".desktop") : null);
+        if (entry)
+            entry.execute();
+    }
 
     function launchTerminal(klass, title, cmd, pause) {
         const shellCmd = pause ? cmd + "; echo; read -rp 'Press Enter to close...'" : cmd;

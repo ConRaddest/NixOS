@@ -17,6 +17,10 @@ FloatingWindow {
     implicitHeight: 460
     color: shell.bg
 
+    WebApps {
+        id: webApps
+    }
+
     // ─── Menu item data ──────────────────────────────────────────────────────
     // Set dynamicApps: true to populate Apps from all installed desktop entries
     // instead of the curated list below.
@@ -63,11 +67,6 @@ FloatingWindow {
             command: "1password"
         },
         {
-            name: "Teams",
-            icon: "󰍡",
-            desktop: "teams-pwa"
-        },
-        {
             name: "Docker",
             icon: "",
             terminal: {
@@ -78,11 +77,13 @@ FloatingWindow {
         },
     ]
 
+    readonly property var appItems: curatedAppItems.concat(webApps.items)
+
     readonly property var menuItems: [
         {
             name: "Apps",
             icon: "󰀻",
-            items: dynamicApps ? dynamicAppItems : curatedAppItems
+            items: dynamicApps ? dynamicAppItems : appItems
         },
         {
             name: "Install",
@@ -92,6 +93,16 @@ FloatingWindow {
                     name: "Windows",
                     icon: "",
                     command: "windows-install"
+                },
+                {
+                    name: "Web App",
+                    icon: "󰖟",
+                    terminal: {
+                        klass: "webapp-install",
+                        title: "webapp-install",
+                        cmd: "nos-webapp install",
+                        pause: true
+                    }
                 },
             ]
         },
@@ -104,6 +115,16 @@ FloatingWindow {
                     icon: "",
                     command: "windows-uninstall",
                     confirm: true
+                },
+                {
+                    name: "Web App",
+                    icon: "󰖟",
+                    terminal: {
+                        klass: "webapp-uninstall",
+                        title: "webapp-uninstall",
+                        cmd: "nos-webapp uninstall",
+                        pause: true
+                    }
                 },
             ]
         },
@@ -179,8 +200,7 @@ FloatingWindow {
                     terminal: {
                         klass: "nixos-build",
                         title: "nixos-build",
-                        cmd: "nos-build",
-                        pause: true
+                        cmd: "nos-build"
                     }
                 },
                 {
@@ -189,8 +209,7 @@ FloatingWindow {
                     terminal: {
                         klass: "nixos-update",
                         title: "nixos-update",
-                        cmd: "nos-update",
-                        pause: true
+                        cmd: "nos-update"
                     }
                 },
                 {
@@ -199,8 +218,7 @@ FloatingWindow {
                     terminal: {
                         klass: "nixos-refresh",
                         title: "nixos-refresh",
-                        cmd: "nos-refresh",
-                        pause: true
+                        cmd: "nos-refresh"
                     }
                 },
                 {
@@ -296,7 +314,15 @@ FloatingWindow {
             return item.icon || "";
         }
         itemIconPath: function (item) {
-            return item.iconPath || "";
+            if (item.icon)
+                return "";
+            if (item.iconPath)
+                return item.iconPath;
+            if (item.desktop) {
+                const entry = DesktopEntries.byId(item.desktop) || (!String(item.desktop).endsWith(".desktop") ? DesktopEntries.byId(item.desktop + ".desktop") : null);
+                return entry && entry.icon ? Quickshell.iconPath(entry.icon) : "";
+            }
+            return "";
         }
         highlightedText: function (text) {
             return launcher.shell.highlightedText(text);
