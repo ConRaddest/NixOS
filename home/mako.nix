@@ -15,7 +15,7 @@
           margin = "12";
           padding = "12,16";
           border-size = 2;
-          max-icon-size = 0;
+          icons = false;
           default-timeout = 5000;
           ignore-timeout = false;
 

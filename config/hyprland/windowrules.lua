@@ -1,9 +1,34 @@
+-- Mako notifications are layer surfaces; their animations are controlled by
+-- Hyprland, not mako. Disable animations only for mako's layer namespace.
+hl.layer_rule({
+	match = { namespace = "notifications" },
+	no_anim = true,
+})
+
 -- shell launcher
 hl.window_rule({
 	match = { title = "shell-launcher" },
 	float = true,
 	size = { 450, 400 },
 })
+
+-- Teams/Chromium notification popups
+-- These should normally go through mako via native notifications. If Chromium
+-- or Teams still creates a small auxiliary window, keep it floating instead of
+-- letting Hyprland tile it as a half-screen window.
+local teams_notification_titles = {
+	".*[Nn]otification.*",
+	".*[Tt]oast.*",
+}
+for _, title in ipairs(teams_notification_titles) do
+	hl.window_rule({
+		match = { class = "TeamsPWA", title = title },
+		float = true,
+		pin = true,
+		size = { 420, 140 },
+		move = { "100%-440", 24 },
+	})
+end
 
 -- Managers
 local managers = {

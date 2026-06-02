@@ -4,6 +4,10 @@ hl.config({
 		accel_profile = "flat",
 		sensitivity = 1.5,
 	},
+	cursor = {
+		-- Render the cursor in software so Wayland screen sharing can capture it.
+		no_hardware_cursors = true,
+	},
 	general = {
 		gaps_in = 5,
 		gaps_out = 10,
@@ -24,7 +28,13 @@ hl.config({
 	},
 	animations = { enabled = true },
 	dwindle = { preserve_split = true },
-	misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
+	misc = {
+		disable_hyprland_logo = true,
+		disable_splash_rendering = true,
+		-- Let apps such as Firefox/Chromium focus their existing window when a
+		-- link is opened from another app, including switching to its workspace.
+		focus_on_activate = true,
+	},
 })
 
 -- Per-device settings targeting your trackpad specifically

@@ -57,6 +57,7 @@ let
       self.lib.homeModules.theme
 
       self.lib.homeModules.btop
+      self.lib.homeModules.desktop
       self.lib.homeModules.firefox
       self.lib.homeModules.git
       self.lib.homeModules.kitty

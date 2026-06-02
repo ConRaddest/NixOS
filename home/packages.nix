@@ -70,11 +70,7 @@
         pi-coding-agent
 
         # communication
-        # Disable Electron GPU acceleration for Teams. The NVIDIA driver can
-        # leave Teams' accelerated renderer blank after suspend/resume.
-        (writeShellScriptBin "teams-for-linux" ''
-          exec ${teams-for-linux}/bin/teams-for-linux --disableGpu "$@"
-        '')
+        chromium
         localsend
 
         # file manager
