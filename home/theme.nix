@@ -114,6 +114,42 @@
           @define-color popover_fg_color      ${colors.fg};
           @define-color dialog_bg_color       ${colors.bg};
           @define-color dialog_fg_color       ${colors.fg};
+
+          /* Nautilus trash/utility banners. AdwBanner's CSS node is `banner`. */
+          window.view banner > revealer > widget,
+          banner > revealer > widget,
+          toolbar,
+          .toolbar,
+          actionbar,
+          infobar {
+            background-color: @view_bg_color;
+            color: @view_fg_color;
+            border-color: @view_bg_color;
+          }
+
+          window.view banner > revealer > widget:backdrop,
+          banner > revealer > widget:backdrop {
+            background-color: @view_bg_color;
+          }
+
+          window.view banner button,
+          banner button,
+          toolbar button,
+          .toolbar button,
+          actionbar button,
+          infobar button {
+            background-color: @card_bg_color;
+            color: @card_fg_color;
+          }
+
+          window.view banner button:hover,
+          banner button:hover,
+          toolbar button:hover,
+          .toolbar button:hover,
+          actionbar button:hover,
+          infobar button:hover {
+            background-color: ${colors.hover};
+          }
         '';
       };
 
