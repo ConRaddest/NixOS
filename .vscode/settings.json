@@ -1,7 +1,4 @@
 {
-  "Lua.diagnostics.globals": [
-    "hl"
-  ],
   "Lua.diagnostics.disable": [
     "duplicate-doc-field",
     "duplicate-doc-alias"

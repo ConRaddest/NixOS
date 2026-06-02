@@ -227,7 +227,17 @@ FloatingWindow {
                 {
                     name: "Logout",
                     icon: "󰍃",
-                    command: "uwsm stop",
+                    // Let Hyprland exit normally; UWSM will then tear down the
+                    // graphical session cleanly. `uwsm stop` force-stops the
+                    // compositor unit from inside the session and can leave
+                    // user/app units in a bad state for relaunches.
+                    command: "hl.dsp.exit()",
+                    confirm: true
+                },
+                {
+                    name: "Suspend",
+                    icon: "󰒲",
+                    command: "systemctl suspend",
                     confirm: true
                 },
                 {

@@ -347,6 +347,16 @@ ShellRoot {
     // normal exec path instead of inheriting Quickshell's QProcess scope.
     function runDetached(command) {
         const trimmed = command.trim();
+
+        // Allow menu items to call Hyprland Lua dispatchers directly. This is
+        // needed for actions like hl.dsp.exit(), which are not shell commands
+        // and must not be wrapped in hl.dsp.exec_cmd(...).
+        if (trimmed.startsWith("hl.dsp.")) {
+            launchProcess.command = ["hyprctl", "dispatch", trimmed];
+            launchProcess.running = true;
+            return;
+        }
+
         const shellMeta = /[|&;<>()`$\\\n]/.test(trimmed);
         const finalCmd = trimmed.startsWith("uwsm app") ? trimmed : shellMeta ? "uwsm app -- bash -lc " + shellQuote(trimmed) : "uwsm app -- " + trimmed;
 

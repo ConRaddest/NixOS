@@ -3,7 +3,9 @@
 hl.bind("SUPER + SHIFT + Space", hl.dsp.exec_cmd("qs ipc call launcher open"))
 hl.bind("SUPER + Space", hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Apps"))
 hl.bind("SUPER + ALT + Space", hl.dsp.exec_cmd("qs ipc call launcher openSubmenu System"))
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Power"), { locked = true })
+-- While locked, external menus cannot receive keyboard input through the
+-- session lock. Make the hardware power key do the safe lockscreen action.
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 
 -- Apps
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("uwsm -- app kitty"))
@@ -107,6 +109,8 @@ local function nos_terminal(klass, cmd)
 	)
 end
 
+hl.bind("CTRL + SHIFT + H", hl.dsp.exec_cmd("hyprctl reload"))
+hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind("CTRL + SHIFT + R", nos_terminal("nixos-refresh", "nos-refresh --offline"))
 hl.bind("CTRL + SHIFT + B", nos_terminal("nixos-build", "nos-build"))
 hl.bind("CTRL + SHIFT + U", nos_terminal("nixos-update", "nos-update"))

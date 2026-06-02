@@ -6,6 +6,9 @@
 
     let
       wallpaper = "${config.xdg.stateHome}/nos/current-wallpaper";
+      hex = color: builtins.substring 1 6 color;
+      rgb = color: "rgb(${hex color})";
+      rgba = color: alpha: "rgba(${hex color}${alpha})";
     in
     {
       programs.hyprlock = {
@@ -14,17 +17,21 @@
           background = [
             {
               path = wallpaper;
-              blur_passes = 3;
-              blur_size = 8;
+              blur_passes = 4;
+              blur_size = 7;
+              brightness = 0.78;
+              contrast = 0.95;
+              vibrancy = 0.18;
+              vibrancy_darkness = 0.15;
             }
           ];
 
           label = [
             {
               text = "$TIME";
-              color = "rgb(${builtins.substring 1 6 colors.fg})";
-              font_family = "JetBrainsMono Nerd Font";
-              font_size = 60;
+              color = rgb colors.fg;
+              font_family = "JetBrainsMono Nerd Font ExtraBold";
+              font_size = 70;
               halign = "center";
               valign = "center";
               position = "0, 100";
@@ -32,39 +39,36 @@
             }
             {
               text = ''cmd[update:60000] date +"%A, %B %d"'';
-              color = "rgb(${builtins.substring 1 6 colors.fg})";
-              font_family = "JetBrainsMono Nerd Font";
-              font_size = 16;
+              color = rgb colors.fg;
+              font_family = "JetBrainsMono Nerd Font Medium";
+              font_size = 18;
               halign = "center";
               valign = "center";
-              position = "0, 30";
+              position = "0, 20";
               text_align = "center";
             }
           ];
 
           input-field = [
             {
-              size = "300, 42";
-              position = "0, -50";
+              size = "280, 44";
+              position = "0, -58";
               halign = "center";
               valign = "center";
 
               fade_on_empty = false;
-              placeholder_text = "Enter password...";
-              fail_text = "Try again...";
+              placeholder_text = "󰌾  Password";
+              fail_text = "󰅙  Try again";
 
-              font_family = "JetBrainsMono Nerd Font Bold";
-              font_color = "rgb(${builtins.substring 1 6 colors.fgMuted})";
+              font_family = "JetBrainsMono Nerd Font Medium";
+              font_color = rgb colors.fg;
 
-              inner_color = "rgb(${builtins.substring 1 6 colors.bg})";
-              outer_color = "rgb(${builtins.substring 1 6 colors.surface})";
-              check_color = "rgb(${builtins.substring 1 6 colors.blue})";
-              fail_color = "rgb(${builtins.substring 1 6 colors.red})";
-              capslock_color = "rgb(${builtins.substring 1 6 colors.yellow})";
+              inner_color = rgba colors.bg "88";
+              check_color = rgba colors.bg "A0";
+              fail_color = rgba colors.bg "88";
 
-              outline_thickness = 2;
-              rounding = 0;
-              shadow_passes = 0;
+              outline_thickness = 0;
+              rounding = -1;
             }
           ];
         };

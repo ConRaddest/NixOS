@@ -1,4 +1,11 @@
 {
+  # -------- TODO LIST -----------
+  # 1. Logout breaks alot of things, need a way to gracefully exit with splash screen
+  # 2. Need get suspend working so i have a way of shutting down without losing any app progress
+  # 3. Need to fix volume OSD to not go infinitely louder (although pretty cool) - maybe make it match what the volume level actually is?
+  # 4. Need to make volume OSD apply to all outputs instead of just the default output
+  # 5. Need to pull pi from github (source) rather than nix branch to always get latest versions
+
   description = "NixOS configuration";
 
   inputs = {

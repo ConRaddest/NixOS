@@ -63,13 +63,18 @@
         # dev tools
         mkcert
         lazydocker
+        watchexec
 
         # ai agents
         claude-code
         pi-coding-agent
 
         # communication
-        teams-for-linux
+        # Disable Electron GPU acceleration for Teams. The NVIDIA driver can
+        # leave Teams' accelerated renderer blank after suspend/resume.
+        (writeShellScriptBin "teams-for-linux" ''
+          exec ${teams-for-linux}/bin/teams-for-linux --disableGpu "$@"
+        '')
         localsend
 
         # file manager

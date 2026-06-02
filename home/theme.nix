@@ -153,13 +153,33 @@
         '';
       };
 
-      dconf.settings."org/gnome/desktop/interface" = {
-        color-scheme = "prefer-dark";
-        gtk-theme = "adw-gtk3-dark";
-        icon-theme = "Adwaita";
-        font-name = "${font.name} ${toString font.size}";
-        document-font-name = "${font.name} ${toString font.size}";
-        monospace-font-name = "${font.mono} ${toString font.monoSize}";
+      dconf.settings = {
+        "org/gnome/desktop/interface" = {
+          color-scheme = "prefer-dark";
+          gtk-theme = "adw-gtk3-dark";
+          icon-theme = "Adwaita";
+          font-name = "${font.name} ${toString font.size}";
+          document-font-name = "${font.name} ${toString font.size}";
+          monospace-font-name = "${font.mono} ${toString font.monoSize}";
+        };
+
+        # Keep Nautilus and GTK file pickers using the same global ordering.
+        "org/gnome/nautilus/preferences" = {
+          default-sort-order = "name";
+          default-sort-in-reverse-order = false;
+        };
+
+        "org/gtk/gtk4/settings/file-chooser" = {
+          sort-column = "name";
+          sort-order = "ascending";
+          sort-directories-first = true;
+        };
+
+        "org/gtk/settings/file-chooser" = {
+          sort-column = "name";
+          sort-order = "ascending";
+          sort-directories-first = true;
+        };
       };
     };
 }
