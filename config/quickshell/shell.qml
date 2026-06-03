@@ -66,7 +66,7 @@ ShellRoot {
     property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
     property string pendingLauncherSubmenu: ""
 
-    // ─── Menu state ──────────────────────────────────────────────────────────
+    // ─── MenuSearch state ──────────────────────────────────────────────────────────
     property bool menuOpen: false
     property bool wallpaperOpen: false
     property bool screenShareOpen: false
@@ -86,7 +86,7 @@ ShellRoot {
     readonly property var searchableMenuItems: flattenMenu(currentMenuItems, "")
     readonly property var filteredMenuItems: getFilteredMenuItems()
 
-    // ─── Menu: navigation ────────────────────────────────────────────────────
+    // ─── MenuSearch: navigation ────────────────────────────────────────────────────
 
     // Push the item's sub-list onto the stack, or run the item's action.
     function enterMenuItem(item) {
@@ -178,7 +178,7 @@ ShellRoot {
         }
     }
 
-    // ─── Menu: confirm dialog ────────────────────────────────────────────────
+    // ─── MenuSearch: confirm dialog ────────────────────────────────────────────────
 
     function confirmAction(item) {
         confirmItem = item;
@@ -205,7 +205,7 @@ ShellRoot {
             cancelConfirm();
     }
 
-    // ─── Menu: filtering & display ───────────────────────────────────────────
+    // ─── MenuSearch: filtering & display ───────────────────────────────────────────
 
     // Flatten a nested item tree into a searchable list, preserving breadcrumb names.
     function flattenMenu(items, prefix) {
@@ -285,7 +285,7 @@ ShellRoot {
         return false;
     }
 
-    // ─── Menu: internal helpers ──────────────────────────────────────────────
+    // ─── MenuSearch: internal helpers ──────────────────────────────────────────────
 
     function resetMenuView() {
         if (launcher.menuInputItem)
@@ -491,7 +491,7 @@ ShellRoot {
             root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss");
 
             statusProcess.running = false;
-            statusProcess.command = ["bash", "-c", root.assetDir + "/shell/scripts/bar.sh"];
+            statusProcess.command = ["bash", "-c", root.assetDir + "/scripts/shell/bar.sh"];
             statusProcess.running = true;
 
             profileProcess.running = false;
@@ -534,8 +534,6 @@ ShellRoot {
             root.screenShareOpen = false;
         }
     }
-
-
 
     IpcHandler {
         target: "osd"
@@ -596,18 +594,18 @@ ShellRoot {
         }
     }
 
-    ThemePicker {
+    PickerTheme {
         shell: root
     }
-    Menu {
+    Launcher {
         id: launcher
         shell: root
     }
-    Screenshare {
+    PickerScreen {
         id: screenShare
         shell: root
     }
-    Wallpaper {
+    PickerWallpaper {
         shell: root
     }
 }

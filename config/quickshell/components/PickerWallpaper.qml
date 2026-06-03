@@ -48,7 +48,7 @@ FloatingWindow {
     function applyWallpaper(item) {
         if (!item || !item.path)
             return;
-        wallpaperProcess.command = [shell.assetDir + "/shell/scripts/wallpaper.sh", item.path];
+        wallpaperProcess.command = [shell.assetDir + "/scripts/shell/wallpaper.sh", item.path];
         wallpaperProcess.running = true;
         shell.wallpaperOpen = false;
     }
@@ -59,7 +59,7 @@ FloatingWindow {
         fetchProcess.running = true;
     }
 
-    ListPreviewPicker {
+    MenuPreview {
         id: picker
         anchors.fill: parent
         shell: wallpaper.shell

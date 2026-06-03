@@ -11,6 +11,6 @@
       };
 
       xdg.configFile."hypr/hyprland.lua".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/config/hyprland/hyprland.lua";
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/config/hyprland/_hyprland.lua";
     };
 }

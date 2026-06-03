@@ -1,13 +1,23 @@
 #!/usr/bin/env bash
 # osd.sh <volume|brightness|mic> <up|down|mute>
+#
+# Adjusts the requested value, then fires an icon:value pair to the Quickshell
+# OSD IPC handler to display the on-screen overlay.
+#
+# Volume and mic actions apply to every active sink/source — not just the
+# PipeWire default — so multi-output setups stay in sync.
 set -euo pipefail
 
 type="$1"
 action="$2"
 
-MAX_VOLUME=1.5
-VOLUME_STEP=5
+MAX_VOLUME=1.5   # allow up to 150% output for quiet sources
+VOLUME_STEP=5    # percentage points per key press
 
+# ─── Helpers ─────────────────────────────────────────────────────────────────
+
+# Parse numeric device IDs out of a named section of `wpctl status`.
+# Stops reading at $end so we don't bleed entries from the next section.
 wpctl_ids() {
   local start="$1"
   local end="$2"
@@ -21,14 +31,10 @@ wpctl_ids() {
   '
 }
 
-sink_ids() {
-  wpctl_ids "Sinks:" "Sources:"
-}
+sink_ids()   { wpctl_ids "Sinks:"   "Sources:"; }
+source_ids() { wpctl_ids "Sources:" "Filters:"; }
 
-source_ids() {
-  wpctl_ids "Sources:" "Filters:"
-}
-
+# Apply a command to each ID in $ids, or to $fallback if the list is empty.
 for_each_id() {
   local fallback="$1"
   local ids="$2"
@@ -43,12 +49,14 @@ for_each_id() {
   fi
 }
 
+# Return the current volume (0–100 integer) for a device ID.
 vol_value() {
   local raw
   raw=$(wpctl get-volume "$1" 2>/dev/null || echo "Volume: 0.00")
   awk '{printf "%d", $2 * 100}' <<< "$raw"
 }
 
+# Return the highest volume across all IDs (drives the OSD bar value).
 vol_value_max() {
   local fallback="$1"
   local ids="$2"
@@ -71,6 +79,7 @@ vol_muted() {
   wpctl get-volume "$1" 2>/dev/null | grep -q '\[MUTED\]' && echo "true" || echo "false"
 }
 
+# Return true (exit 0) only when every device in $ids is muted.
 all_muted() {
   local fallback="$1"
   local ids="$2"
@@ -86,6 +95,8 @@ all_muted() {
   [ "$(vol_muted "$fallback")" = "true" ]
 }
 
+# These callbacks read $volume_delta / $mute_state set by the caller before
+# passing the function to for_each_id — intentional closure-style globals.
 set_volume_id() {
   wpctl set-volume -l "$MAX_VOLUME" "$1" "${VOLUME_STEP}%${volume_delta}"
 }
@@ -93,6 +104,8 @@ set_volume_id() {
 set_mute_id() {
   wpctl set-mute "$1" "$mute_state"
 }
+
+# ─── Dispatch ────────────────────────────────────────────────────────────────
 
 case "$type" in
   volume)
@@ -104,6 +117,7 @@ case "$type" in
         for_each_id @DEFAULT_AUDIO_SINK@ "$ids" set_volume_id
         ;;
       mute)
+        # Toggle: unmute everything if all are muted, otherwise mute all.
         if all_muted @DEFAULT_AUDIO_SINK@ "$ids"; then mute_state=0
         else                                         mute_state=1
         fi
@@ -112,9 +126,8 @@ case "$type" in
     esac
 
     value=$(vol_value_max @DEFAULT_AUDIO_SINK@ "$ids")
-
     if all_muted @DEFAULT_AUDIO_SINK@ "$ids"; then icon="󰖁"; value=0
-    else                                      icon="󰕾"
+    else                                          icon="󰕾"
     fi
     ;;
 
@@ -135,9 +148,8 @@ case "$type" in
     esac
 
     value=$(vol_value_max @DEFAULT_AUDIO_SOURCE@ "$ids")
-
     if all_muted @DEFAULT_AUDIO_SOURCE@ "$ids"; then icon="󰍭"; value=0
-    else                                        icon="󰍬"
+    else                                            icon="󰍬"
     fi
     ;;
 

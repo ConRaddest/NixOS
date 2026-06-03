@@ -7,7 +7,8 @@
     {
       programs.ssh = {
         enable = true;
-        matchBlocks."*".extraOptions.IdentityAgent = "~/.1password/agent.sock";
+        enableDefaultConfig = false;
+        settings."*".IdentityAgent = "~/.1password/agent.sock";
       };
     };
 }

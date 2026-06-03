@@ -17,7 +17,7 @@ FloatingWindow {
     implicitHeight: 460
     color: shell.bg
 
-    // ─── Menu item data ──────────────────────────────────────────────────────
+    // ─── MenuSearch item data ──────────────────────────────────────────────────────
     // Set dynamicApps: true to populate Apps from all installed desktop entries
     // instead of the curated list below.
     readonly property bool dynamicApps: false
@@ -261,7 +261,7 @@ FloatingWindow {
         },
     ]
 
-    SearchMenu {
+    MenuSearch {
         id: menu
         anchors.fill: parent
         shell: launcher.shell

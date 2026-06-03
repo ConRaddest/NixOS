@@ -1,13 +1,16 @@
--- Settings
 hl.config({
+	-- input
 	input = {
 		accel_profile = "flat",
 		sensitivity = 1.5,
+		repeat_rate = 35,
+		repeat_delay = 200,
 	},
 	cursor = {
-		-- Render the cursor in software so Wayland screen sharing can capture it.
 		no_hardware_cursors = true,
 	},
+
+	-- cosmetics
 	general = {
 		gaps_in = 5,
 		gaps_out = 10,
@@ -27,10 +30,10 @@ hl.config({
 	},
 	animations = { enabled = true },
 	layout = {
-		-- Disabled by default. Toggle with SUPER+M to constrain a single tiled
-		-- window to 16:9 on ultrawide workspaces.
 		single_window_aspect_ratio = { 16, 9 },
 	},
+
+	-- misc
 	dwindle = { preserve_split = true },
 	misc = {
 		disable_hyprland_logo = true,
@@ -39,7 +42,7 @@ hl.config({
 	},
 })
 
--- Per-device settings targeting your trackpad specifically
+-- trackpad specific settings
 hl.device({
 	name = "msft0001:01-06cb:cd5f-touchpad",
 	accel_profile = "adaptive",

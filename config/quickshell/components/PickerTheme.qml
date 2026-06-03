@@ -63,7 +63,7 @@ FloatingWindow {
         currentProcess.running = true;
     }
 
-    ListPreviewPicker {
+    MenuPreview {
         id: picker
         anchors.fill: parent
         shell: themePicker.shell

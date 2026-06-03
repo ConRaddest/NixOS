@@ -17,11 +17,11 @@
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
-      nos-refresh = mkNosScript "nos-refresh" "${self}/config/scripts/nos-refresh.sh";
-      nos-build = mkNosScript "nos-build" "${self}/config/scripts/nos-build.sh";
-      nos-update = mkNosScript "nos-update" "${self}/config/scripts/nos-update.sh";
-      nos-check = mkNosScript "nos-check" "${self}/config/scripts/nos-check.sh";
-      nos-theme = mkNosScript "nos-theme" "${self}/config/scripts/nos-theme.sh";
+      nos-refresh = mkNosScript "nos-refresh" "${self}/scripts/system/nos-refresh.sh";
+      nos-build = mkNosScript "nos-build" "${self}/scripts/system/nos-build.sh";
+      nos-update = mkNosScript "nos-update" "${self}/scripts/system/nos-update.sh";
+      nos-check = mkNosScript "nos-check" "${self}/scripts/system/nos-check.sh";
+      nos-theme = mkNosScript "nos-theme" "${self}/scripts/system/nos-theme.sh";
     in
     {
       programs.bash = {

@@ -5,8 +5,8 @@ hl.window_rule({
 	size = { 375, 400 },
 })
 
--- Managers
-local managers = {
+-- title based windows
+local title_windows = {
 	"wallpaper-picker",
 	"theme-picker",
 	"theme-apply",
@@ -31,7 +31,7 @@ local managers = {
 	"webapp-install",
 	"webapp-uninstall",
 }
-for _, title in ipairs(managers) do
+for _, title in ipairs(title_windows) do
 	hl.window_rule({
 		match = { title = title },
 		float = true,
@@ -40,34 +40,17 @@ for _, title in ipairs(managers) do
 	})
 end
 
--- File pickers / file managers
-local themed_file_windows = {
+-- class based windows
+local class_windows = {
 	"xdg-desktop-portal-gtk",
 	"org.gnome.Nautilus",
+	"1password",
 }
-for _, class in ipairs(themed_file_windows) do
+for _, class in ipairs(class_windows) do
 	hl.window_rule({
 		match = { class = class },
 		float = true,
 		center = true,
 		size = { 1300, 800 },
-		-- opacity = "0.98 override",
 	})
 end
-
-hl.window_rule({
-	match = { class = "1password" },
-	float = true,
-	center = true,
-	size = { 1300, 800 },
-})
-
-hl.window_rule({
-	-- Chromium derives app-mode classes from the URL, and Google Calendar may
-	-- include account/path details such as `__calendar_u_0_r`. Match only the
-	-- stable host prefix so this works across accounts and installs.
-	match = { class = "chrome-calendar\\.google\\.com.*" },
-	float = true,
-	center = true,
-	size = { 1900, 1100 },
-})

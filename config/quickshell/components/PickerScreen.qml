@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 
 // ─── Screen-share picker window ──────────────────────────────────────────────
-// Opened by screenshare.sh via IPC. Reads a list of monitors from a temp file,
+// Opened by screen.sh via IPC. Reads a list of monitors from a temp file,
 // displays previews, and writes the user's selection back to a result file.
 // The script polls that file and forwards the value to the portal.
 FloatingWindow {

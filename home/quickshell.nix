@@ -50,20 +50,20 @@
           readonly property string monoFont:     "${font.mono}"
 
           readonly property string flakeDir:     "${nos}"
-          readonly property string assetDir:     "${nos}/config"
+          readonly property string assetDir:     "${nos}"
           readonly property string wallpaperDir: "${nos}/themes/${theme.id}/wallpapers"
           readonly property string themeDir:     "${nos}/themes"
           readonly property string stateDir:     "${stateDir}"
         }
       '';
 
-      xdg.configFile."quickshell/shell.qml".source = sym "${nos}/config/shell/shell.qml";
-      xdg.configFile."quickshell/components".source = sym "${nos}/config/shell/components";
-      xdg.configFile."quickshell/scripts".source = sym "${nos}/config/shell/scripts";
+      xdg.configFile."quickshell/shell.qml".source = sym "${nos}/config/quickshell/shell.qml";
+      xdg.configFile."quickshell/components".source = sym "${nos}/config/quickshell/components";
+      xdg.configFile."quickshell/scripts".source = sym "${nos}/scripts";
 
       xdg.configFile."hypr/xdph.conf".text = ''
         screencopy {
-          custom_picker_binary = ${nos}/config/shell/scripts/screenshare.sh
+          custom_picker_binary = ${nos}/scripts/shell/screen.sh
         }
       '';
     };
