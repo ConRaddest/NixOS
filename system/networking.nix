@@ -3,8 +3,6 @@
     { ... }:
 
     {
-      # Use iwd directly, managed from impala/iwctl. Do not run NetworkManager at
-      # the same time, otherwise NM and impala/iwd can fight over reconnects.
       networking.networkmanager.enable = false;
       networking.useDHCP = false;
 
@@ -17,17 +15,9 @@
             EnableIPv6 = true;
             NameResolvingService = "systemd";
           };
-          # Keep periodic scans enabled while disconnected so iwd keeps looking
-          # for known networks and reconnects automatically after Wi-Fi drops.
-          Scan = {
-            DisablePeriodicScan = false;
-            InitialPeriodicScanInterval = 10;
-            MaximumPeriodicScanInterval = 60;
-          };
         };
       };
 
-      # DNS for iwd's built-in network configuration.
       services.resolved = {
         enable = true;
         settings.Resolve.FallbackDNS = [
@@ -42,11 +32,11 @@
           "partner-local.pmis.servicesseta.org.za"
           "learner-local.pmis.servicesseta.org.za"
         ];
-        "::1" = [
-          "management-local.pmis.servicesseta.org.za"
-          "partner-local.pmis.servicesseta.org.za"
-          "learner-local.pmis.servicesseta.org.za"
-        ];
+        # "::1" = [
+        #   "management-local.pmis.servicesseta.org.za"
+        #   "partner-local.pmis.servicesseta.org.za"
+        #   "learner-local.pmis.servicesseta.org.za"
+        # ];
       };
     };
 }

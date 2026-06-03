@@ -15,7 +15,7 @@ hl.config({
 		layout = "dwindle",
 	},
 	decoration = {
-		rounding = 12,
+		rounding = 0,
 		active_opacity = 0.93,
 		inactive_opacity = 0.90,
 		blur = {
@@ -31,7 +31,7 @@ hl.config({
 		-- window to 16:9 on ultrawide workspaces.
 		single_window_aspect_ratio = { 16, 9 },
 	},
-	dwindle = { preserve_split = false },
+	dwindle = { preserve_split = true },
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,

@@ -54,7 +54,7 @@
         pciutils
         usbutils
 
-        # nautilus trash support
+        # trash support
         gvfs
       ];
     };

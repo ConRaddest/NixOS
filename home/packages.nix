@@ -36,47 +36,34 @@
       };
 
       home.packages = with pkgs; [
-        # version control
-        git
+        # dev
+        vscode # text editor
+        neovim # alternate text editor
+        git # source control
+        mkcert # local cert management
 
-        # search
-        ripgrep
-        fd
-
-        # cli utilities
-        jq
-        bat
-        eza
-        zoxide
-        fzf
-        tldr
-        tree
-        unzip
-
-        # system info
-        fastfetch
-
-        # language servers
-        nixd
-        lua-language-server
-        qt6.qtdeclarative
-
-        # formatters
-        nixfmt
-        stylua
-
-        # editor
-        vscode
-
-        # runtimes
+        # languages
         python3
         nodejs
         dotnet-sdk_10
 
+        # cli utilities
+        ripgrep # better
+        fd # for finding directories
+        jq # json cli proccessor
+        eza # better ls
+        zoxide # better cd
+        fzf # fuzzy search
+        tldr # command summaries
+        tree # folder
+        unzip # unzip files
+
+        # system info
+        fastfetch
+
         # dev tools
-        mkcert
         lazydocker
-        watchexec
+        yazi
 
         # ai agents
         claude-code
@@ -92,6 +79,15 @@
         # media
         mpv
         imv
+
+        # language servers
+        nixd
+        lua-language-server
+        qt6.qtdeclarative
+
+        # formatters
+        nixfmt
+        stylua
       ];
     };
 }
