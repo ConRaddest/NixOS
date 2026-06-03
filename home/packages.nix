@@ -2,39 +2,9 @@
 
 {
   flake.lib.homeModules.packages =
-    {
-      pkgs,
-      config,
-      ...
-    }:
+    { pkgs, ... }:
 
     {
-      xdg.userDirs = {
-        enable = true;
-        createDirectories = true;
-        desktop = null;
-        templates = null;
-        publicShare = null;
-        download = "${config.home.homeDirectory}/Downloads";
-        documents = "${config.home.homeDirectory}/Documents";
-        pictures = "${config.home.homeDirectory}/Pictures";
-        music = "${config.home.homeDirectory}/Music";
-        videos = "${config.home.homeDirectory}/Videos";
-      };
-
-      # Keep npm global installs/links out of the immutable Nix store.
-      # This makes commands like `npm link` write to ~/.npm-global instead.
-      home.sessionPath = [
-        "${config.home.homeDirectory}/.npm-global/bin"
-      ];
-
-      home.file = {
-        ".npmrc".text = ''
-          prefix=${config.home.homeDirectory}/.npm-global
-        '';
-        ".npm-global/.keep".text = "";
-      };
-
       home.packages = with pkgs; [
         # dev
         vscode # text editor

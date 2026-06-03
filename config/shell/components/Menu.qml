@@ -17,10 +17,6 @@ FloatingWindow {
     implicitHeight: 460
     color: shell.bg
 
-    WebApps {
-        id: webApps
-    }
-
     // ─── Menu item data ──────────────────────────────────────────────────────
     // Set dynamicApps: true to populate Apps from all installed desktop entries
     // instead of the curated list below.
@@ -77,7 +73,7 @@ FloatingWindow {
         },
     ]
 
-    readonly property var appItems: curatedAppItems.concat(webApps.items)
+    readonly property var appItems: curatedAppItems
 
     readonly property var menuItems: [
         {
@@ -94,16 +90,6 @@ FloatingWindow {
                     icon: "",
                     command: "windows-install"
                 },
-                {
-                    name: "Web App",
-                    icon: "󰖟",
-                    terminal: {
-                        klass: "webapp-install",
-                        title: "webapp-install",
-                        cmd: "nos-webapp install",
-                        pause: true
-                    }
-                },
             ]
         },
         {
@@ -115,16 +101,6 @@ FloatingWindow {
                     icon: "",
                     command: "windows-uninstall",
                     confirm: true
-                },
-                {
-                    name: "Web App",
-                    icon: "󰖟",
-                    terminal: {
-                        klass: "webapp-uninstall",
-                        title: "webapp-uninstall",
-                        cmd: "nos-webapp uninstall",
-                        pause: true
-                    }
                 },
             ]
         },
@@ -141,16 +117,6 @@ FloatingWindow {
                     name: "Theme",
                     icon: "󰏘",
                     command: "qs ipc call theme open"
-                },
-                {
-                    name: "Clipboard",
-                    icon: "󰅎",
-                    command: "qs ipc call clipboard open"
-                },
-                {
-                    name: "Screenshots",
-                    icon: "󰹑",
-                    command: "qs ipc call screenshots open"
                 },
                 {
                     name: "Wi-Fi",

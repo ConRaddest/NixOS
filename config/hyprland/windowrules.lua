@@ -1,10 +1,3 @@
--- Mako notifications are layer surfaces; their animations are controlled by
--- Hyprland, not mako. Disable animations only for mako's layer namespace.
-hl.layer_rule({
-	match = { namespace = "notifications" },
-	no_anim = true,
-})
-
 -- shell launcher
 hl.window_rule({
 	match = { title = "shell-launcher" },
@@ -34,6 +27,7 @@ local managers = {
 	"nixos-build",
 	"nixos-update",
 	"nixos-check",
+
 	"webapp-install",
 	"webapp-uninstall",
 }

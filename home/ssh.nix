@@ -2,9 +2,12 @@
 
 {
   flake.lib.homeModules.ssh =
-    { self, ... }:
+    { ... }:
 
     {
-      home.file.".ssh/config".source = "${self}/config/ssh/config";
+      programs.ssh = {
+        enable = true;
+        matchBlocks."*".extraOptions.IdentityAgent = "~/.1password/agent.sock";
+      };
     };
 }

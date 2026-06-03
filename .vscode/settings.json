@@ -4,6 +4,6 @@
     "duplicate-doc-alias"
   ],
   "Lua.workspace.library": [
-    "${workspaceFolder}/.vscode/hyprland-lua.d.lua"
+    "${workspaceFolder}/.vscode/hl.meta.lua"
   ]
 }

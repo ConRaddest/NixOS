@@ -7,10 +7,8 @@
     {
       wayland.windowManager.hyprland = {
         enable = true;
-        systemd.enable = false; # UWSM handles the session
+        systemd.enable = false;
       };
-
-      home.packages = [ pkgs.inotify-tools ];
 
       xdg.configFile."hypr/hyprland.lua".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/config/hyprland/hyprland.lua";

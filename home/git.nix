@@ -12,13 +12,6 @@
           name = "Connor du Toit";
           email = "connordutoit@gmail.com";
         };
-
-        includes = [
-          # {
-          #   condition = "gitdir:~/work/**";
-          #   contents.user.email = "connor@work.com";
-          # }
-        ];
       };
     };
 }

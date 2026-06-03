@@ -53,14 +53,16 @@ let
       self.lib.homeModules.hyprland
       self.lib.homeModules.hyprlock
       self.lib.homeModules.hyprpaper
-      self.lib.homeModules.mako
       self.lib.homeModules.theme
 
+      self.lib.homeModules.bash
       self.lib.homeModules.btop
       self.lib.homeModules.desktop
+      self.lib.homeModules.directories
       self.lib.homeModules.firefox
       self.lib.homeModules.git
       self.lib.homeModules.kitty
+      self.lib.homeModules.npm
       self.lib.homeModules.ssh
       self.lib.homeModules.starship
 

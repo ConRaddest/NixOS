@@ -69,9 +69,7 @@ ShellRoot {
     // ─── Menu state ──────────────────────────────────────────────────────────
     property bool menuOpen: false
     property bool wallpaperOpen: false
-    property bool screenshotsOpen: false
     property bool screenShareOpen: false
-    property bool clipboardOpen: false
     property bool themeOpen: false
     property string menuQuery: ""
     property var menuStack: []
@@ -537,25 +535,7 @@ ShellRoot {
         }
     }
 
-    IpcHandler {
-        target: "screenshots"
-        function open(): void {
-            if (root.screenshotsOpen) {
-                root.screenshotsOpen = false;
-            }
-            root.screenshotsOpen = true;
-        }
-    }
 
-    IpcHandler {
-        target: "clipboard"
-        function open(): void {
-            if (root.clipboardOpen) {
-                root.clipboardOpen = false;
-            }
-            root.clipboardOpen = true;
-        }
-    }
 
     IpcHandler {
         target: "osd"
@@ -623,15 +603,8 @@ ShellRoot {
         id: launcher
         shell: root
     }
-    Clipboard {
-        id: clipboardWindow
-        shell: root
-    }
     Screenshare {
         id: screenShare
-        shell: root
-    }
-    Screenshots {
         shell: root
     }
     Wallpaper {

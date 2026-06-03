@@ -5,20 +5,20 @@
     { self, pkgs, ... }:
 
     let
-      windowsScript = pkgs.writeShellScriptBin "windows-vm" (
+      windows-vm = pkgs.writeShellScriptBin "windows-vm" (
         builtins.readFile "${self}/config/windows/scripts/windows.sh"
       );
-      windowsInstallScript = pkgs.writeShellScriptBin "windows-install" (
-        builtins.readFile "${self}/config/windows/scripts/windows-install.sh"
-      );
-      windowsUninstallScript = pkgs.writeShellScriptBin "windows-uninstall" (
-        builtins.readFile "${self}/config/windows/scripts/windows-uninstall.sh"
-      );
-      windowsRdpScript = pkgs.writeShellScriptBin "windows-vm-rdp" (
+      windows-vm-rdp = pkgs.writeShellScriptBin "windows-vm-rdp" (
         builtins.readFile "${self}/config/windows/scripts/windows-vm-rdp.sh"
       );
-      windowsStartScript = pkgs.writeShellScriptBin "windows-vm-start" (
+      windows-vm-start = pkgs.writeShellScriptBin "windows-vm-start" (
         builtins.readFile "${self}/config/windows/scripts/windows-vm-start.sh"
+      );
+      windows-install = pkgs.writeShellScriptBin "windows-install" (
+        builtins.readFile "${self}/config/windows/scripts/windows-install.sh"
+      );
+      windows-uninstall = pkgs.writeShellScriptBin "windows-uninstall" (
+        builtins.readFile "${self}/config/windows/scripts/windows-uninstall.sh"
       );
     in
     {
@@ -27,11 +27,14 @@
       home.packages = with pkgs; [
         docker-compose
         freerdp
-        windowsScript
-        windowsInstallScript
-        windowsUninstallScript
-        windowsRdpScript
-        windowsStartScript
+        jq
+
+        windows-vm
+        windows-vm-rdp
+        windows-vm-start
+
+        windows-install
+        windows-uninstall
       ];
     };
 }
