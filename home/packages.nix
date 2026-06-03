@@ -22,6 +22,19 @@
         videos = "${config.home.homeDirectory}/Videos";
       };
 
+      # Keep npm global installs/links out of the immutable Nix store.
+      # This makes commands like `npm link` write to ~/.npm-global instead.
+      home.sessionPath = [
+        "${config.home.homeDirectory}/.npm-global/bin"
+      ];
+
+      home.file = {
+        ".npmrc".text = ''
+          prefix=${config.home.homeDirectory}/.npm-global
+        '';
+        ".npm-global/.keep".text = "";
+      };
+
       home.packages = with pkgs; [
         # version control
         git

@@ -29,7 +29,7 @@ hl.config({
 	layout = {
 		-- Disabled by default. Toggle with SUPER+M to constrain a single tiled
 		-- window to 16:9 on ultrawide workspaces.
-		single_window_aspect_ratio = { 16, 10 },
+		single_window_aspect_ratio = { 16, 9 },
 	},
 	dwindle = { preserve_split = false },
 	misc = {

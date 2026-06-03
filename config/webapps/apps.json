@@ -1,13 +1,5 @@
 [
   {
-    "id": "teams",
-    "name": "Teams",
-    "url": "https://teams.cloud.microsoft/",
-    "icon": "icons/teams.png",
-    "launcher": true,
-    "glyph": "󰍡"
-  },
-  {
     "id": "whatsapp",
     "name": "WhatsApp",
     "url": "https://web.whatsapp.com/",

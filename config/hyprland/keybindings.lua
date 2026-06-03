@@ -59,7 +59,7 @@ local single_window_aspect_enabled = true
 hl.bind("SUPER + M", function()
 	single_window_aspect_enabled = not single_window_aspect_enabled
 	if single_window_aspect_enabled then
-		hl.config({ layout = { single_window_aspect_ratio = { 16, 10 } } })
+		hl.config({ layout = { single_window_aspect_ratio = { 16, 9 } } })
 	else
 		hl.config({ layout = { single_window_aspect_ratio = { 0, 0 } } })
 	end
