@@ -20,7 +20,7 @@ FloatingWindow {
     // ─── MenuSearch item data ──────────────────────────────────────────────────────
     // Set dynamicApps: true to populate Apps from all installed desktop entries
     // instead of the curated list below.
-    readonly property bool dynamicApps: false
+    readonly property bool dynamicApps: true
 
     readonly property var dynamicAppItems: {
         DesktopEntries.applicationsChanged;
@@ -61,6 +61,25 @@ FloatingWindow {
             name: "1Password",
             icon: "󰌾",
             command: "1password"
+        },
+        {
+            name: "Teams",
+            icon: "󰊻",
+            command: "teams-for-linux"
+        },
+        {
+            name: "WhatsApp",
+            icon: "󰖣",
+            command: "whatsie"
+        },
+        {
+            name: "Yazi",
+            icon: "󰉋",
+            terminal: {
+                klass: "yazi",
+                title: "yazi",
+                cmd: "yazi"
+            }
         },
         {
             name: "Docker",

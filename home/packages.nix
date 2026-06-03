@@ -35,15 +35,16 @@
         lazydocker
         yazi
 
-        # ai agents
+        # ai agents\
         claude-code
         pi-coding-agent
 
         # communication
         chromium
         localsend
+        teams-for-linux
+        whatsie
 
-        # file manager
         nautilus
 
         # media

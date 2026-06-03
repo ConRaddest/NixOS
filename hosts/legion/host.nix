@@ -57,7 +57,7 @@ let
 
       self.lib.homeModules.bash
       self.lib.homeModules.btop
-      self.lib.homeModules.desktop
+      self.lib.homeModules.fzf
       self.lib.homeModules.directories
       self.lib.homeModules.firefox
       self.lib.homeModules.git
@@ -69,6 +69,7 @@ let
       self.lib.homeModules.quickshell
       self.lib.homeModules.windows
       self.lib.homeModules.packages
+      self.lib.homeModules.yazi
     ];
 
     _module.args = { inherit font colors; };
