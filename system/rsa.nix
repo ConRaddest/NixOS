@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.locale =
+  flake.systemModules.rsa =
     { ... }:
 
     {

@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.users =
+  flake.systemModules.security =
     {
       pkgs,
       username,

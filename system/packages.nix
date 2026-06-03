@@ -13,7 +13,7 @@
         hyprpicker
 
         # polkit
-        lxqt.lxqt-policykit
+        hyprpolkitagent
 
         # screenshot management
         grim
@@ -32,20 +32,21 @@
         cliphist
         wl-clipboard
 
-        # reloading home manager
+        # home manager
         home-manager
         # custom shell
         quickshell
 
-        # wifi / bluetooth / volume ui
+        # bluetooth
         bluetui
-        impala
-        wiremix
-        # controls volume from cli
-        pamixer
 
-        # networking backend for impala
+        # network
+        impala
         iwd
+
+        # audio
+        wiremix
+        pamixer
 
         # windows vm
         qemu

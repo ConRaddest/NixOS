@@ -80,7 +80,7 @@ let
 in
 {
   # ============================================================
-  # System
+  # System modules
   # ============================================================
 
   flake.systemModules.homeManager =
@@ -98,19 +98,18 @@ in
     };
 
   flake.systemModules.legionConfiguration =
-    { pkgs, stateVersion, ... }:
+    { stateVersion, ... }:
     {
       imports = [
         self.systemModules.legionHardware
 
-        self.systemModules.boot
-        self.systemModules.locale
+        self.systemModules.core
+        self.systemModules.rsa
         self.systemModules.networking
         self.systemModules.nix
-        self.systemModules.users
+        self.systemModules.security
 
         self.systemModules.fonts
-        self.systemModules.greetd
         self.systemModules.hyprland
         self.systemModules.portals
 
@@ -118,7 +117,7 @@ in
         self.systemModules.nvidia
 
         self.systemModules.audio
-        self.systemModules.power
+        self.systemModules.battery
         self.systemModules.printing
 
         self.systemModules.docker
@@ -129,21 +128,6 @@ in
 
       networking.hostName = hostName;
       system.stateVersion = stateVersion;
-
-      # Laptop-specific power management.
-      services.thermald.enable = true;
-
-      services.logind.settings.Login = {
-        HandlePowerKey = "ignore";
-        HandleLidSwitch = "ignore";
-        HandleLidSwitchExternalPower = "ignore";
-        HandleLidSwitchDocked = "ignore";
-      };
-
-      services.udev.extraRules = ''
-        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
-        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
-      '';
     };
 
   # ============================================================

@@ -32,11 +32,11 @@
           "partner-local.pmis.servicesseta.org.za"
           "learner-local.pmis.servicesseta.org.za"
         ];
-        # "::1" = [
-        #   "management-local.pmis.servicesseta.org.za"
-        #   "partner-local.pmis.servicesseta.org.za"
-        #   "learner-local.pmis.servicesseta.org.za"
-        # ];
+        "::1" = [
+          "management-local.pmis.servicesseta.org.za"
+          "partner-local.pmis.servicesseta.org.za"
+          "learner-local.pmis.servicesseta.org.za"
+        ];
       };
     };
 }

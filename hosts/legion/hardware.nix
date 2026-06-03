@@ -28,15 +28,6 @@
 
       boot.extraModulePackages = [ ];
 
-      # Intel Wireless-AC 9560 (CNVi) stability fixes.
-      # power_save=0 + power_scheme=1: disable all firmware power saving (CAM mode).
-      # bt_coex_active=0: disable WiFi/BT coexistence — the BT keyboard sharing the
-      # same radio was causing mac80211's keep-alive monitor to time out.
-      boot.extraModprobeConfig = ''
-        options iwlwifi power_save=0 uapsd_disable=1 bt_coex_active=0
-        options iwlmvm power_scheme=1
-      '';
-
       fileSystems."/" = {
         device = "/dev/disk/by-uuid/fb1d081a-2de5-49ba-a19f-2df4274e9a90";
         fsType = "ext4";
