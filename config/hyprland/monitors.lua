@@ -1,11 +1,12 @@
--- monitor specific workspace rules
-hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })
-hl.workspace_rule({ workspace = "2", monitor = "eDP-1", default = true })
-hl.workspace_rule({ workspace = "3", monitor = "eDP-1", default = true })
+local function assign_workspaces(monitor, workspaces)
+	for _, ws in ipairs(workspaces) do
+		hl.workspace_rule({ workspace = tostring(ws), monitor = monitor, default = true })
+	end
+end
 
-hl.workspace_rule({ workspace = "4", monitor = "HDMI-A-1", default = true })
-hl.workspace_rule({ workspace = "5", monitor = "HDMI-A-1", default = true })
-hl.workspace_rule({ workspace = "6", monitor = "HDMI-A-1", default = true })
+-- monitor specific workspace rules
+assign_workspaces("eDP-1", { 1, 2, 3 })
+assign_workspaces("HDMI-A-1", { 4, 5, 6 })
 
 -- monitor config
 hl.monitor({

@@ -1,56 +1,42 @@
--- shell launcher
-hl.window_rule({
-	match = { title = "shell-launcher" },
-	float = true,
-	size = { 375, 400 },
-})
+local POPUP_SIZE = { 1300, 800 }
 
--- title based windows
-local title_windows = {
-	"wallpaper-picker",
-	"theme-picker",
-	"theme-apply",
-	"screenshot-picker",
-	"shell-clipboard",
+local popup_windows = {
+	{ title = "shell-launcher", size = { 375, 400 } },
 
-	"wifi-manager",
-	"bluetooth-manager",
-	"performance-monitor",
-	"audio-manager",
+	{ title = "wallpaper-picker" },
+	{ title = "theme-picker" },
+	{ title = "theme-apply" },
+	{ title = "screenshot-picker" },
+	{ title = "shell-clipboard" },
 
-	"windows-install",
-	"windows-uninstall",
-	"windows-credentials",
-	"windows-vm-start",
+	{ title = "wifi-manager" },
+	{ title = "bluetooth-manager" },
+	{ title = "performance-monitor" },
+	{ title = "audio-manager" },
 
-	"nixos-refresh",
-	"nixos-build",
-	"nixos-update",
-	"nixos-check",
+	{ title = "windows-install" },
+	{ title = "windows-uninstall" },
+	{ title = "windows-credentials" },
+	{ title = "windows-vm-start" },
 
-	"webapp-install",
-	"webapp-uninstall",
+	{ title = "nixos-refresh" },
+	{ title = "nixos-build" },
+	{ title = "nixos-update" },
+	{ title = "nixos-check" },
+
+	{ title = "webapp-install" },
+	{ title = "webapp-uninstall" },
+
+	{ class = "xdg-desktop-portal-gtk" },
+	{ class = "org.gnome.Nautilus" },
+	{ class = "1password" },
 }
-for _, title in ipairs(title_windows) do
+
+for _, w in ipairs(popup_windows) do
 	hl.window_rule({
-		match = { title = title },
+		match = w.title and { title = w.title } or { class = w.class },
 		float = true,
 		center = true,
-		size = { 1300, 800 },
-	})
-end
-
--- class based windows
-local class_windows = {
-	"xdg-desktop-portal-gtk",
-	"org.gnome.Nautilus",
-	"1password",
-}
-for _, class in ipairs(class_windows) do
-	hl.window_rule({
-		match = { class = class },
-		float = true,
-		center = true,
-		size = { 1300, 800 },
+		size = w.size or POPUP_SIZE,
 	})
 end

@@ -1,11 +1,16 @@
 local config_dir = os.getenv("HOME") .. "/NixOS/config/hyprland"
 -- Startup
+local startup_apps = {
+	"uwsm app -- hyprlock", -- lock the screen after auto-login
+	"uwsm app -- hyprpaper", -- load the wallpaper
+	"uwsm app -- qs", -- load quickshell
+	"systemctl --user enable --now hyprpolkitagent.service", -- load polkitagent
+}
+
 hl.on("hyprland.start", function()
-	hl.exec_cmd("uwsm app -- hyprpaper")
-	hl.exec_cmd("systemctl --user enable --now hyprpolkitagent.service")
-	hl.exec_cmd("uwsm app -- qs")
-	hl.exec_cmd("uwsm app -- wl-paste --watch cliphist store")
-	hl.exec_cmd("uwsm app -- hyprlock")
+	for _, cmd in ipairs(startup_apps) do
+		hl.exec_cmd(cmd)
+	end
 end)
 
 dofile(config_dir .. "/monitors.lua")

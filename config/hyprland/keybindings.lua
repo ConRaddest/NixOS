@@ -7,10 +7,15 @@ hl.bind("SUPER + ALT + Space", hl.dsp.exec_cmd("qs ipc call launcher openSubmenu
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 
 -- app binds
-hl.bind("SUPER + Return", hl.dsp.exec_cmd("uwsm -- app kitty"))
-hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm -- app nautilus"))
-hl.bind("SUPER + B", hl.dsp.exec_cmd("uwsm -- app firefox"))
-hl.bind("SUPER + Grave", hl.dsp.exec_cmd("uwsm -- app code"))
+local app_binds = {
+	{ "SUPER + Return", "kitty" },
+	{ "SUPER + E",      "nautilus" },
+	{ "SUPER + B",      "firefox" },
+	{ "SUPER + Grave",  "code" },
+}
+for _, b in ipairs(app_binds) do
+	hl.bind(b[1], hl.dsp.exec_cmd("uwsm -- app " .. b[2]))
+end
 
 -- workspace binds
 hl.bind("SUPER + W", hl.dsp.window.close())
@@ -40,23 +45,17 @@ hl.bind("CTRL + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
 hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("hyprlock"))
 
 -- laptop lid disables display
-hl.bind("switch:on:Lid Switch", function()
-	hl.monitor({ output = "eDP-1", disabled = true })
-end, { locked = true })
-
-hl.bind("switch:off:Lid Switch", function()
-	hl.monitor({ output = "eDP-1", disabled = false })
-end, { locked = true })
+for _, s in ipairs({ { "on", true }, { "off", false } }) do
+	hl.bind("switch:" .. s[1] .. ":Lid Switch", function()
+		hl.monitor({ output = "eDP-1", disabled = s[2] })
+	end, { locked = true })
+end
 
 -- screenshot
-hl.bind(
-	"SUPER + SHIFT + S",
-	hl.dsp.exec_cmd(
-		"mkdir -p ~/Screenshots && "
-			.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
-			.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
-	)
-)
+local screenshot_cmd = "mkdir -p ~/Screenshots && "
+	.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
+	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
 -- nixos helpers
 local function terminal(klass, cmd)
@@ -71,9 +70,14 @@ local function terminal(klass, cmd)
 	)
 end
 
-hl.bind("CTRL + SHIFT + R", terminal("nixos-refresh", "nos-refresh --offline"))
-hl.bind("CTRL + SHIFT + B", terminal("nixos-build", "nos-build"))
-hl.bind("CTRL + SHIFT + U", terminal("nixos-update", "nos-update"))
+local nixos_binds = {
+	{ "CTRL + SHIFT + R", "nixos-refresh", "nos-refresh --offline" },
+	{ "CTRL + SHIFT + B", "nixos-build",   "nos-build" },
+	{ "CTRL + SHIFT + U", "nixos-update",  "nos-update" },
+}
+for _, b in ipairs(nixos_binds) do
+	hl.bind(b[1], terminal(b[2], b[3]))
+end
 
 --- advanced shortcuts ---
 -- universal copy / paste

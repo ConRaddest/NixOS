@@ -11,35 +11,13 @@ hl.curve("fast", {
 })
 
 local animations = {
-	{
-		leaf = "windows",
-		speed = 2,
-		spring = "spring",
-	},
-	{
-		leaf = "windowsOut",
-		speed = 2,
-		spring = "spring",
-	},
-	{
-		leaf = "workspaces",
-		speed = 2,
-		bezier = "fast",
-	},
-	{
-		leaf = "specialWorkspace",
-		speed = 2,
-		bezier = "fast",
-		style = "slidevert",
-	},
-	{
-		leaf = "fade",
-		speed = 1,
-		bezier = "fast",
-	},
+	{ enabled = true, leaf = "windows", speed = 2, spring = "spring" },
+	{ enabled = true, leaf = "windowsOut", speed = 2, spring = "spring" },
+	{ enabled = true, leaf = "workspaces", speed = 2, bezier = "fast" },
+	{ enabled = true, leaf = "specialWorkspace", speed = 2, bezier = "fast", style = "slidevert" },
+	{ enabled = true, leaf = "fade", speed = 1, bezier = "fast" },
 }
 
 for _, animation in ipairs(animations) do
-	animation.enabled = true
 	hl.animation(animation)
 end

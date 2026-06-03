@@ -43,8 +43,9 @@ hl.config({
 })
 
 -- trackpad specific settings
+local TOUCHPAD = "msft0001:01-06cb:cd5f-touchpad"
 hl.device({
-	name = "msft0001:01-06cb:cd5f-touchpad",
+	name = TOUCHPAD,
 	accel_profile = "adaptive",
 	natural_scroll = true,
 	sensitivity = 0.0,
