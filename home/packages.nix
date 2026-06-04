@@ -28,6 +28,8 @@
         tree # folder
         unzip # unzip files
 
+        audacity
+
         # system info
         fastfetch
 
