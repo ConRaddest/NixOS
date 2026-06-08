@@ -2,9 +2,115 @@
 
 {
   flake.lib.homeModules.yazi =
-    { colors, ... }:
-
     {
+      pkgs,
+      colors,
+      ...
+    }:
+
+    let
+      yazi-wrapper = pkgs.writeShellScriptBin "yazi-wrapper.sh" ''
+        multiple="$1"
+        directory="$2"
+        save="$3"
+        path="$4"
+        out="$5"
+
+        log="/tmp/yazi-chooser.log"
+        echo "--- $(date) ---"       >> "$log"
+        echo "multiple=$multiple"    >> "$log"
+        echo "directory=$directory"  >> "$log"
+        echo "save=$save"            >> "$log"
+        echo "path=$path"            >> "$log"
+
+        termcmd="''${TERMCMD:-kitty --title termfilechooser -e}"
+
+        : > "$out"
+        $termcmd yazi --chooser-file="$out" ''${path:+"$path"} || true
+
+        echo "result=$(cat "$out" 2>/dev/null || echo EMPTY)" >> "$log"
+
+        if [ -s "$out" ] && [ "$directory" != "1" ] && [ "$save" != "1" ]; then
+            selected=$(head -1 "$out")
+            if [ -d "$selected" ]; then
+                : > "$out"
+            fi
+        fi
+
+        [ -s "$out" ] || : > "$out"
+        exit 0
+      '';
+    in
+    {
+      home.packages = [ yazi-wrapper ];
+
+      xdg.desktopEntries.yazi = {
+        name = "Yazi";
+        comment = "Terminal file manager";
+        exec = "kitty --class yazi --title yazi --override window_padding_width=0 -e yazi %f";
+        icon = "yazi";
+        terminal = false;
+        type = "Application";
+        mimeType = [
+          "inode/directory"
+          "application/x-directory"
+        ];
+        categories = [
+          "System"
+          "FileManager"
+          "FileTools"
+        ];
+      };
+
+      xdg.configFile."xdg-desktop-portal-termfilechooser/config".text = ''
+        [filechooser]
+        cmd=yazi-wrapper.sh
+        default_dir=$HOME
+        env=TERMCMD=kitty --class termfilechooser --title FileChooser --override window_padding_width=0 -e
+        open_mode=suggested
+        save_mode=suggested
+        create_help_file=1
+      '';
+
+      xdg.mimeApps = {
+        enable = true;
+        defaultApplications = {
+          "inode/directory" = "yazi.desktop";
+          "application/x-directory" = "yazi.desktop";
+        };
+      };
+
+      xdg.configFile."yazi/yazi.toml".text = ''
+        [mgr]
+        show_hidden = false
+
+        [opener]
+        edit = [
+          { run = "uwsm app -- code --reuse-window %*", block = false, desc = "VS Code" },
+        ]
+        view = [
+          { run = "uwsm app -- imv %*", block = false, desc = "imv" },
+          { run = "xdg-open %*", block = false, desc = "Open" },
+        ]
+        play = [
+          { run = "uwsm app -- mpv %*", block = false, desc = "mpv" },
+        ]
+        open = [
+          { run = "xdg-open %*", block = false, desc = "Open" },
+        ]
+
+        [open]
+        rules = [
+          { mime = "inode/x-empty",   use = ["edit"] },
+          { mime = "text/*",          use = ["edit"] },
+          { mime = "application/{json,ld+json,javascript,typescript,x-yaml,toml,xml,x-sh,x-shellscript}", use = ["edit"] },
+          { url = "*.{md,markdown,txt,log,csv,tsv,json,jsonc,yml,yaml,toml,xml,html,css,js,jsx,ts,tsx,py,sh,bash,zsh,lua,nix,rs,go,c,cpp,h,hpp}", use = ["edit"] },
+          { mime = "image/*",         use = ["view", "edit"] },
+          { mime = "{audio,video}/*", use = ["play"] },
+          { mime = "*",               use = ["open"] },
+        ]
+      '';
+
       xdg.configFile."yazi/theme.toml".text = ''
         [mgr]
         cwd             = { fg = "${colors.primary}" }
@@ -109,8 +215,8 @@
         [icon]
         dirs = []
         prepend_conds = [
-          { if = "dir & hovered", text = "", fg = "${colors.primary}" },
-          { if = "dir",           text = "", fg = "${colors.primary}" },
+          { if = "dir & hovered", text = "󰝰", fg = "${colors.primary}" },
+          { if = "dir",           text = "󰉋", fg = "${colors.primary}" },
         ]
 
         [filetype]
@@ -124,55 +230,5 @@
           { url = "*",  fg = "${colors.fg}",      bg = "${colors.bg}" },
         ]
       '';
-
-      xdg.configFile."yazi/yazi.toml".text = ''
-        [opener]
-        edit = [
-          { run = "uwsm app -- code %*", block = false, desc = "VS Code" },
-        ]
-        view = [
-          { run = "uwsm app -- imv %*", block = false, desc = "imv" },
-        ]
-        play = [
-          { run = "uwsm app -- mpv %*", block = false, desc = "mpv" },
-        ]
-
-        [open]
-        rules = [
-          { mime = "image/*",         use = ["view", "edit"] },
-          { mime = "{audio,video}/*", use = ["play", "edit"] },
-          { mime = "inode/x-empty",   use = ["edit"] },
-          { mime = "text/*",          use = ["edit"] },
-          { mime = "application/{json,javascript,typescript,x-yaml,toml,xml,x-sh,x-shellscript}", use = ["edit"] },
-          { mime = "*",               use = ["edit"] },
-        ]
-      '';
-
-      xdg.configFile."yazi/scripts/fz.sh" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          dir=$(zoxide query -i 2>/dev/null)
-          [ -n "$dir" ] && ya emit cd "$dir"
-        '';
-      };
-
-      xdg.configFile."yazi/scripts/ff.sh" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          file=$(fzf 2>/dev/null)
-          [ -n "$file" ] && ya emit reveal "$file"
-        '';
-      };
-
-      xdg.configFile."yazi/scripts/fd.sh" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          dir=$(fd --type d 2>/dev/null | fzf 2>/dev/null)
-          [ -n "$dir" ] && ya emit cd "$dir"
-        '';
-      };
     };
 }

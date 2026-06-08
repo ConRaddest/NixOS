@@ -30,6 +30,7 @@
           ls = "eza --icons";
           ll = "eza -la --icons";
           cd = "z";
+          startw = "uwsm start hyprland-uwsm.desktop";
         };
         initExtra = ''
           if [ -f "$HOME/NixOS/.env" ]; then

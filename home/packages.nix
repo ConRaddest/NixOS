@@ -6,6 +6,9 @@
 
     {
       home.packages = with pkgs; [
+        # portals
+        xdg-desktop-portal-termfilechooser
+
         # dev
         vscode # text editor
         neovim # alternate text editor
@@ -42,12 +45,9 @@
         pi-coding-agent
 
         # communication
-        chromium
         localsend
         teams-for-linux
         whatsie
-
-        nautilus
 
         # media
         mpv
