@@ -65,13 +65,3 @@ fi
 
 # btop reads its color config at startup, so it must be restarted to pick up changes.
 pkill -x btop >/dev/null 2>&1 || true
-
-# Quickshell generates Theme.qml from the Nix-built home-manager output.
-# Kill and relaunch so it loads the freshly-linked theme colors.
-qs kill >/dev/null 2>&1 || true
-sleep 0.2
-if command -v uwsm >/dev/null 2>&1; then
-  uwsm app -- qs >/dev/null 2>&1 &
-else
-  qs --daemonize >/dev/null 2>&1 || true
-fi

@@ -25,30 +25,49 @@
         import QtQuick
 
         QtObject {
-          readonly property string bg:           "${colors.bg}"
-          readonly property string bgDark:       "${colors.bgDark}"
-          readonly property string bgLight:      "${colors.bgLight}"
+          // ── Surfaces ──────────────────────────────────────────────────────
+          readonly property string crust:   "${colors.crust}"
+          readonly property string mantle:  "${colors.mantle}"
+          readonly property string base:    "${colors.base}"
+          readonly property string surface: "${colors.surface}"
+          readonly property string overlay: "${colors.overlay}"
+          readonly property string border:  "${colors.border}"
 
-          readonly property string fg:           "${colors.fg}"
-          readonly property string fgDark:       "${colors.fgDark}"
-          readonly property string fgLight:      "${colors.fgLight}"
+          // ── Text ──────────────────────────────────────────────────────────
+          readonly property string text:    "${colors.text}"
+          readonly property string subtext: "${colors.subtext}"
+          readonly property string muted:   "${colors.muted}"
+          readonly property string faint:   "${colors.faint}"
 
-          readonly property string primary:      "${colors.primary}"
-          readonly property string secondary:    "${colors.secondary}"
-          readonly property string tertiary:     "${colors.tertiary}"
-          readonly property string quaternary:   "${colors.quaternary}"
+          // ── Accent ────────────────────────────────────────────────────────
+          readonly property string accent:  "${colors.accent}"
 
-          readonly property string black:        "${colors.black}"
-          readonly property string red:          "${colors.red}"
-          readonly property string orange:       "${colors.orange}"
-          readonly property string yellow:       "${colors.yellow}"
-          readonly property string green:        "${colors.green}"
-          readonly property string teal:         "${colors.teal}"
-          readonly property string blue:         "${colors.blue}"
-          readonly property string purple:       "${colors.purple}"
+          // ── Hues ──────────────────────────────────────────────────────────
+          readonly property string red:    "${colors.red}"
+          readonly property string orange: "${colors.orange}"
+          readonly property string yellow: "${colors.yellow}"
+          readonly property string green:  "${colors.green}"
+          readonly property string teal:   "${colors.teal}"
+          readonly property string cyan:   "${colors.cyan}"
+          readonly property string blue:   "${colors.blue}"
+          readonly property string purple: "${colors.purple}"
 
+          // ── Terminal ANSI (normal) ────────────────────────────────────────
+          readonly property string black: "${colors.black}"
+          readonly property string white: "${colors.white}"
+
+          // ── Terminal ANSI (bright) ────────────────────────────────────────
+          readonly property string brightBlack:  "${colors.brightBlack}"
+          readonly property string brightRed:    "${colors.brightRed}"
+          readonly property string brightGreen:  "${colors.brightGreen}"
+          readonly property string brightYellow: "${colors.brightYellow}"
+          readonly property string brightBlue:   "${colors.brightBlue}"
+          readonly property string brightPurple: "${colors.brightPurple}"
+          readonly property string brightCyan:   "${colors.brightCyan}"
+          readonly property string brightWhite:  "${colors.brightWhite}"
+
+          // ── Meta ──────────────────────────────────────────────────────────
           readonly property string monoFont:     "${font.mono}"
-
           readonly property string flakeDir:     "${nos}"
           readonly property string assetDir:     "${nos}"
           readonly property string wallpaperDir: "${nos}/themes/${theme.id}/wallpapers"

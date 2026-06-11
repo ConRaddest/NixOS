@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
 
@@ -15,7 +16,9 @@ PanelWindow {
         right: true
     }
 
-    implicitHeight: 30
+    visible: shell.barVisible
+    implicitHeight: 38
+    exclusiveZone: shell.barVisible ? 28 : 0
     color: "transparent"
 
     // ─── Inline component: StatusPill ────────────────────────────────────────
@@ -31,15 +34,23 @@ PanelWindow {
         width: label.implicitWidth + 14
         height: 24
         radius: 6
-        color: pill.clickable && mouse.containsMouse ? pill.shell.bgLight : "transparent"
+        color: "transparent"
 
         Text {
             id: label
             anchors.centerIn: parent
             text: pill.text
-            color: pill.shell.fg
+            color: pill.shell.text
             font.family: pill.shell.monoFont
-            font.pixelSize: 13
+            font.pixelSize: 14
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowColor: "#ff000000"
+                shadowBlur: 1.0
+                shadowVerticalOffset: 2
+                shadowHorizontalOffset: 0
+            }
         }
 
         MouseArea {
@@ -77,46 +88,17 @@ PanelWindow {
         return ids.sort((a, b) => a - b);
     }
 
-    readonly property int monitorActiveWorkspace: {
-        const active = bar.hyprMonitor?.activeWorkspace?.id || 0;
-        return active > 0 ? active : 0;
-    }
-
     // ─── Background ──────────────────────────────────────────────────────────
     Rectangle {
         anchors.fill: parent
-        color: bar.shell.bg
-        opacity: 0.90
+        color: "transparent"
 
         // ─── Left: launcher icon + workspace indicators ───────────────────────
         Row {
             anchors.left: parent.left
-            anchors.leftMargin: 4
+            anchors.leftMargin: 14
             anchors.verticalCenter: parent.verticalCenter
             spacing: 6
-
-            Rectangle {
-                width: 22
-                height: 22
-                radius: 6
-                color: launcherMouse.containsMouse ? bar.shell.bgLight : "transparent"
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "󰍜"
-                    color: bar.shell.fgDark
-                    font.family: bar.shell.monoFont
-                    font.pixelSize: 13
-                }
-
-                MouseArea {
-                    id: launcherMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: bar.shell.menuOpen = true
-                }
-            }
 
             Repeater {
                 model: bar.monitorWorkspaceIds
@@ -125,21 +107,28 @@ PanelWindow {
                     required property int modelData
 
                     readonly property bool active: (Hyprland.focusedWorkspace?.id || 0) === modelData
-                    readonly property bool monitorActive: !active && bar.monitorActiveWorkspace === modelData
 
                     width: 22
                     height: 22
                     radius: 6
-                    color: active ? bar.shell.bgLight : "transparent"
-                    border.color: active ? bar.shell.fg : (monitorActive ? bar.shell.fgDark : "transparent")
-                    border.width: (active || monitorActive) ? 1 : 0
+                    color: "transparent"
+                    border.color: active ? bar.shell.text : "transparent"
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        shadowEnabled: true
+                        shadowColor: "#e6000000"
+                        shadowBlur: 0.9
+                        shadowVerticalOffset: 1.5
+                        shadowHorizontalOffset: 0
+                    }
 
                     Text {
                         anchors.centerIn: parent
                         text: parent.modelData
-                        color: parent.active ? bar.shell.fg : bar.shell.fgDark
+                        color: parent.active ? bar.shell.text : bar.shell.text
                         font.family: bar.shell.monoFont
-                        font.pixelSize: 13
+                        font.pixelSize: 14
                     }
 
                     MouseArea {
@@ -151,33 +140,7 @@ PanelWindow {
             }
         }
 
-        // ─── Center: clock ────────────────────────────────────────────────────
-        Rectangle {
-            anchors.centerIn: parent
-            width: clockText.implicitWidth + 14
-            height: 24
-            radius: 6
-            color: clockMouse.containsMouse ? bar.shell.bgLight : "transparent"
-
-            Text {
-                id: clockText
-                anchors.centerIn: parent
-                text: bar.shell.timeText
-                color: bar.shell.fg
-                font.family: bar.shell.monoFont
-                font.pixelSize: 13
-            }
-
-            MouseArea {
-                id: clockMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: bar.shell.launchDesktop("calendar-pwa")
-            }
-        }
-
-        // ─── Right: system status pills ───────────────────────────────────────
+        // ─── Right: status pills + clock ─────────────────────────────────────
         Row {
             anchors.right: parent.right
             anchors.rightMargin: 14
@@ -206,13 +169,13 @@ PanelWindow {
                 shell: bar.shell
                 text: bar.shell.batteryText
                 clickable: true
-                onClicked: bar.shell.runDetached("qs ipc call launcher openSubmenu Profile")
+                onClicked: bar.shell.launchTerminal("performance-monitor", "performance-monitor", "btop")
             }
             StatusPill {
                 shell: bar.shell
-                text: "  " + bar.shell.cpuText + "    " + bar.shell.ramText
+                text: bar.shell.timeText
                 clickable: true
-                onClicked: bar.shell.launchTerminal("performance-monitor", "performance-monitor", "btop")
+                onClicked: bar.shell.launchDesktop("calendar-pwa")
             }
         }
     }

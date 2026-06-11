@@ -70,6 +70,7 @@ let
       self.lib.homeModules.windows
       self.lib.homeModules.packages
       self.lib.homeModules.yazi
+      self.lib.homeModules.icons
     ];
 
     _module.args = { inherit font colors; };

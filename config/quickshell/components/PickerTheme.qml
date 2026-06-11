@@ -16,7 +16,7 @@ FloatingWindow {
     title: "theme-picker"
     implicitWidth: 760
     implicitHeight: 460
-    color: shell.bg
+    color: shell.base
 
     // ─── Read current theme symlink target ───────────────────────────────────
     Process {

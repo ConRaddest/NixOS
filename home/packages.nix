@@ -5,6 +5,19 @@
     { pkgs, ... }:
 
     {
+      xdg.desktopEntries.lazydocker = {
+        name = "LazyDocker";
+        comment = "Docker terminal UI";
+        exec = "kitty --class lazy-docker --title lazy-docker -e lazydocker";
+        icon = "docker";
+        terminal = false;
+        type = "Application";
+        categories = [
+          "Development"
+          "System"
+        ];
+      };
+
       home.packages = with pkgs; [
         # portals
         xdg-desktop-portal-termfilechooser
@@ -32,6 +45,7 @@
         unzip # unzip files
 
         audacity
+        blender
 
         # system info
         fastfetch

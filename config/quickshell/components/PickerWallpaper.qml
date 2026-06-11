@@ -15,7 +15,7 @@ FloatingWindow {
     title: "wallpaper-picker"
     implicitWidth: 760
     implicitHeight: 460
-    color: shell.bg
+    color: shell.base
 
     Process {
         id: wallpaperProcess

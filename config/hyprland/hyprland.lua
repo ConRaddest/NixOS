@@ -61,11 +61,16 @@ hl.config({
 	general = {
 		gaps_in = 5,
 		gaps_out = 10,
-		border_size = 0,
+		border_size = 1,
 		layout = "dwindle",
+		col = {
+			active_border = "rgba(1a1b26ff)",
+			inactive_border = "rgba(1a1b26ff)",
+		},
 	},
+
 	decoration = {
-		rounding = 0,
+		rounding = 12,
 		active_opacity = 0.93,
 		inactive_opacity = 0.90,
 		blur = {
@@ -74,6 +79,15 @@ hl.config({
 			size = 5,
 			passes = 2,
 			xray = true,
+		},
+		shadow = {
+			enabled = true,
+			range = 40, -- Huge spread to get that soft macOS feel
+			render_power = 20, -- Max smoothness for the gradient falloff
+			color = 0x33000000, -- Soft black with roughly 40% opacity (0x66)
+			color_inactive = 0x22000000, -- Lighter shadow for unfocused windows
+			offset = { 0, 3 }, -- Pushes the shadow significantly downward
+			scale = 1, -- Slightly shrinks the shadow footprint behind the window
 		},
 	},
 	animations = { enabled = true },
@@ -116,11 +130,11 @@ hl.curve("fast", {
 })
 
 local animations = {
-	{ enabled = true, leaf = "windows",          speed = 2, spring = "spring" },
-	{ enabled = true, leaf = "windowsOut",        speed = 2, spring = "spring" },
-	{ enabled = true, leaf = "workspaces",        speed = 2, bezier = "fast" },
-	{ enabled = true, leaf = "specialWorkspace",  speed = 2, bezier = "fast", style = "slidevert" },
-	{ enabled = true, leaf = "fade",              speed = 1, bezier = "fast" },
+	{ enabled = true, leaf = "windows", speed = 2, spring = "spring" },
+	{ enabled = true, leaf = "windowsOut", speed = 2, spring = "spring" },
+	{ enabled = true, leaf = "workspaces", speed = 2, bezier = "fast" },
+	{ enabled = true, leaf = "specialWorkspace", speed = 2, bezier = "fast", style = "slidevert" },
+	{ enabled = true, leaf = "fade", speed = 1, bezier = "fast" },
 }
 
 for _, animation in ipairs(animations) do
@@ -132,9 +146,37 @@ end
 -- ============================================================
 
 -- launchers
-hl.bind("SUPER + SHIFT + Space", hl.dsp.exec_cmd("qs ipc call launcher open"))
-hl.bind("SUPER + Space",         hl.dsp.exec_cmd("qs ipc call launcher openSubmenu Apps"))
-hl.bind("SUPER + ALT + Space",   hl.dsp.exec_cmd("qs ipc call launcher openSubmenu System"))
+local function place_launcher_on_active_workspace(workspace, monitor)
+	for _, win in ipairs(hl.get_windows()) do
+		if win.title == "shell-launcher" then
+			hl.dispatch(hl.dsp.window.move({ window = win, workspace = workspace }))
+			hl.dispatch(hl.dsp.window.move({ window = win, monitor = monitor }))
+			hl.dispatch(hl.dsp.window.center({ window = win }))
+			hl.dispatch(hl.dsp.focus({ window = win }))
+			return
+		end
+	end
+end
+
+local function open_launcher(cmd)
+	local workspace = hl.get_active_workspace()
+	local monitor = hl.get_active_monitor()
+	hl.dispatch(hl.dsp.exec_cmd(cmd))
+	hl.timer(function()
+		place_launcher_on_active_workspace(workspace, monitor)
+	end, { timeout = 120, type = "oneshot" })
+end
+
+hl.bind("SUPER + SHIFT + Space", function()
+	open_launcher("qs ipc call launcher open")
+end)
+hl.bind("SUPER + Space", function()
+	open_launcher("qs ipc call launcher openSubmenu Apps")
+end)
+hl.bind("SUPER + ALT + Space", function()
+	open_launcher("qs ipc call launcher openSubmenu System")
+end)
+hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("qs ipc call bar toggle"))
 
 -- suspend on power off
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
@@ -142,35 +184,42 @@ hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 -- apps
 local app_binds = {
 	{ "SUPER + Return", "kitty" },
-	{ "SUPER + B",      "firefox" },
-	{ "SUPER + Grave",  "code" },
+	{ "SUPER + B", "firefox" },
 }
 for _, b in ipairs(app_binds) do
 	hl.bind(b[1], hl.dsp.exec_cmd("uwsm -- app " .. b[2]))
 end
 
-hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi --override window_padding_width=0 -e yazi"))
+hl.bind("SUPER + Grave", hl.dsp.workspace.toggle_special("terminal"))
+hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi -e yazi"))
 
 -- workspaces
-hl.bind("SUPER + W",   hl.dsp.window.close())
-hl.bind("SUPER + J",   hl.dsp.layout("togglesplit"))
-hl.bind("SUPER + T",   hl.dsp.window.float({ action = "toggle" }))
-hl.bind("SUPER + F",   hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+hl.bind("SUPER + W", function()
+	local win = hl.get_active_window()
+	if win and win.title == "shell-launcher" then
+		hl.dispatch(hl.dsp.exec_cmd("qs ipc call launcher close"))
+	else
+		hl.dispatch(hl.dsp.window.close())
+	end
+end)
+hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
+hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
+hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
-hl.bind("SUPER + S",   hl.dsp.workspace.toggle_special("scratchpad"))
+hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("scratchpad"))
 
 for _, dir in ipairs({ "left", "right", "up", "down" }) do
-	hl.bind("SUPER + " .. dir,         hl.dsp.focus({ direction = dir }))
+	hl.bind("SUPER + " .. dir, hl.dsp.focus({ direction = dir }))
 	hl.bind("SUPER + SHIFT + " .. dir, hl.dsp.window.move({ direction = dir }))
 end
 
 for ws = 1, 9 do
-	hl.bind("SUPER + " .. ws,         hl.dsp.focus({ workspace = ws }))
+	hl.bind("SUPER + " .. ws, hl.dsp.focus({ workspace = ws }))
 	hl.bind("SUPER + SHIFT + " .. ws, hl.dsp.window.move({ workspace = ws }))
 end
 
 -- window resizing
-hl.bind("SUPER + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- hypr shortcuts
@@ -206,8 +255,8 @@ end
 
 local nixos_binds = {
 	{ "CTRL + SHIFT + R", "nixos-refresh", "nos-refresh --offline" },
-	{ "CTRL + SHIFT + B", "nixos-build",   "nos-build" },
-	{ "CTRL + SHIFT + U", "nixos-update",  "nos-update" },
+	{ "CTRL + SHIFT + B", "nixos-build", "nos-build" },
+	{ "CTRL + SHIFT + U", "nixos-update", "nos-update" },
 }
 for _, b in ipairs(nixos_binds) do
 	hl.bind(b[1], terminal(b[2], b[3]))
@@ -246,7 +295,7 @@ local function bind_shortcut(bind, mods, key, desc)
 end
 
 bind_shortcut("SUPER + X", "SHIFT", "Delete", "Universal cut")
-bind_shortcut("SUPER + C", "CTRL",  "Insert", "Universal copy")
+bind_shortcut("SUPER + C", "CTRL", "Insert", "Universal copy")
 bind_shortcut("SUPER + V", "SHIFT", "Insert", "Universal paste")
 
 -- toggle single window aspect ratio
@@ -264,12 +313,12 @@ end, { desc = "Toggle single-window max width" })
 local osd = os.getenv("HOME") .. "/NixOS/scripts/shell/osd.sh"
 
 local media = {
-	{ "XF86AudioRaiseVolume",   "bash " .. osd .. " volume up" },
-	{ "XF86AudioLowerVolume",   "bash " .. osd .. " volume down" },
-	{ "XF86AudioMute",          "bash " .. osd .. " volume mute" },
-	{ "XF86AudioMicMute",       "bash " .. osd .. " mic mute" },
-	{ "XF86MonBrightnessUp",    "bash " .. osd .. " brightness up" },
-	{ "XF86MonBrightnessDown",  "bash " .. osd .. " brightness down" },
+	{ "XF86AudioRaiseVolume", "bash " .. osd .. " volume up" },
+	{ "XF86AudioLowerVolume", "bash " .. osd .. " volume down" },
+	{ "XF86AudioMute", "bash " .. osd .. " volume mute" },
+	{ "XF86AudioMicMute", "bash " .. osd .. " mic mute" },
+	{ "XF86MonBrightnessUp", "bash " .. osd .. " brightness up" },
+	{ "XF86MonBrightnessDown", "bash " .. osd .. " brightness down" },
 }
 for _, b in ipairs(media) do
 	hl.bind(b[1], hl.dsp.exec_cmd(b[2]), { locked = true, repeating = true })
@@ -282,7 +331,7 @@ end
 local POPUP_SIZE = { 1300, 800 }
 
 local popup_windows = {
-	{ title = "shell-launcher", size = { 375, 400 } },
+	{ title = "shell-launcher", size = { 700, 710 }, stay_focused = true },
 
 	{ title = "wallpaper-picker" },
 	{ title = "theme-picker" },
@@ -311,6 +360,7 @@ local popup_windows = {
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },
 	{ class = "1password" },
+	{ class = "lazy-docker" },
 }
 
 for _, w in ipairs(popup_windows) do
@@ -319,5 +369,9 @@ for _, w in ipairs(popup_windows) do
 		float = true,
 		center = true,
 		size = w.size or POPUP_SIZE,
+		pin = w.pin,
+		stay_focused = w.stay_focused,
 	})
 end
+
+hl.window_rule({ match = { float = true }, opacity = "0.935 override" })

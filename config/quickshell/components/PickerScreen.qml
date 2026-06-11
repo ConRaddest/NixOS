@@ -37,7 +37,7 @@ FloatingWindow {
     implicitHeight: outerMargin * 2 + tabsHeight + previewGap + previewHeight * screenRows + previewGap * Math.max(screenRows - 1, 0)
     minimumSize: Qt.size(implicitWidth, implicitHeight)
     maximumSize: Qt.size(implicitWidth, implicitHeight)
-    color: shell.bg
+    color: shell.base
 
     // ─── IPC entry point ─────────────────────────────────────────────────────
     // Called by the script after writing monitor info to sourcePath.
@@ -122,7 +122,7 @@ FloatingWindow {
     Rectangle {
         id: pickerContent
         anchors.fill: parent
-        color: picker.shell.bg
+        color: picker.shell.base
         focus: picker.shell.screenShareOpen
         Keys.onEscapePressed: picker.cancel()
 
@@ -142,14 +142,14 @@ FloatingWindow {
                     width: 130
                     height: picker.tabsHeight
                     radius: 5
-                    color: picker.shell.bgLight
-                    border.color: picker.shell.primary
+                    color: picker.shell.overlay
+                    border.color: picker.shell.accent
                     border.width: 2
 
                     Text {
                         anchors.centerIn: parent
                         text: "󰍹  Screen"
-                        color: picker.shell.fg
+                        color: picker.shell.text
                         font.family: picker.shell.monoFont
                         font.pixelSize: 13
                         font.weight: Font.Bold
@@ -162,13 +162,13 @@ FloatingWindow {
                     height: picker.tabsHeight
                     radius: 5
                     color: "transparent"
-                    border.color: regionMouse.containsMouse ? picker.shell.primary : picker.shell.bgLight
+                    border.color: regionMouse.containsMouse ? picker.shell.accent : picker.shell.overlay
                     border.width: 2
 
                     Text {
                         anchors.centerIn: parent
                         text: "󰩭  Region"
-                        color: regionMouse.containsMouse ? picker.shell.fg : picker.shell.fgDark
+                        color: regionMouse.containsMouse ? picker.shell.text : picker.shell.muted
                         font.family: picker.shell.monoFont
                         font.pixelSize: 13
                         font.weight: Font.Bold
@@ -199,8 +199,8 @@ FloatingWindow {
                         width: picker.previewWidth
                         height: picker.previewHeight
                         radius: 6
-                        color: mouse.containsMouse ? picker.shell.bgLight : picker.shell.bgLight
-                        border.color: mouse.containsMouse ? picker.shell.primary : "transparent"
+                        color: mouse.containsMouse ? picker.shell.overlay : picker.shell.overlay
+                        border.color: mouse.containsMouse ? picker.shell.accent : "transparent"
                         border.width: mouse.containsMouse ? 2 : 0
 
                         Image {

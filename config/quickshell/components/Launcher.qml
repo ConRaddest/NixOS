@@ -13,9 +13,9 @@ FloatingWindow {
     screen: shell.launcherScreen
     visible: shell.menuOpen
     title: "shell-launcher"
-    implicitWidth: 600
-    implicitHeight: 460
-    color: shell.bg
+    implicitWidth: 700
+    implicitHeight: 710
+    color: shell.base
 
     // ─── MenuSearch item data ──────────────────────────────────────────────────────
     // Set dynamicApps: true to populate Apps from all installed desktop entries
@@ -24,11 +24,18 @@ FloatingWindow {
 
     readonly property var dynamicAppItems: {
         DesktopEntries.applicationsChanged;
-        return DesktopEntries.applications.values.filter(e => !e.noDisplay).map(e => ({
-                    name: e.name,
-                    iconPath: e.icon ? Quickshell.iconPath(e.icon) : "",
-                    desktop: e.id
-                })).sort((a, b) => a.name.localeCompare(b.name));
+        return DesktopEntries.applications.values.filter(e => !e.noDisplay).map(e => {
+            const rawId = String(e.id).replace(/\.desktop$/, "");
+            const cmd = rawId.split(".").pop().toLowerCase();
+            const category = e.categories ? String(e.categories).split(/[;,]/)[0].trim() : "";
+            return {
+                name: e.name,
+                iconPath: e.icon ? Quickshell.iconPath(e.icon) : "",
+                desktop: e.id,
+                cmd: cmd,
+                category: category,
+            };
+        }).sort((a, b) => a.name.localeCompare(b.name));
     }
 
     readonly property var curatedAppItems: [
@@ -283,6 +290,7 @@ FloatingWindow {
     MenuSearch {
         id: menu
         anchors.fill: parent
+        radius: 12
         shell: launcher.shell
         query: launcher.shell.menuQuery
         items: launcher.shell.filteredMenuItems
@@ -308,6 +316,15 @@ FloatingWindow {
                 return entry && entry.icon ? Quickshell.iconPath(entry.icon) : "";
             }
             return "";
+        }
+        itemCommand: function (item) {
+            if (item.cmd) return item.cmd;
+            if (item.command) return item.command.split(" ")[0];
+            if (item.terminal) return item.terminal.cmd.split(" ")[0];
+            return "";
+        }
+        itemCategory: function (item) {
+            return item.category || "";
         }
         highlightedText: function (text) {
             return launcher.shell.highlightedText(text);

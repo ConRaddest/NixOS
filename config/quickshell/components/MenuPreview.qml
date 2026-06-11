@@ -44,7 +44,7 @@ Rectangle {
     signal queryEdited(string query)
     signal back
 
-    color: shell.bg
+    color: shell.base
 
     onItemsChanged: Qt.callLater(resetSelection)
     onQueryChanged: Qt.callLater(resetSelection)
@@ -76,228 +76,308 @@ Rectangle {
         const q = query.trim();
         if (q === "")
             return escapeHtml(value);
+
         const lowerValue = value.toLowerCase();
         const lowerQuery = q.toLowerCase();
-        let result = "";
-        let pos = 0;
-        let match = lowerValue.indexOf(lowerQuery, pos);
-        while (match !== -1) {
-            result += escapeHtml(value.slice(pos, match));
-            result += "<span style=\"color: " + shell.primary + "\">" + escapeHtml(value.slice(match, match + q.length)) + "</span>";
-            pos = match + q.length;
-            match = lowerValue.indexOf(lowerQuery, pos);
+
+        const matched = new Array(value.length).fill(false);
+        let qi = 0;
+        for (let si = 0; si < lowerValue.length && qi < lowerQuery.length; si++) {
+            if (lowerValue[si] === lowerQuery[qi]) {
+                matched[si] = true;
+                qi++;
+            }
         }
-        return result + escapeHtml(value.slice(pos));
+        if (qi < lowerQuery.length)
+            return escapeHtml(value);
+
+        let result = "";
+        let inSpan = false;
+        for (let i = 0; i < value.length; i++) {
+            if (matched[i] && !inSpan) {
+                result += "<span style=\"color: " + shell.accent + "\">";
+                inSpan = true;
+            } else if (!matched[i] && inSpan) {
+                result += "</span>";
+                inSpan = false;
+            }
+            result += escapeHtml(value[i]);
+        }
+        if (inSpan)
+            result += "</span>";
+        return result;
     }
 
     function escapeHtml(text) {
         return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    Column {
-        anchors.fill: parent
-        anchors.margins: 10
-        spacing: 10
+    // ─── Search bar ───────────────────────────────────────────────────────────
+    Item {
+        id: searchBar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 56
+
+        Text {
+            id: searchIconText
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+            text: picker.searchIcon
+            color: picker.shell.muted
+            font.family: picker.shell.monoFont
+            font.pixelSize: 16
+        }
+
+        Text {
+            anchors.left: searchIconText.right
+            anchors.leftMargin: 12
+            anchors.right: escPill.left
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Search..."
+            color: picker.shell.muted
+            font.family: picker.shell.monoFont
+            font.pixelSize: 14
+            visible: input.text === ""
+            elide: Text.ElideRight
+        }
+
+        TextInput {
+            id: input
+            anchors.left: searchIconText.right
+            anchors.leftMargin: 12
+            anchors.right: escPill.left
+            anchors.rightMargin: 12
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            verticalAlignment: TextInput.AlignVCenter
+            text: picker.query
+            color: picker.shell.text
+            selectionColor: picker.shell.overlay
+            selectedTextColor: picker.shell.text
+            font.family: picker.shell.monoFont
+            font.pixelSize: 14
+
+            onTextChanged: picker.queryEdited(text)
+
+            Keys.onEscapePressed: picker.back()
+            Keys.onDownPressed: list.currentIndex = Math.min(list.currentIndex + 1, picker.filteredItems.length - 1)
+            Keys.onUpPressed: list.currentIndex = Math.max(list.currentIndex - 1, 0)
+            Keys.onReturnPressed: if (picker.currentItem)
+                picker.accepted(picker.currentItem)
+            Keys.onPressed: event => {
+                if (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_C) {
+                    input.text = "";
+                    picker.queryEdited("");
+                    event.accepted = true;
+                }
+            }
+        }
 
         Rectangle {
-            width: parent.width
-            height: 42
+            id: escPill
+            anchors.right: parent.right
+            anchors.rightMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            width: escLabel.implicitWidth + 16
+            height: 22
             radius: 5
             color: "transparent"
-            border.color: picker.shell.bgLight
-            border.width: 2
+            border.color: picker.shell.border
+            border.width: 1
 
             Text {
-                id: searchIconItem
-                anchors.left: parent.left
-                anchors.leftMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                width: 18
-                text: picker.searchIcon
-                color: picker.shell.primary
+                id: escLabel
+                anchors.centerIn: parent
+                text: "esc"
+                color: picker.shell.muted
                 font.family: picker.shell.monoFont
-                font.pixelSize: 16
-                font.weight: Font.Bold
-                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 12
             }
 
-            TextInput {
-                id: input
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: searchIconItem.right
-                anchors.right: parent.right
-                anchors.topMargin: 4
-                anchors.bottomMargin: 4
-                anchors.rightMargin: 4
-                anchors.leftMargin: 10
-                leftPadding: 0
-                rightPadding: 10
-                verticalAlignment: TextInput.AlignVCenter
-                text: picker.query
-                color: picker.shell.fg
-                selectionColor: picker.shell.bgLight
-                selectedTextColor: picker.shell.fg
-                font.family: picker.shell.monoFont
-                font.pixelSize: 15
-                font.weight: Font.Bold
+            MouseArea {
+                anchors.fill: parent
+                onClicked: picker.back()
+            }
+        }
 
-                onTextChanged: picker.queryEdited(text)
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: picker.shell.border
+        }
+    }
 
-                Keys.onEscapePressed: picker.back()
-                Keys.onDownPressed: list.currentIndex = Math.min(list.currentIndex + 1, picker.filteredItems.length - 1)
-                Keys.onUpPressed: list.currentIndex = Math.max(list.currentIndex - 1, 0)
-                Keys.onReturnPressed: if (picker.currentItem)
-                    picker.accepted(picker.currentItem)
-                Keys.onPressed: event => {
-                    if (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_C) {
-                        input.text = "";
-                        picker.queryEdited("");
-                        event.accepted = true;
+    // ─── Body: list + divider + preview ──────────────────────────────────────
+    Item {
+        id: body
+        anchors.top: searchBar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        // ── Left pane: item list ──────────────────────────────────────────────
+        Item {
+            id: leftPane
+            width: Math.max(160, Math.min(picker.listWidth, body.width - 180))
+            height: parent.height
+            clip: true
+
+            ListView {
+                id: list
+                anchors.fill: parent
+                model: picker.filteredItems
+                currentIndex: picker.filteredItems.length > 0 ? 0 : -1
+                onCurrentIndexChanged: picker.syncSelection()
+
+                delegate: Item {
+                    required property var modelData
+                    required property int index
+
+                    readonly property bool isCurrent: ListView.isCurrentItem
+
+                    width: leftPane.width
+                    height: 44
+
+                    Rectangle {
+                        x: 0
+                        y: 0
+                        width: leftPane.width
+                        height: parent.height
+                        color: parent.isCurrent ? picker.shell.overlay : "transparent"
+                        opacity: 0.6
+                    }
+
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        width: 3
+                        radius: 2
+                        color: picker.shell.accent
+                        visible: parent.isCurrent
+                    }
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 14
+                        anchors.right: parent.right
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 10
+
+                        Text {
+                            width: 18
+                            text: picker.itemIcon(modelData)
+                            color: picker.shell.accent
+                            font.family: picker.shell.monoFont
+                            font.pixelSize: 15
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: picker.highlightedText(picker.itemText(modelData))
+                            textFormat: Text.RichText
+                            color: isCurrent ? picker.shell.text : picker.shell.subtext
+                            font.family: picker.shell.monoFont
+                            font.pixelSize: 14
+                            font.weight: isCurrent ? Font.Bold : Font.Normal
+                            elide: Text.ElideRight
+                            width: leftPane.width - 50
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onEntered: list.currentIndex = index
+                        onClicked: {
+                            list.currentIndex = index;
+                            picker.accepted(modelData);
+                        }
                     }
                 }
             }
         }
 
+        // ── Draggable divider ─────────────────────────────────────────────────
         Item {
-            id: body
-            width: parent.width
-            height: parent.height - 42 - parent.spacing
+            id: divider
+            x: leftPane.width
+            width: 9
+            height: parent.height
 
             Rectangle {
-                id: leftPane
-                width: Math.max(160, Math.min(picker.listWidth, body.width - 180))
+                x: 0
+                y: 0
+                width: 1
                 height: parent.height
-                radius: 5
-                color: "transparent"
-                border.color: picker.shell.bgLight
-                border.width: 2
-
-                ListView {
-                    id: list
-                    anchors.fill: parent
-                    anchors.margins: 6
-                    clip: true
-                    model: picker.filteredItems
-                    currentIndex: picker.filteredItems.length > 0 ? 0 : -1
-                    onCurrentIndexChanged: picker.syncSelection()
-
-                    delegate: Rectangle {
-                        required property var modelData
-                        required property int index
-
-                        width: ListView.view.width
-                        height: 28
-                        color: ListView.isCurrentItem ? picker.shell.bgLight : "transparent"
-
-                        Row {
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 4
-                            spacing: 10
-
-                            Text {
-                                width: 18
-                                text: picker.itemIcon(modelData)
-                                color: picker.shell.primary
-                                font.family: picker.shell.monoFont
-                                font.pixelSize: 14
-                                font.weight: Font.Bold
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-
-                            Text {
-                                text: picker.highlightedText(picker.itemText(modelData))
-                                textFormat: Text.RichText
-                                color: ListView.isCurrentItem ? picker.shell.fg : "#b7bbcc"
-                                font.family: picker.shell.monoFont
-                                font.pixelSize: 14
-                                font.weight: Font.Bold
-                                elide: Text.ElideRight
-                                width: leftPane.width - 44
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onEntered: list.currentIndex = index
-                            onClicked: {
-                                list.currentIndex = index;
-                                picker.accepted(modelData);
-                            }
-                        }
-                    }
-                }
+                color: dividerMouse.containsMouse || dividerMouse.pressed ? picker.shell.accent : picker.shell.border
+                opacity: dividerMouse.containsMouse || dividerMouse.pressed ? 1 : 0.6
             }
 
-            Rectangle {
-                id: divider
-                x: leftPane.width + 2
-                width: 6
-                height: parent.height
-                color: dividerMouse.containsMouse || dividerMouse.pressed ? picker.shell.primary : "transparent"
-                opacity: 0.65
+            property real dragStartX: 0
+            property real dragStartWidth: 0
 
-                property real dragStartX: 0
-                property real dragStartWidth: 0
-
-                MouseArea {
-                    id: dividerMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.SplitHCursor
-                    onPressed: mouse => {
-                        const p = mapToItem(body, mouse.x, mouse.y);
-                        divider.dragStartX = p.x;
-                        divider.dragStartWidth = picker.listWidth;
-                    }
-                    onPositionChanged: mouse => {
-                        if (!pressed)
-                            return;
-                        const p = mapToItem(body, mouse.x, mouse.y);
-                        picker.listWidth = Math.max(160, Math.min(divider.dragStartWidth + (p.x - divider.dragStartX), body.width - 180));
-                    }
+            MouseArea {
+                id: dividerMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.SplitHCursor
+                onPressed: mouse => {
+                    const p = mapToItem(body, mouse.x, mouse.y);
+                    divider.dragStartX = p.x;
+                    divider.dragStartWidth = picker.listWidth;
+                }
+                onPositionChanged: mouse => {
+                    if (!pressed)
+                        return;
+                    const p = mapToItem(body, mouse.x, mouse.y);
+                    picker.listWidth = Math.max(160, Math.min(divider.dragStartWidth + (p.x - divider.dragStartX), body.width - 180));
                 }
             }
+        }
 
-            Rectangle {
-                id: rightPane
-                x: leftPane.width + 10
-                width: body.width - leftPane.width - 10
-                height: parent.height
-                radius: 5
-                color: "transparent"
-                border.color: picker.shell.bgLight
-                border.width: 2
+        // ── Right pane: preview ───────────────────────────────────────────────
+        Item {
+            id: rightPane
+            x: leftPane.width + divider.width
+            width: body.width - leftPane.width - divider.width
+            height: parent.height
 
-                Image {
-                    anchors.fill: parent
-                    anchors.margins: 8
-                    visible: picker.currentItem && picker.isImage(picker.currentItem)
-                    source: picker.currentItem ? picker.imageSource(picker.currentItem) : ""
-                    fillMode: Image.PreserveAspectFit
-                    asynchronous: true
-                    cache: false
-                }
+            Image {
+                anchors.fill: parent
+                anchors.margins: 12
+                visible: picker.currentItem && picker.isImage(picker.currentItem)
+                source: picker.currentItem ? picker.imageSource(picker.currentItem) : ""
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                cache: false
+            }
 
-                Flickable {
-                    anchors.fill: parent
-                    anchors.margins: 8
-                    visible: !picker.currentItem || !picker.isImage(picker.currentItem)
-                    contentWidth: Math.max(width, textPreview.paintedWidth)
-                    contentHeight: textPreview.paintedHeight
-                    clip: true
+            Flickable {
+                anchors.fill: parent
+                anchors.margins: 12
+                visible: !picker.currentItem || !picker.isImage(picker.currentItem)
+                contentWidth: Math.max(width, textPreview.paintedWidth)
+                contentHeight: textPreview.paintedHeight
+                clip: true
 
-                    Text {
-                        id: textPreview
-                        width: parent.width
-                        text: picker.currentItem ? picker.previewText(picker.currentItem) : ""
-                        color: picker.shell.fg
-                        font.family: picker.shell.monoFont
-                        font.pixelSize: 14
-                        wrapMode: Text.Wrap
-                    }
+                Text {
+                    id: textPreview
+                    width: parent.width
+                    text: picker.currentItem ? picker.previewText(picker.currentItem) : ""
+                    color: picker.shell.text
+                    font.family: picker.shell.monoFont
+                    font.pixelSize: 14
+                    wrapMode: Text.Wrap
                 }
             }
         }

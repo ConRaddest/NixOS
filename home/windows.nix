@@ -22,6 +22,16 @@
       );
     in
     {
+      xdg.desktopEntries.windows-vm = {
+        name = "Windows";
+        comment = "Launch Windows virtual machine";
+        exec = "windows-vm";
+        icon = "windows-vm";
+        terminal = false;
+        type = "Application";
+        categories = [ "System" ];
+      };
+
       xdg.configFile."windows/docker-compose.yaml".source = "${self}/config/windows/docker-compose.yaml";
 
       home.packages = with pkgs; [

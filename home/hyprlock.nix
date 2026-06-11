@@ -34,7 +34,7 @@
           label = [
             {
               text = "$TIME";
-              color = rgb colors.fg;
+              color = rgb colors.text;
               font_family = font.system;
               font_size = 70;
               halign = "center";
@@ -44,7 +44,7 @@
             }
             {
               text = ''cmd[update:60000] date +"%A, %B %d"'';
-              color = rgb colors.fg;
+              color = rgb colors.text;
               font_family = font.system;
               font_size = 18;
               halign = "center";
@@ -66,11 +66,11 @@
               fail_text = "󰅙  Try again";
 
               font_family = font.mono;
-              font_color = rgb colors.fg;
+              font_color = rgb colors.text;
 
-              inner_color = rgba colors.bg "88";
-              check_color = rgba colors.bg "A0";
-              fail_color = rgba colors.bg "88";
+              inner_color = rgba colors.base "88";
+              check_color = rgba colors.base "A0";
+              fail_color = rgba colors.base "88";
 
               outline_thickness = 0;
               rounding = -1;

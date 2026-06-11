@@ -34,17 +34,17 @@
         settings = {
           font_family = font.mono;
           font_size = 12;
-          window_padding_width = 8;
+          window_padding_width = 6;
           confirm_os_window_close = 0;
           enable_audio_bell = false;
           open_url_with = "${config.home.homeDirectory}/.config/kitty/open-url.sh";
 
-          background = colors.bg;
-          foreground = colors.fg;
-          cursor = colors.fg;
-          cursor_text_color = colors.bg;
-          selection_background = colors.bgLight;
-          selection_foreground = colors.fg;
+          background = colors.base;
+          foreground = colors.text;
+          cursor = colors.text;
+          cursor_text_color = colors.base;
+          selection_background = colors.overlay;
+          selection_foreground = colors.text;
 
           # Normal colors
           color0 = colors.black;
@@ -54,17 +54,17 @@
           color4 = colors.blue;
           color5 = colors.purple;
           color6 = colors.teal;
-          color7 = colors.fgDark;
+          color7 = colors.white;
 
           # Bright colors
-          color8 = colors.bgLight;
-          color9 = colors.red;
-          color10 = colors.green;
-          color11 = colors.orange;
-          color12 = colors.primary;
-          color13 = colors.secondary;
-          color14 = colors.tertiary;
-          color15 = colors.fgLight;
+          color8 = colors.brightBlack;
+          color9 = colors.brightRed;
+          color10 = colors.brightGreen;
+          color11 = colors.brightYellow;
+          color12 = colors.brightBlue;
+          color13 = colors.brightPurple;
+          color14 = colors.brightCyan;
+          color15 = colors.brightWhite;
         };
       };
     };

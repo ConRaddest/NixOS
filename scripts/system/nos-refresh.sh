@@ -23,8 +23,19 @@ run_refresh() {
     && home-manager switch "${offline_opts[@]}" --flake "$NOS_DIR#$USER"
 }
 
+restart_qs() {
+  qs kill >/dev/null 2>&1 || true
+  sleep 0.2
+  if command -v uwsm >/dev/null 2>&1; then
+    uwsm app -- qs >/dev/null 2>&1 &
+  else
+    qs --daemonize >/dev/null 2>&1 || true
+  fi
+}
+
 while true; do
   if run_refresh; then
+    restart_qs
     exit 0
   fi
 

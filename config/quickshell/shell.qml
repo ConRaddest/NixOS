@@ -17,27 +17,46 @@ ShellRoot {
         id: theme
     }
 
-    readonly property string bg: theme.bg
-    readonly property string bgDark: theme.bgDark
-    readonly property string bgLight: theme.bgLight
+    // ── Surfaces ─────────────────────────────────────────────────────────────
+    readonly property string crust: theme.crust
+    readonly property string mantle: theme.mantle
+    readonly property string base: theme.base
+    readonly property string surface: theme.surface
+    readonly property string overlay: theme.overlay
+    readonly property string border: theme.border
 
-    readonly property string fg: theme.fg
-    readonly property string fgDark: theme.fgDark
-    readonly property string fgLight: theme.fgLight
+    // ── Text ─────────────────────────────────────────────────────────────────
+    readonly property string text: theme.text
+    readonly property string subtext: theme.subtext
+    readonly property string muted: theme.muted
+    readonly property string faint: theme.faint
 
-    readonly property string primary: theme.primary
-    readonly property string secondary: theme.secondary
-    readonly property string tertiary: theme.tertiary
-    readonly property string quaternary: theme.quaternary
+    // ── Accent ───────────────────────────────────────────────────────────────
+    readonly property string accent: theme.accent
 
-    readonly property string black: theme.black
+    // ── Hues ─────────────────────────────────────────────────────────────────
     readonly property string red: theme.red
     readonly property string orange: theme.orange
     readonly property string yellow: theme.yellow
     readonly property string green: theme.green
     readonly property string teal: theme.teal
+    readonly property string cyan: theme.cyan
     readonly property string blue: theme.blue
     readonly property string purple: theme.purple
+
+    // ── Terminal ANSI (normal) ────────────────────────────────────────────────
+    readonly property string black: theme.black
+    readonly property string white: theme.white
+
+    // ── Terminal ANSI (bright) ────────────────────────────────────────────────
+    readonly property string brightBlack: theme.brightBlack
+    readonly property string brightRed: theme.brightRed
+    readonly property string brightGreen: theme.brightGreen
+    readonly property string brightYellow: theme.brightYellow
+    readonly property string brightBlue: theme.brightBlue
+    readonly property string brightPurple: theme.brightPurple
+    readonly property string brightCyan: theme.brightCyan
+    readonly property string brightWhite: theme.brightWhite
 
     readonly property string monoFont: theme.monoFont
     readonly property string flakeDir: theme.flakeDir
@@ -47,6 +66,8 @@ ShellRoot {
     readonly property string stateDir: theme.stateDir
 
     // ─── Bar state ───────────────────────────────────────────────────────────
+    property bool barVisible: true
+
     // Updated every second by bar.sh via statusProcess.
     property string cpuText: "--"
     property string ramText: "--"
@@ -54,7 +75,7 @@ ShellRoot {
     property string bluetoothText: "󰂲"
     property string batteryText: "󰚥 AC"
     property string volumeText: "󰕾"
-    property string timeText: Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
+    property string timeText: Qt.formatDateTime(new Date(), "dd MMM HH:mm")
 
     // ─── OSD state ───────────────────────────────────────────────────────────
     property bool osdVisible: false
@@ -65,6 +86,7 @@ ShellRoot {
 
     property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
     property string pendingLauncherSubmenu: ""
+    property string activeLauncherSubmenu: ""
 
     // ─── MenuSearch state ──────────────────────────────────────────────────────────
     property bool menuOpen: false
@@ -221,12 +243,23 @@ ShellRoot {
         return flattened;
     }
 
+    function fuzzyMatch(str, query) {
+        str = str.toLowerCase();
+        query = query.toLowerCase();
+        let qi = 0;
+        for (let si = 0; si < str.length && qi < query.length; si++) {
+            if (str[si] === query[qi])
+                qi++;
+        }
+        return qi === query.length;
+    }
+
     function getFilteredMenuItems() {
         const query = menuQuery.trim();
         if (query === "")
             return currentMenuItems;
 
-        const matches = searchableMenuItems.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+        const matches = searchableMenuItems.filter(item => fuzzyMatch(item.name, query));
         const calculation = menuCalculatorEnabled ? calculate(query) : null;
 
         if (calculation !== null)
@@ -252,24 +285,44 @@ ShellRoot {
         return matches;
     }
 
-    // Wrap the query match in a primary-coloured span for the list delegate.
+    // Highlight the individual characters matched by the fuzzy algorithm.
     function highlightedText(text) {
         const value = String(text);
         const query = menuQuery.trim();
-        if (query === "")
+        if (query === "" || value.startsWith("Search: "))
             return escapeHtml(value);
+
         const lowerValue = value.toLowerCase();
         const lowerQuery = query.toLowerCase();
-        let result = "";
-        let position = 0;
-        let match = lowerValue.indexOf(lowerQuery, position);
-        while (match !== -1) {
-            result += escapeHtml(value.slice(position, match));
-            result += "<span style=\"color: " + primary + "\">" + escapeHtml(value.slice(match, match + query.length)) + "</span>";
-            position = match + query.length;
-            match = lowerValue.indexOf(lowerQuery, position);
+
+        // Mark which indices in value were consumed by the fuzzy match.
+        const matched = new Array(value.length).fill(false);
+        let qi = 0;
+        for (let si = 0; si < lowerValue.length && qi < lowerQuery.length; si++) {
+            if (lowerValue[si] === lowerQuery[qi]) {
+                matched[si] = true;
+                qi++;
+            }
         }
-        return result + escapeHtml(value.slice(position));
+        if (qi < lowerQuery.length)
+            return escapeHtml(value);
+
+        // Build output, opening/closing a span around consecutive matched chars.
+        let result = "";
+        let inSpan = false;
+        for (let i = 0; i < value.length; i++) {
+            if (matched[i] && !inSpan) {
+                result += "<span style=\"color: " + accent + "\">";
+                inSpan = true;
+            } else if (!matched[i] && inSpan) {
+                result += "</span>";
+                inSpan = false;
+            }
+            result += escapeHtml(value[i]);
+        }
+        if (inSpan)
+            result += "</span>";
+        return result;
     }
 
     // Returns true when item matches the currently active power profile.
@@ -305,6 +358,7 @@ ShellRoot {
         confirmSelection = "confirm";
         menuQuery = "";
         openedAsSubmenu = false;
+        activeLauncherSubmenu = "";
         resetMenuView();
     }
 
@@ -488,7 +542,7 @@ ShellRoot {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss");
+            root.timeText = Qt.formatDateTime(new Date(), "dd MMM HH:mm");
 
             statusProcess.running = false;
             statusProcess.command = ["bash", "-c", root.assetDir + "/scripts/shell/bar.sh"];
@@ -501,6 +555,19 @@ ShellRoot {
     }
 
     // ─── IPC ─────────────────────────────────────────────────────────────────
+
+    IpcHandler {
+        target: "bar"
+        function toggle(): void {
+            root.barVisible = !root.barVisible;
+        }
+        function show(): void {
+            root.barVisible = true;
+        }
+        function hide(): void {
+            root.barVisible = false;
+        }
+    }
 
     IpcHandler {
         target: "theme"
@@ -554,18 +621,27 @@ ShellRoot {
                 root.menuOpen = false;
             }
 
+            root.launcherScreen = screenForName(Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : "") || root.launcherScreen;
             root.menuOpen = true;
         }
+        function close(): void {
+            root.menuOpen = false;
+        }
         function openSubmenu(targetName: string): void {
+            if (root.menuOpen && root.activeLauncherSubmenu.toLowerCase() === String(targetName).toLowerCase())
+                return;
+
             if (root.menuOpen) {
                 root.menuOpen = false;
             }
 
+            root.launcherScreen = screenForName(Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : "") || root.launcherScreen;
             if (targetName) {
                 let path = [];
                 if (findMenuPath(menuItems, targetName, path)) {
                     menuStack = path;
                     openedAsSubmenu = true;
+                    activeLauncherSubmenu = targetName;
                 }
             }
 

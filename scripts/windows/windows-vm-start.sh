@@ -3,12 +3,10 @@ set -euo pipefail
 trap 'echo; read -rp "Press Enter to close..."' ERR
 
 container="Windows"
-compose_file="${HOME}/.config/windows/docker-compose.yaml"
 
 printf '\033[1;36mStarting Windows VM...\033[0m\n\n'
 echo "Starting Windows container..."
-docker rm -f "$container" >/dev/null 2>&1 || true
-docker compose --progress quiet --file "$compose_file" up -d >/dev/null
+docker start "$container" >/dev/null
 
 echo "Waiting for Windows to be ready..."
 ready=false

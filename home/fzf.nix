@@ -15,24 +15,24 @@
       # login shells and Kitty under Hyprland opens non-login bash.
       programs.bash.initExtra = ''
         export FZF_DEFAULT_OPTS=" \
-          --color=fg:${colors.fg} \
-          --color=fg+:${colors.fg} \
-          --color=bg:${colors.bg} \
-          --color=bg+:${colors.bgLight} \
-          --color=hl:${colors.primary} \
-          --color=hl+:${colors.primary} \
-          --color=info:${colors.fgDark} \
-          --color=border:${colors.fgDark} \
-          --color=separator:${colors.fgDark} \
-          --color=scrollbar:${colors.fgDark} \
-          --color=label:${colors.primary} \
-          --color=prompt:${colors.primary} \
-          --color=pointer:${colors.primary} \
-          --color=marker:${colors.secondary} \
-          --color=spinner:${colors.tertiary} \
-          --color=header:${colors.fgDark} \
-          --color=gutter:${colors.bgLight} \
-          --color=query:${colors.fg}"
+          --color=fg:${colors.text} \
+          --color=fg+:${colors.text} \
+          --color=bg:${colors.base} \
+          --color=bg+:${colors.overlay} \
+          --color=hl:${colors.accent} \
+          --color=hl+:${colors.accent} \
+          --color=info:${colors.muted} \
+          --color=border:${colors.muted} \
+          --color=separator:${colors.muted} \
+          --color=scrollbar:${colors.muted} \
+          --color=label:${colors.accent} \
+          --color=prompt:${colors.accent} \
+          --color=pointer:${colors.accent} \
+          --color=marker:${colors.purple} \
+          --color=spinner:${colors.teal} \
+          --color=header:${colors.muted} \
+          --color=gutter:${colors.overlay} \
+          --color=query:${colors.text}"
       '';
     };
 }

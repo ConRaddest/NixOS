@@ -26,8 +26,8 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: osd.shell.bg
-        border.color: osd.shell.bgLight
+        color: osd.shell.base
+        border.color: osd.shell.overlay
         border.width: 1
         radius: 6
 
@@ -42,7 +42,7 @@ PanelWindow {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: osd.shell.osdIcon
-                color: osd.shell.primary
+                color: osd.shell.accent
                 font.family: osd.shell.monoFont
                 font.pixelSize: 16
                 width: 16
@@ -54,13 +54,13 @@ PanelWindow {
                 width: 162
                 height: 4
                 radius: 2
-                color: osd.shell.bgLight
+                color: osd.shell.overlay
 
                 Rectangle {
                     width: parent.width * Math.max(0, Math.min(1, osd.shell.osdValue / osd.maxValue))
                     height: parent.height
                     radius: parent.radius
-                    color: osd.shell.primary
+                    color: osd.shell.accent
 
                     Behavior on width {
                         NumberAnimation {
