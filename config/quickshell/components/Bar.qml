@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Wayland
 
 // ─── Bar window ──────────────────────────────────────────────────────────────
 // Anchored full-width panel at the top of each monitor.
@@ -18,8 +19,10 @@ PanelWindow {
 
     visible: shell.barVisible
     implicitHeight: 38
-    exclusiveZone: shell.barVisible ? 28 : 0
+    exclusiveZone: shell.barVisible ? 26 : 0
     color: "transparent"
+    WlrLayershell.namespace: "bar"
+    WlrLayershell.layer: WlrLayer.Bottom
 
     // ─── Inline component: StatusPill ────────────────────────────────────────
     // Small clickable status indicator used in the right section of the bar.
@@ -28,6 +31,8 @@ PanelWindow {
 
         required property var shell
         property string text: ""
+        property string textColor: pill.shell.text
+        property int fontPixelSize: 14
         property bool clickable: false
         signal clicked
 
@@ -40,14 +45,14 @@ PanelWindow {
             id: label
             anchors.centerIn: parent
             text: pill.text
-            color: pill.shell.text
+            color: pill.textColor
             font.family: pill.shell.monoFont
-            font.pixelSize: 14
+            font.pixelSize: pill.fontPixelSize
             layer.enabled: true
             layer.effect: MultiEffect {
                 shadowEnabled: true
                 shadowColor: "#ff000000"
-                shadowBlur: 1.0
+                shadowBlur: 1
                 shadowVerticalOffset: 2
                 shadowHorizontalOffset: 0
             }
@@ -93,12 +98,48 @@ PanelWindow {
         anchors.fill: parent
         color: "transparent"
 
-        // ─── Left: launcher icon + workspace indicators ───────────────────────
+        // Nearly invisible alpha mask for Hyprland blur. With the `ignorezero`
+        // layer rule, fully transparent pixels are skipped while this fades the
+        // blur out toward the bottom without adding a visible color scrim.
+        Rectangle {
+            anchors.fill: parent
+            color: "transparent"
+
+            gradient: Gradient {
+                orientation: Gradient.Vertical
+
+                GradientStop {
+                    position: 0.0
+                    color: "#08000000"
+                }
+
+                GradientStop {
+                    position: 0.75
+                    color: "#02000000"
+                }
+
+                GradientStop {
+                    position: 1.0
+                    color: "#00000000"
+                }
+            }
+        }
+
+        // ─── Left: NixOS launcher icon + workspace indicators ─────────────────
         Row {
             anchors.left: parent.left
-            anchors.leftMargin: 14
+            anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             spacing: 6
+
+            StatusPill {
+                shell: bar.shell
+                text: ""
+                textColor: bar.shell.text
+                fontPixelSize: 20
+                clickable: true
+                onClicked: bar.shell.runDetached("qs ipc call launcher open")
+            }
 
             Repeater {
                 model: bar.monitorWorkspaceIds
@@ -126,7 +167,7 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: parent.modelData
-                        color: parent.active ? bar.shell.text : bar.shell.text
+                        color: bar.shell.text
                         font.family: bar.shell.monoFont
                         font.pixelSize: 14
                     }
@@ -140,7 +181,16 @@ PanelWindow {
             }
         }
 
-        // ─── Right: status pills + clock ─────────────────────────────────────
+        // ─── Center: clock ────────────────────────────────────────────────────
+        StatusPill {
+            anchors.centerIn: parent
+            shell: bar.shell
+            text: bar.shell.timeText
+            clickable: true
+            onClicked: bar.shell.launchDesktop("calendar-pwa")
+        }
+
+        // ─── Right: system stats + status pills ───────────────────────────────
         Row {
             anchors.right: parent.right
             anchors.rightMargin: 14
@@ -173,9 +223,11 @@ PanelWindow {
             }
             StatusPill {
                 shell: bar.shell
-                text: bar.shell.timeText
-                clickable: true
-                onClicked: bar.shell.launchDesktop("calendar-pwa")
+                text: "󰍛 " + bar.shell.cpuText
+            }
+            StatusPill {
+                shell: bar.shell
+                text: "  " + bar.shell.ramText
             }
         }
     }

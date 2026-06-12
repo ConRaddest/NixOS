@@ -63,6 +63,7 @@ let
       self.lib.homeModules.git
       self.lib.homeModules.kitty
       self.lib.homeModules.npm
+      self.lib.homeModules.nvim
       self.lib.homeModules.ssh
       self.lib.homeModules.starship
 

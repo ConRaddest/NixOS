@@ -33,7 +33,7 @@ FloatingWindow {
                 iconPath: e.icon ? Quickshell.iconPath(e.icon) : "",
                 desktop: e.id,
                 cmd: cmd,
-                category: category,
+                category: category
             };
         }).sort((a, b) => a.name.localeCompare(b.name));
     }
@@ -180,6 +180,11 @@ FloatingWindow {
                         cmd: "btop"
                     }
                 },
+                {
+                    name: "Processes",
+                    icon: "󰒋",
+                    command: "qs ipc call processes open"
+                },
             ]
         },
         {
@@ -245,7 +250,7 @@ FloatingWindow {
                     confirm: true
                 },
                 {
-                    name: "Suspend",
+                    name: "Sleep",
                     icon: "󰒲",
                     command: "systemctl suspend",
                     confirm: true
@@ -318,9 +323,12 @@ FloatingWindow {
             return "";
         }
         itemCommand: function (item) {
-            if (item.cmd) return item.cmd;
-            if (item.command) return item.command.split(" ")[0];
-            if (item.terminal) return item.terminal.cmd.split(" ")[0];
+            if (item.cmd)
+                return item.cmd;
+            if (item.command)
+                return item.command.split(" ")[0];
+            if (item.terminal)
+                return item.terminal.cmd.split(" ")[0];
             return "";
         }
         itemCategory: function (item) {

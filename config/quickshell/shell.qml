@@ -66,7 +66,7 @@ ShellRoot {
     readonly property string stateDir: theme.stateDir
 
     // ─── Bar state ───────────────────────────────────────────────────────────
-    property bool barVisible: true
+    property bool barVisible: false
 
     // Updated every second by bar.sh via statusProcess.
     property string cpuText: "--"
@@ -75,7 +75,7 @@ ShellRoot {
     property string bluetoothText: "󰂲"
     property string batteryText: "󰚥 AC"
     property string volumeText: "󰕾"
-    property string timeText: Qt.formatDateTime(new Date(), "dd MMM HH:mm")
+    property string timeText: Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
     // ─── OSD state ───────────────────────────────────────────────────────────
     property bool osdVisible: false
@@ -85,11 +85,13 @@ ShellRoot {
     readonly property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
     property var launcherScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
+    property var processScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
     property string pendingLauncherSubmenu: ""
     property string activeLauncherSubmenu: ""
 
     // ─── MenuSearch state ──────────────────────────────────────────────────────────
     property bool menuOpen: false
+    property bool processOpen: false
     property bool wallpaperOpen: false
     property bool screenShareOpen: false
     property bool themeOpen: false
@@ -537,12 +539,18 @@ ShellRoot {
     }
 
     Timer {
+        id: peekTimer
+        interval: 1500
+        onTriggered: root.barVisible = false
+    }
+
+    Timer {
         interval: 1000
         running: true
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root.timeText = Qt.formatDateTime(new Date(), "dd MMM HH:mm");
+            root.timeText = Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss");
 
             statusProcess.running = false;
             statusProcess.command = ["bash", "-c", root.assetDir + "/scripts/shell/bar.sh"];
@@ -559,13 +567,20 @@ ShellRoot {
     IpcHandler {
         target: "bar"
         function toggle(): void {
+            peekTimer.stop();
             root.barVisible = !root.barVisible;
         }
         function show(): void {
+            peekTimer.stop();
             root.barVisible = true;
         }
         function hide(): void {
+            peekTimer.stop();
             root.barVisible = false;
+        }
+        function peek(): void {
+            root.barVisible = true;
+            peekTimer.restart();
         }
     }
 
@@ -576,6 +591,20 @@ ShellRoot {
                 root.themeOpen = false;
             }
             root.themeOpen = true;
+        }
+    }
+
+    IpcHandler {
+        target: "processes"
+        function open(): void {
+            if (root.processOpen) {
+                root.processOpen = false;
+            }
+            root.processScreen = screenForName(Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : "") || root.processScreen;
+            root.processOpen = true;
+        }
+        function close(): void {
+            root.processOpen = false;
         }
     }
 
@@ -671,6 +700,9 @@ ShellRoot {
     }
 
     PickerTheme {
+        shell: root
+    }
+    ProcessManager {
         shell: root
     }
     Launcher {

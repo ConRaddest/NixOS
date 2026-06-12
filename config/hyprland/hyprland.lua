@@ -176,7 +176,9 @@ end)
 hl.bind("SUPER + ALT + Space", function()
 	open_launcher("qs ipc call launcher openSubmenu System")
 end)
+hl.bind("SUPER + P", hl.dsp.exec_cmd("qs ipc call processes open"))
 hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("qs ipc call bar toggle"))
+hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call bar peek"))
 
 -- suspend on power off
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
@@ -332,6 +334,7 @@ local POPUP_SIZE = { 1300, 800 }
 
 local popup_windows = {
 	{ title = "shell-launcher", size = { 700, 710 }, stay_focused = true },
+	{ title = "process-manager", size = { 700, 710 } },
 
 	{ title = "wallpaper-picker" },
 	{ title = "theme-picker" },
@@ -361,6 +364,8 @@ local popup_windows = {
 	{ class = "termfilechooser" },
 	{ class = "1password" },
 	{ class = "lazy-docker" },
+
+	{ class = "yazi" },
 }
 
 for _, w in ipairs(popup_windows) do
@@ -375,3 +380,5 @@ for _, w in ipairs(popup_windows) do
 end
 
 hl.window_rule({ match = { float = true }, opacity = "0.935 override" })
+
+-- hl.layer_rule({ match = { namespace = "bar" }, blur = true })

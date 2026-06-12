@@ -10,7 +10,15 @@ Rectangle {
     property string query: ""
     property var items: []
     property string searchIcon: "󰍉"
+    property string placeholderText: "Search apps / the web · do math"
+    property string rightPillText: "esc"
+    property bool rightPillBorder: true
+    property string headerCommandText: ""
+    property string headerCategoryText: ""
     property bool focusWhenVisible: false
+    property bool terminateKeyEnabled: false
+    property bool resetIndexOnItemsChanged: true
+    property bool hoverSelectEnabled: true
 
     // Callbacks supplied by the caller.
     property var itemText: function (item) {
@@ -38,6 +46,7 @@ Rectangle {
     // Confirm overlay support.
     property bool confirmVisible: false
     property string confirmText: "Confirm"
+    property string confirmTitle: "Are you sure?"
     property string confirmSelection: "confirm"
 
     property alias inputItem: input
@@ -47,6 +56,8 @@ Rectangle {
     signal accepted(var item)
     signal back
     signal clearRequested
+    signal terminateRequested(var item)
+    signal dotPressed
     signal confirmAccepted
     signal confirmCancelled
     signal confirmSelectionEdited(string selection)
@@ -55,7 +66,16 @@ Rectangle {
 
     onVisibleChanged: if (visible && focusWhenVisible)
         input.forceActiveFocus()
-    onItemsChanged: list.currentIndex = 0
+    onItemsChanged: if (resetIndexOnItemsChanged)
+        list.currentIndex = 0
+
+    function moveSelection(delta) {
+        if (items.length === 0)
+            return;
+
+        list.currentIndex = Math.max(0, Math.min(list.currentIndex + delta, items.length - 1));
+        list.positionViewAtIndex(list.currentIndex, ListView.Contain);
+    }
 
     // ─── Search bar ───────────────────────────────────────────────────────────
     Item {
@@ -80,10 +100,10 @@ Rectangle {
         Text {
             anchors.left: searchIconText.right
             anchors.leftMargin: 12
-            anchors.right: escPill.left
+            anchors.right: headerCategoryLabel.visible ? headerCommandLabel.left : escPill.left
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
-            text: "Search apps / the web · do math"
+            text: menu.placeholderText
             color: menu.shell.muted
             font.family: menu.shell.monoFont
             font.pixelSize: 14
@@ -95,7 +115,7 @@ Rectangle {
             id: input
             anchors.left: searchIconText.right
             anchors.leftMargin: 12
-            anchors.right: escPill.left
+            anchors.right: headerCategoryLabel.visible ? headerCommandLabel.left : escPill.left
             anchors.rightMargin: 12
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -113,11 +133,11 @@ Rectangle {
             Keys.onEscapePressed: menu.back()
             Keys.onDownPressed: {
                 if (!menu.confirmVisible)
-                    list.currentIndex = Math.min(list.currentIndex + 1, menu.items.length - 1);
+                    menu.moveSelection(1);
             }
             Keys.onUpPressed: {
                 if (!menu.confirmVisible)
-                    list.currentIndex = Math.max(list.currentIndex - 1, 0);
+                    menu.moveSelection(-1);
             }
             Keys.onLeftPressed: {
                 if (menu.confirmVisible)
@@ -131,6 +151,12 @@ Rectangle {
                 if (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_C) {
                     input.text = "";
                     menu.clearRequested();
+                    event.accepted = true;
+                } else if (menu.terminateKeyEnabled && event.modifiers === Qt.NoModifier && event.key === Qt.Key_T && menu.items.length > 0 && list.currentIndex >= 0) {
+                    menu.terminateRequested(menu.items[list.currentIndex]);
+                    event.accepted = true;
+                } else if (event.modifiers === Qt.NoModifier && event.key === Qt.Key_Period) {
+                    menu.dotPressed();
                     event.accepted = true;
                 }
             }
@@ -146,29 +172,57 @@ Rectangle {
             }
         }
 
+        Text {
+            id: headerCategoryLabel
+            anchors.right: parent.right
+            anchors.rightMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            text: menu.headerCategoryText
+            color: menu.shell.muted
+            font.family: menu.shell.monoFont
+            font.pixelSize: 13
+            width: 72
+            horizontalAlignment: Text.AlignRight
+            visible: text !== ""
+        }
+
+        Text {
+            id: headerCommandLabel
+            anchors.right: headerCategoryLabel.left
+            anchors.rightMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            text: menu.headerCommandText
+            color: menu.shell.muted
+            font.family: menu.shell.monoFont
+            font.pixelSize: 13
+            visible: text !== ""
+        }
+
         Rectangle {
             id: escPill
             anchors.right: parent.right
             anchors.rightMargin: 16
             anchors.verticalCenter: parent.verticalCenter
-            width: escLabel.implicitWidth + 16
+            width: escLabel.implicitWidth + (menu.rightPillBorder ? 16 : 0)
             height: 22
             radius: 5
             color: "transparent"
-            border.color: menu.shell.border
-            border.width: 1
+            border.color: menu.rightPillBorder ? menu.shell.border : "transparent"
+            border.width: menu.rightPillBorder ? 1 : 0
+            visible: !headerCategoryLabel.visible
 
             Text {
                 id: escLabel
                 anchors.centerIn: parent
-                text: "esc"
+                text: menu.rightPillText
                 color: menu.shell.muted
                 font.family: menu.shell.monoFont
-                font.pixelSize: 12
+                font.pixelSize: menu.rightPillBorder ? 12 : 13
             }
 
             MouseArea {
                 anchors.fill: parent
+                enabled: menu.rightPillText === "esc"
                 onClicked: menu.back()
             }
         }
@@ -306,9 +360,13 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: true
-                onEntered: list.currentIndex = index
-                onClicked: menu.accepted(modelData)
+                hoverEnabled: menu.hoverSelectEnabled
+                onEntered: if (menu.hoverSelectEnabled)
+                    list.currentIndex = index
+                onClicked: {
+                    list.currentIndex = index;
+                    menu.accepted(modelData);
+                }
             }
         }
     }
@@ -322,9 +380,9 @@ Rectangle {
         property bool selected: false
         signal clicked
 
-        width: 110
-        height: 32
-        radius: 6
+        width: 140
+        height: 42
+        radius: 8
         color: selected || mouse.containsMouse ? shell.overlay : "transparent"
         border.color: selected || mouse.containsMouse ? shell.accent : shell.border
         border.width: 1
@@ -334,7 +392,7 @@ Rectangle {
             text: button.text
             color: button.shell.text
             font.family: menu.shell.monoFont
-            font.pixelSize: 14
+            font.pixelSize: 15
             font.weight: Font.Bold
         }
 
@@ -354,20 +412,20 @@ Rectangle {
 
         Column {
             anchors.centerIn: parent
-            spacing: 18
+            spacing: 20
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Are you sure?"
+                text: menu.confirmTitle
                 color: menu.shell.text
                 font.family: menu.shell.monoFont
-                font.pixelSize: 16
+                font.pixelSize: 17
                 font.weight: Font.Bold
             }
 
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 12
+                spacing: 14
 
                 ConfirmButton {
                     shell: menu.shell

@@ -18,13 +18,40 @@
         ];
       };
 
+      xdg.desktopEntries.nvim = {
+        name = "Neovim";
+        genericName = "Text Editor";
+        comment = "Edit text files in Neovim";
+        exec = "kitty --class neovim --title neovim -e nvim %F";
+        icon = "nvim";
+        terminal = false;
+        type = "Application";
+        categories = [
+          "Utility"
+          "TextEditor"
+          "Development"
+        ];
+        mimeType = [
+          "text/plain"
+          "text/x-c"
+          "text/x-c++"
+          "text/x-chdr"
+          "text/x-csrc"
+          "text/x-c++hdr"
+          "text/x-c++src"
+          "text/x-java"
+          "text/x-makefile"
+          "text/x-python"
+          "application/x-shellscript"
+        ];
+      };
+
       home.packages = with pkgs; [
         # portals
         xdg-desktop-portal-termfilechooser
 
         # dev
         vscode # text editor
-        neovim # alternate text editor
         git # source control
         mkcert # local cert management
 
@@ -44,6 +71,7 @@
         tree # folder
         unzip # unzip files
 
+        # personal apps
         audacity
         blender
 
@@ -54,7 +82,7 @@
         lazydocker
         yazi
 
-        # ai agents\
+        # ai agents
         claude-code
         pi-coding-agent
 
@@ -62,6 +90,7 @@
         localsend
         teams-for-linux
         whatsie
+        slacky
 
         # media
         mpv

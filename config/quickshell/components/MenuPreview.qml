@@ -49,6 +49,14 @@ Rectangle {
     onItemsChanged: Qt.callLater(resetSelection)
     onQueryChanged: Qt.callLater(resetSelection)
 
+    function moveSelection(delta) {
+        if (filteredItems.length === 0)
+            return;
+
+        list.currentIndex = Math.max(0, Math.min(list.currentIndex + delta, filteredItems.length - 1));
+        list.positionViewAtIndex(list.currentIndex, ListView.Contain);
+    }
+
     function itemAtIndex(index) {
         return index >= 0 && index < filteredItems.length ? filteredItems[index] : null;
     }
@@ -164,8 +172,8 @@ Rectangle {
             onTextChanged: picker.queryEdited(text)
 
             Keys.onEscapePressed: picker.back()
-            Keys.onDownPressed: list.currentIndex = Math.min(list.currentIndex + 1, picker.filteredItems.length - 1)
-            Keys.onUpPressed: list.currentIndex = Math.max(list.currentIndex - 1, 0)
+            Keys.onDownPressed: picker.moveSelection(1)
+            Keys.onUpPressed: picker.moveSelection(-1)
             Keys.onReturnPressed: if (picker.currentItem)
                 picker.accepted(picker.currentItem)
             Keys.onPressed: event => {
@@ -232,7 +240,7 @@ Rectangle {
                 id: list
                 anchors.fill: parent
                 model: picker.filteredItems
-                currentIndex: picker.filteredItems.length > 0 ? 0 : -1
+                currentIndex: -1
                 onCurrentIndexChanged: picker.syncSelection()
 
                 delegate: Item {

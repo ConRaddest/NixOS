@@ -82,6 +82,7 @@
 
       xdg.configFile."yazi/yazi.toml".text = ''
         [mgr]
+        ratio = [2, 4, 3]
         show_hidden = false
 
         [opener]
