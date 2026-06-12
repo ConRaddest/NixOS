@@ -474,6 +474,7 @@ FloatingWindow {
     function commitItems(itemsByKey) {
         const list = picker.listItem;
         const currentContentY = list.contentY;
+        const viewportGeneration = picker.viewportGeneration;
 
         // If the selected row is off-screen, ListView may auto-scroll back to it
         // when the model is replaced. Anchor selection to the visible viewport
@@ -499,6 +500,12 @@ FloatingWindow {
         list.currentIndex = nextIndex;
         list.contentY = currentContentY;
         Qt.callLater(function () {
+            // If the user navigated after this refresh started, do not restore a
+            // stale viewport. That stale restore was the source of the edge
+            // jitter while arrow-key scrolling through the process list.
+            if (picker.viewportGeneration !== viewportGeneration)
+                return;
+
             list.currentIndex = nextIndex;
             list.contentY = currentContentY;
         });
@@ -563,7 +570,7 @@ FloatingWindow {
     }
 
     Timer {
-        interval: 500
+        interval: 2000
         running: processManager.visible && processManager.confirmItem === null
         repeat: true
         onTriggered: processManager.refresh()

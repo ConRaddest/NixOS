@@ -19,6 +19,7 @@ Rectangle {
     property bool terminateKeyEnabled: false
     property bool resetIndexOnItemsChanged: true
     property bool hoverSelectEnabled: true
+    property int viewportGeneration: 0
 
     // Callbacks supplied by the caller.
     property var itemText: function (item) {
@@ -73,6 +74,7 @@ Rectangle {
         if (items.length === 0)
             return;
 
+        viewportGeneration++;
         list.currentIndex = Math.max(0, Math.min(list.currentIndex + delta, items.length - 1));
         list.positionViewAtIndex(list.currentIndex, ListView.Contain);
     }
