@@ -73,16 +73,16 @@ FloatingWindow {
         if (start < 0)
             return shell.escapeHtml(value);
 
-        return shell.escapeHtml(value.slice(0, start))
-                + "<span style=\"color: " + shell.accent + "\">"
-                + shell.escapeHtml(value.slice(start, start + q.length))
-                + "</span>"
-                + shell.escapeHtml(value.slice(start + q.length));
+        return shell.escapeHtml(value.slice(0, start)) + "<span style=\"color: " + shell.accent + "\">" + shell.escapeHtml(value.slice(start, start + q.length)) + "</span>" + shell.escapeHtml(value.slice(start + q.length));
     }
 
     function truncateTitle(title) {
         const value = String(title || "");
         return value.length > titleMaxLength ? value.slice(0, titleMaxLength - 3) + "..." : value;
+    }
+
+    function comparableName(name) {
+        return String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
     }
 
     // ─── Desktop-entry lookup ────────────────────────────────────────────────
@@ -171,22 +171,23 @@ FloatingWindow {
             return;
         }
 
-        const iconPath = entry && entry.icon ? Quickshell.iconPath(entry.icon) : "";
+        const iconPath = options.iconPath || (entry && entry.icon ? Quickshell.iconPath(entry.icon) : "");
         itemsByKey[key] = {
             pid: String(options.pid),
             itemKey: key,
             desktopId: desktopId,
             name: options.name || (entry ? entry.name : fallbackName),
-            icon: iconPath ? "" : (options.fallbackIcon || "󰣆"),
+            icon: iconPath ? "" : (options.fallbackIcon),
             iconPath: iconPath,
             cpu: cpu,
             mem: memGiB,
             address: options.address || "",
-            hasWindow: !!options.address
+            hasWindow: !!options.address,
+            terminateCommand: options.terminateCommand || ""
         };
     }
 
-    function addClientWindowItems(itemsByKey, clients, visibleAppIds) {
+    function addClientWindowItems(itemsByKey, clients, visibleAppIds, visibleWindowTitles) {
         const clientInfos = [];
         const windowCounts = ({});
 
@@ -211,6 +212,8 @@ FloatingWindow {
             };
 
             visibleAppIds[appId] = true;
+            if (info.title)
+                visibleWindowTitles[comparableName(info.title)] = true;
             windowCounts[appId] = (windowCounts[appId] || 0) + 1;
             clientInfos.push(info);
         }
@@ -223,7 +226,7 @@ FloatingWindow {
                 pid: client.pid,
                 entry: client.entry,
                 fallbackName: client.appName,
-                fallbackIcon: "󰣆",
+                fallbackIcon: "{}",
                 address: client.address,
                 key: multipleWindows ? "window:" + client.address : client.appId,
                 name: multipleWindows ? truncateTitle(client.title || client.appName) : client.appName
@@ -240,6 +243,37 @@ FloatingWindow {
 
         appStats[appId].cpu += Number(cpu) || 0;
         appStats[appId].rssKiB += Number(rssKiB) || 0;
+    }
+
+    function addStatsToVisibleItem(itemsByKey, name, cpu, rssKiB, terminateCommand, entry) {
+        const target = comparableName(name);
+        if (!target)
+            return false;
+
+        for (const key of Object.keys(itemsByKey)) {
+            const item = itemsByKey[key];
+            if (comparableName(item.name) === target) {
+                item.cpu += Number(cpu) || 0;
+                item.mem += (Number(rssKiB) || 0) / 1048576;
+
+                // If this visible row is actually a terminal wrapper for a known
+                // app, prefer the app's desktop-entry name/icon over the generic
+                // terminal/window icon.
+                if (entry) {
+                    const iconPath = entry.icon ? Quickshell.iconPath(entry.icon) : "";
+                    item.desktopId = String(entry.id || item.desktopId);
+                    item.name = entry.name || item.name;
+                    item.iconPath = iconPath || item.iconPath;
+                    item.icon = iconPath ? "" : item.icon;
+                }
+
+                if (terminateCommand)
+                    item.terminateCommand = terminateCommand;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function isManageableBackgroundProcess(command, args, rssKiB) {
@@ -317,11 +351,12 @@ FloatingWindow {
 
         const itemsByKey = ({});
         const visibleAppIds = ({});
+        const visibleWindowTitles = ({});
         const appStats = ({});
         const currentProcessTicks = ({});
         let totalTicks = 0;
 
-        addClientWindowItems(itemsByKey, clients, visibleAppIds);
+        addClientWindowItems(itemsByKey, clients, visibleAppIds, visibleWindowTitles);
 
         for (const line of psText.split("\n")) {
             const trimmed = line.trim();
@@ -337,6 +372,30 @@ FloatingWindow {
             const totalMatch = trimmed.match(/^TOTAL\s+(\d+)$/);
             if (totalMatch) {
                 totalTicks = Number(totalMatch[1]) || 0;
+                continue;
+            }
+
+            const dockerMatch = trimmed.match(/^DOCKER\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/);
+            if (dockerMatch) {
+                const id = dockerMatch[1];
+                const cpu = Math.min(100, (Number(dockerMatch[2]) || 0) / Math.max(1, cpuCount));
+                const rssKiB = Number(dockerMatch[3]) || 0;
+                const name = dockerMatch[4];
+                const stopCommand = "docker stop " + shell.shellQuote(id);
+
+                // Containers are distinct managed targets from any GUI client
+                // that may connect to them, e.g. Windows RDP session + Windows
+                // Docker VM container. Always show the container as its own row.
+                createOrUpdateItem(itemsByKey, {
+                    pid: id,
+                    fallbackName: name,
+                    fallbackIcon: "",
+                    iconPath: Quickshell.iconPath("docker"),
+                    cpu: cpu,
+                    rssKiB: rssKiB,
+                    key: "docker:" + id,
+                    terminateCommand: stopCommand
+                });
                 continue;
             }
 
@@ -362,25 +421,40 @@ FloatingWindow {
                 const appId = String(entry.id || "");
                 accumulateAppStats(appStats, appId, cpu, rssKiB);
 
+                // If a terminal/window title already represents this process,
+                // merge the stats into that visible row instead of adding a
+                // second desktop-entry row. Example: `lazy-docker` window title
+                // and `LazyDocker` desktop/process match.
+                if (addStatsToVisibleItem(itemsByKey, entry.name, cpu, rssKiB, "", entry) || addStatsToVisibleItem(itemsByKey, command, cpu, rssKiB, "", entry))
+                    continue;
+
                 // If the app has no visible windows, add a background-only row.
                 if (!visibleAppIds[appId]) {
                     createOrUpdateItem(itemsByKey, {
                         pid: pid,
                         entry: entry,
                         fallbackName: entry.name,
-                        fallbackIcon: "󰣆",
+                        fallbackIcon: "{}",
                         cpu: cpu,
                         rssKiB: rssKiB
                     });
                 }
             } else if (showExtraProcesses && isManageableBackgroundProcess(command, args, rssKiB)) {
+                const displayName = displayNameForProcess(command);
+
+                // If a terminal window is already representing this foreground
+                // TUI command by title, do not add the child process as a second
+                // row. Example: kitty title `lazy-docker` + process `lazydocker`.
+                if (visibleWindowTitles[comparableName(displayName)] || visibleWindowTitles[comparableName(command)])
+                    continue;
+
                 // Optional non-desktop user services/background apps, e.g.
                 // Quickshell. Hidden by default to keep the list app-focused;
                 // press `.` to toggle them.
                 createOrUpdateItem(itemsByKey, {
                     pid: pid,
-                    fallbackName: displayNameForProcess(command),
-                    fallbackIcon: "󰅩",
+                    fallbackName: displayName,
+                    fallbackIcon: "{}",
                     cpu: cpu,
                     rssKiB: rssKiB,
                     key: "process:" + command
@@ -412,9 +486,9 @@ FloatingWindow {
         const anchoredIndex = (list.currentIndex < topIndex || list.currentIndex > bottomIndex) ? topIndex : list.currentIndex;
 
         const newItems = Object.values(itemsByKey).map(item => Object.assign(item, {
-                    cpuText: item.cpu.toFixed(1) + "%",
-                    memText: item.mem.toFixed(1) + "G"
-                })).sort((a, b) => (b.mem - a.mem) || (b.cpu - a.cpu) || a.name.localeCompare(b.name));
+                cpuText: item.cpu.toFixed(1) + "%",
+                memText: item.mem.toFixed(1) + "G"
+            })).sort((a, b) => (b.mem - a.mem) || (b.cpu - a.cpu) || a.name.localeCompare(b.name));
 
         const nextIndex = Math.max(0, Math.min(anchoredIndex, newItems.length - 1));
 
@@ -431,8 +505,13 @@ FloatingWindow {
     }
 
     function refresh() {
-        listProcess.running = false;
-        listProcess.command = ["bash", "-c", "hyprctl clients -j 2>/dev/null; printf '\n---QS-PS---\n'; exec -a qs-process-manager-list python3 - <<'PY'\nimport os, subprocess\nprint('CPUS', os.cpu_count() or 1)\ntry:\n    with open('/proc/stat') as f:\n        parts = f.readline().split()[1:]\n    print('TOTAL', sum(int(p) for p in parts))\nexcept Exception:\n    print('TOTAL', 0)\ntry:\n    rows = subprocess.check_output(['ps', '-eo', 'pid=,rss=,comm=,args='], text=True)\nexcept Exception:\n    rows = ''\ncurrent_uid = os.getuid()\nfor line in rows.splitlines():\n    fields = line.strip().split(None, 3)\n    if len(fields) < 3:\n        continue\n    pid, rss, comm = fields[:3]\n    args = fields[3] if len(fields) > 3 else comm\n    try:\n        if os.stat('/proc/%s' % pid).st_uid != current_uid:\n            continue\n        stat = open('/proc/%s/stat' % pid).read()\n        rest = stat.rsplit(') ', 1)[1].split()\n        ticks = int(rest[11]) + int(rest[12])\n\n    except Exception:\n        continue\n    print(pid, ticks, rss, comm, args)\nPY"];
+        // The sampler can take longer than the 500ms UI refresh interval when
+        // Docker is queried. Do not kill an in-flight sample, otherwise slow
+        // container stats may never make it into the list.
+        if (listProcess.running)
+            return;
+
+        listProcess.command = ["bash", "-c", "hyprctl clients -j 2>/dev/null; printf '\n---QS-PS---\n'; exec -a qs-process-manager-list python3 - <<'PY'\nimport os, re, subprocess\nprint('CPUS', os.cpu_count() or 1)\ntry:\n    with open('/proc/stat') as f:\n        parts = f.readline().split()[1:]\n    print('TOTAL', sum(int(p) for p in parts))\nexcept Exception:\n    print('TOTAL', 0)\ntry:\n    rows = subprocess.check_output(['ps', '-eo', 'pid=,rss=,comm=,args='], text=True)\nexcept Exception:\n    rows = ''\ncurrent_uid = os.getuid()\nfor line in rows.splitlines():\n    fields = line.strip().split(None, 3)\n    if len(fields) < 3:\n        continue\n    pid, rss, comm = fields[:3]\n    args = fields[3] if len(fields) > 3 else comm\n    try:\n        if os.stat('/proc/%s' % pid).st_uid != current_uid:\n            continue\n        stat = open('/proc/%s/stat' % pid).read()\n        rest = stat.rsplit(') ', 1)[1].split()\n        ticks = int(rest[11]) + int(rest[12])\n\n    except Exception:\n        continue\n    print(pid, ticks, rss, comm, args)\n\ndef mem_to_kib(value):\n    # Docker uses compact IEC units such as `620MiB`, `2.4GiB`, or sometimes\n    # spaced forms. Convert the *used* side of `.MemUsage` to KiB for QML.\n    match = re.search(r'([0-9]+(?:\\.[0-9]+)?)\\s*([KMGT]?i?B|[KMGT]?B)?', value.strip(), re.I)\n    if not match:\n        return 0\n\n    number = float(match.group(1))\n    unit = (match.group(2) or 'B').lower()\n\n    if unit.startswith('k'):\n        return int(number)\n    if unit.startswith('m'):\n        return int(number * 1024)\n    if unit.startswith('g'):\n        return int(number * 1024 * 1024)\n    if unit.startswith('t'):\n        return int(number * 1024 * 1024 * 1024)\n    return int(number / 1024)\n\ntry:\n    stats = subprocess.check_output(['docker', 'stats', '--no-stream', '--format', '{{.ID}}\\t{{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}'], text=True, stderr=subprocess.DEVNULL, timeout=2)\nexcept Exception:\n    stats = ''\nfor line in stats.splitlines():\n    fields = line.split('\\t')\n    if len(fields) < 4:\n        continue\n    cid, name, cpu_text, mem_text = fields[:4]\n    cpu = cpu_text.strip().rstrip('%') or '0'\n    used_mem = mem_text.split('/')[0].strip()\n    print('DOCKER', cid, cpu, mem_to_kib(used_mem), name)\nPY"];
         listProcess.running = true;
     }
 
@@ -456,7 +535,7 @@ FloatingWindow {
             return;
 
         killProcess.running = false;
-        killProcess.command = ["bash", "-c", "kill -- " + shell.shellQuote(confirmItem.pid) + " 2>/dev/null || true"];
+        killProcess.command = confirmItem.terminateCommand ? ["bash", "-c", confirmItem.terminateCommand] : ["bash", "-c", "kill -- " + shell.shellQuote(confirmItem.pid) + " 2>/dev/null || true"];
         killProcess.running = true;
         confirmItem = null;
         confirmSelection = "confirm";
@@ -484,7 +563,7 @@ FloatingWindow {
     }
 
     Timer {
-        interval: 3000
+        interval: 500
         running: processManager.visible && processManager.confirmItem === null
         repeat: true
         onTriggered: processManager.refresh()

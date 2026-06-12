@@ -540,7 +540,7 @@ ShellRoot {
 
     Timer {
         id: peekTimer
-        interval: 1500
+        interval: 3000
         onTriggered: root.barVisible = false
     }
 
