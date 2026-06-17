@@ -18,9 +18,9 @@ PanelWindow {
     }
 
     visible: shell.barVisible
-    implicitHeight: 38
-    exclusiveZone: shell.barVisible ? 26 : 0
-    color: "transparent"
+    implicitHeight: 28
+    exclusiveZone: shell.barVisible ? 28 : 0
+    color: "#66000000"
     WlrLayershell.namespace: "bar"
     WlrLayershell.layer: WlrLayer.Bottom
 
@@ -96,34 +96,7 @@ PanelWindow {
     // ─── Background ──────────────────────────────────────────────────────────
     Rectangle {
         anchors.fill: parent
-        color: "transparent"
-
-        // Nearly invisible alpha mask for Hyprland blur. With the `ignorezero`
-        // layer rule, fully transparent pixels are skipped while this fades the
-        // blur out toward the bottom without adding a visible color scrim.
-        Rectangle {
-            anchors.fill: parent
-            color: "transparent"
-
-            gradient: Gradient {
-                orientation: Gradient.Vertical
-
-                GradientStop {
-                    position: 0.0
-                    color: "#08000000"
-                }
-
-                GradientStop {
-                    position: 0.75
-                    color: "#02000000"
-                }
-
-                GradientStop {
-                    position: 1.0
-                    color: "#00000000"
-                }
-            }
-        }
+        color: "#66000000"
 
         // ─── Left: NixOS launcher icon + workspace indicators ─────────────────
         Row {

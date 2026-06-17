@@ -25,7 +25,7 @@ local function assign_workspaces(monitor, workspaces)
 end
 
 assign_workspaces("eDP-1", { 1, 2, 3 })
-assign_workspaces("DP-1", { 4, 5, 6 })
+assign_workspaces("HDMI-A-1", { 4, 5, 6 })
 
 hl.monitor({
 	output = "eDP-1",
@@ -35,7 +35,7 @@ hl.monitor({
 })
 
 hl.monitor({
-	output = "DP-1",
+	output = "HDMI-A-1",
 	mode = "3440x1440@174.96",
 	position = "1920x0",
 	scale = 1,
@@ -59,8 +59,8 @@ hl.config({
 
 	-- cosmetics
 	general = {
-		gaps_in = 5,
-		gaps_out = 10,
+		gaps_in = 4,
+		gaps_out = 8,
 		border_size = 1,
 		layout = "dwindle",
 		col = {
@@ -70,24 +70,23 @@ hl.config({
 	},
 
 	decoration = {
-		rounding = 12,
+		rounding = 1,
 		active_opacity = 0.93,
 		inactive_opacity = 0.90,
 		blur = {
 			enabled = true,
 			special = true,
-			size = 5,
-			passes = 2,
+			size = 2,
+			passes = 3,
 			xray = true,
 		},
 		shadow = {
 			enabled = true,
-			range = 40, -- Huge spread to get that soft macOS feel
-			render_power = 20, -- Max smoothness for the gradient falloff
-			color = 0x33000000, -- Soft black with roughly 40% opacity (0x66)
-			color_inactive = 0x22000000, -- Lighter shadow for unfocused windows
-			offset = { 0, 3 }, -- Pushes the shadow significantly downward
-			scale = 1, -- Slightly shrinks the shadow footprint behind the window
+			range = 30,
+			render_power = 100,
+			color = 0x33000000,
+			color_inactive = 0x22000000,
+			offset = { 0, 4 },
 		},
 	},
 	animations = { enabled = true },
@@ -177,8 +176,7 @@ hl.bind("SUPER + ALT + Space", function()
 	open_launcher("qs ipc call launcher openSubmenu System")
 end)
 hl.bind("SUPER + P", hl.dsp.exec_cmd("qs ipc call processes open"))
-hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("qs ipc call bar toggle"))
-hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call bar peek"))
+hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call bar toggle"))
 
 -- suspend on power off
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
@@ -256,9 +254,9 @@ local function terminal(klass, cmd)
 end
 
 local nixos_binds = {
-	{ "CTRL + SHIFT + R", "nixos-refresh", "nos-refresh --offline" },
-	{ "CTRL + SHIFT + B", "nixos-build", "nos-build" },
-	{ "CTRL + SHIFT + U", "nixos-update", "nos-update" },
+	{ "SUPER + SHIFT + R", "nixos-refresh", "nos-refresh --offline" },
+	{ "SUPER + SHIFT + B", "nixos-build", "nos-build" },
+	{ "SUPER + SHIFT + U", "nixos-update", "nos-update" },
 }
 for _, b in ipairs(nixos_binds) do
 	hl.bind(b[1], terminal(b[2], b[3]))
@@ -380,5 +378,3 @@ for _, w in ipairs(popup_windows) do
 end
 
 hl.window_rule({ match = { float = true }, opacity = "0.935 override" })
-
--- hl.layer_rule({ match = { namespace = "bar" }, blur = true })

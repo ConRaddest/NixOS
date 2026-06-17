@@ -7,16 +7,13 @@
     let
       dpmsOff = "hyprctl dispatch 'hl.dsp.dpms({ action = \"disable\" })'";
       dpmsOn = "hyprctl dispatch 'hl.dsp.dpms({ action = \"enable\" })'";
-      lock = "pgrep -x hyprlock >/dev/null || hyprlock";
     in
     {
       services.hypridle = {
         enable = true;
         settings = {
           general = {
-            lock_cmd = lock;
-            before_sleep_cmd = lock;
-            after_sleep_cmd = "sleep 2 && ${dpmsOn}";
+            after_sleep_cmd = "${dpmsOn}";
           };
 
           listener = [
@@ -27,7 +24,7 @@
             }
             {
               timeout = 600;
-              on-timeout = lock;
+              on-timeout = "hyprlock";
             }
             {
               timeout = 900;
