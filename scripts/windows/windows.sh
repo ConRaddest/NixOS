@@ -6,7 +6,7 @@ legacy_container="WinApps"
 viewer_class="windows-vm"
 credential_class="windows-credentials"
 base_dir="${HOME}/VMs/windows"
-config_file="${base_dir}/config.env"
+env_file="${HOME}/NixOS/.env"
 
 container_exists() {
   docker ps -a --format '{{.Names}}' | grep -qx "$container"
@@ -53,17 +53,32 @@ prompt_credentials() {
     --title windows-credentials \
     -e bash -lc '
       set -euo pipefail
-      config_file="$HOME/VMs/windows/config.env"
-      read -rp "Windows username []: " user
-      user="${user:-}"
+      env_file="$HOME/NixOS/.env"
+      set_env_var() {
+        local key="$1"
+        local value="$2"
+        local tmp
+        tmp="$(mktemp)"
+
+        mkdir -p "$(dirname "$env_file")"
+        touch "$env_file"
+        chmod 600 "$env_file"
+        grep -Ev "^(export[[:space:]]+)?${key}=" "$env_file" > "$tmp" || true
+        printf "export %s=%q\n" "$key" "$value" >> "$tmp"
+        cat "$tmp" > "$env_file"
+        rm -f "$tmp"
+      }
+
+      read -rp "Windows username [Docker]: " user
+      user="${user:-Docker}"
       read -rsp "Windows password: " pass
       echo
-      mkdir -p "$(dirname "$config_file")"
-      {
-        printf "USERNAME=%q\n" "$user"
-        printf "PASSWORD=%q\n" "$pass"
-      } > "$config_file"
-      chmod 600 "$config_file"
+      if [[ -z "$pass" ]]; then
+        echo "error: password cannot be empty." >&2
+        exit 1
+      fi
+      set_env_var WINDOWS_USERNAME "$user"
+      set_env_var WINDOWS_PASSWORD "$pass"
       exec windows-vm
     '
 }
@@ -73,7 +88,7 @@ open_viewer() {
     return 0
   fi
 
-  if [[ ! -f "$config_file" ]]; then
+  if [[ ! -f "$env_file" ]] || ! grep -Eq '^(export[[:space:]]+)?WINDOWS_PASSWORD=' "$env_file"; then
     prompt_credentials
   fi
 

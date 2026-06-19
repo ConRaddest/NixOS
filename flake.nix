@@ -1,6 +1,4 @@
 {
-  # 1 keyring not unlocked with system unlock
-
   description = "NixOS configuration";
 
   inputs = {
@@ -11,7 +9,6 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
-    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
   };
 
   outputs =
@@ -24,12 +21,6 @@
           (inputs.import-tree ./home)
           (inputs.import-tree ./hosts)
         ];
-
-        options.flake.systemModules = lib.mkOption {
-          type = lib.types.lazyAttrsOf lib.types.raw;
-          default = { };
-          description = "NixOS system modules exported by this flake.";
-        };
 
         options.flake.lib.homeModules = lib.mkOption {
           type = lib.types.lazyAttrsOf lib.types.raw;

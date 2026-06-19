@@ -1,6 +1,6 @@
 {
-  flake.systemModules.networking =
-    { ... }:
+  flake.nixosModules.networking =
+    { pkgs, ... }:
 
     {
       networking.networkmanager.enable = false;
@@ -17,6 +17,11 @@
           };
         };
       };
+
+      environment.systemPackages = with pkgs; [
+        impala
+        iwd
+      ];
 
       services.resolved = {
         enable = true;

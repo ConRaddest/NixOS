@@ -5,6 +5,9 @@
 #   name        — apply that theme and reload the desktop environment.
 set -euo pipefail
 
+# shellcheck source=scripts/system/progress.sh
+source "$NOS_DIR/scripts/system/progress.sh"
+
 name="${1:-}"
 themes_dir="$NOS_DIR/themes"
 
@@ -22,11 +25,14 @@ if [ ! -f "$themes_dir/${name}/theme.nix" ]; then
 fi
 
 # ─── Apply ───────────────────────────────────────────────────────────────────
-printf '\033[1;36mApplying theme: %s\033[0m\n\n' "$name"
+printf '\033[1;36mApplying theme: %s\033[0m\n' "$name"
 
 # current.nix is a relative symlink so the flake stays portable — it points to
 # e.g. tokyo-night/theme.nix rather than an absolute path on this machine.
+nos_stage "select theme"
 ln -sf "${name}/theme.nix" "$themes_dir/current.nix"
+
+nos_stage "refresh home-manager"
 nos-refresh
 
 # ─── Wallpaper ───────────────────────────────────────────────────────────────
@@ -37,12 +43,12 @@ default_wallpaper=$(grep 'wallpaper = ' "$themes_dir/${name}/theme.nix" | head -
 wallpaper_path="$themes_dir/$name/wallpapers/$default_wallpaper"
 
 if [ -n "$default_wallpaper" ] && [ -f "$wallpaper_path" ]; then
-  printf '\n\033[1;36mApplying wallpaper: %s\033[0m\n' "$default_wallpaper"
-  bash "$NOS_DIR/scripts/wallpaper.sh" "$wallpaper_path"
+  nos_stage "apply wallpaper"
+  bash "$NOS_DIR/scripts/shell/wallpaper.sh" "$wallpaper_path"
 fi
 
 # ─── Reload applications ─────────────────────────────────────────────────────
-printf '\n\033[1;36mRefreshing themed applications...\033[0m\n'
+nos_stage "reload applications"
 
 # Nautilus caches its own icon theme; quitting it forces a clean reload on next open.
 nautilus -q >/dev/null 2>&1 || true
@@ -65,3 +71,5 @@ fi
 
 # btop reads its color config at startup, so it must be restarted to pick up changes.
 pkill -x btop >/dev/null 2>&1 || true
+
+nos_done

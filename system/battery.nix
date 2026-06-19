@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.battery =
+  flake.nixosModules.battery =
     { pkgs, ... }:
 
     {
@@ -9,6 +9,8 @@
 
       services.power-profiles-daemon.enable = true;
       services.upower.enable = true;
+
+      environment.systemPackages = [ pkgs.brightnessctl ];
 
       # Laptop-specific power management.
       services.thermald.enable = true;
@@ -20,11 +22,27 @@
         HandleLidSwitchDocked = "ignore";
       };
 
-      # change the selected plan when power is plugged in or out
+      # Trigger systemd units from udev instead of running longer commands directly in udev.
       services.udev.extraRules = ''
-        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
-        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
+        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-battery.service"
+        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-ac.service"
       '';
+
+      systemd.services.power-profile-battery = {
+        description = "Set power profile when running on battery";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver";
+        };
+      };
+
+      systemd.services.power-profile-ac = {
+        description = "Set power profile when running on AC power";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance";
+        };
+      };
 
     };
 }

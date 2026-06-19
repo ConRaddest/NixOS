@@ -2,12 +2,14 @@
 
 {
   flake.lib.homeModules.npm =
-    { config, ... }:
+    { config, pkgs, ... }:
 
     let
       npmPrefix = "${config.home.homeDirectory}/.npm-link";
     in
     {
+      home.packages = [ pkgs.nodejs ];
+
       # Keep `npm link` out of the immutable Nix store.
       home.sessionPath = [
         "${npmPrefix}/bin"

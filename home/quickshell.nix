@@ -18,7 +18,11 @@
       sym = config.lib.file.mkOutOfStoreSymlink;
     in
     {
-      home.packages = [ pkgs.quickshell ];
+      home.packages = with pkgs; [
+        libnotify
+        python3
+        quickshell
+      ];
 
       # The only file Nix generates — injects theme tokens that can't be known at edit time.
       xdg.configFile."quickshell/Theme.qml".text = ''

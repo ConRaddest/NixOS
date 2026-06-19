@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.nix =
+  flake.nixosModules.nix =
     { ... }:
 
     {

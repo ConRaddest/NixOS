@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.rsa =
+  flake.nixosModules.rsa =
     { ... }:
 
     {

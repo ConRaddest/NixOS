@@ -2,9 +2,11 @@
 
 {
   flake.lib.homeModules.firefox =
-    { pkgs, lib, ... }:
+    { config, pkgs, ... }:
 
     {
+      home.packages = [ pkgs.mkcert ];
+
       xdg.mimeApps = {
         enable = true;
         defaultApplications = {
@@ -19,7 +21,7 @@
       programs.firefox = {
         enable = true;
         policies.Certificates.Install = [
-          "/home/cdt/.local/share/mkcert/rootCA.pem"
+          "${config.home.homeDirectory}/.local/share/mkcert/rootCA.pem"
         ];
         profiles.default = {
           id = 0;

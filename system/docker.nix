@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.docker =
+  flake.nixosModules.docker =
     { ... }:
 
     {

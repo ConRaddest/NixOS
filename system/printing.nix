@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.printing =
+  flake.nixosModules.printing =
     { ... }:
 
     {

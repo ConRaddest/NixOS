@@ -6,6 +6,9 @@
 # and the loop must stay alive after a failure to offer the retry prompt.
 set -uo pipefail
 
+# shellcheck source=scripts/system/progress.sh
+source "$NOS_DIR/scripts/system/progress.sh"
+
 # Use an array so the offline flag expands cleanly as separate words,
 # and expands to nothing at all when not set.
 offline_opts=()
@@ -14,13 +17,15 @@ if [[ "${1:-}" == "--offline" ]]; then
 fi
 
 run_build() {
-  printf '\033[1;36mBuilding and switching system configuration...\033[0m\n\n'
+  printf '\033[1;36mBuilding and switching system configuration...\033[0m\n'
 
   # Format and stage first so the built configuration matches the source tree
   # and the git index is clean for inspection after a successful build.
-  find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" | xargs -r nixfmt \
+  find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && sudo nixos-rebuild switch "${offline_opts[@]}" --flake "$NOS_DIR#$HOSTNAME"
+    && nos_stage "switch nixos" \
+    && sudo nixos-rebuild switch "${offline_opts[@]}" --flake "$NOS_DIR#$HOSTNAME" \
+    && nos_done
 }
 
 while true; do
@@ -28,6 +33,7 @@ while true; do
     exit 0
   fi
 
+  nos_fail "build failed"
   printf '\n\033[1;31mSomething went wrong... Would you like to retry? [Y/n]\033[0m '
   read -r -n 1 answer
   printf '\n'

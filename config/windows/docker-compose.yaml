@@ -13,9 +13,9 @@ services:
       - NET_ADMIN
 
     ports:
-      - "8006:8006"
-      - "3389:3389/tcp"
-      - "3389:3389/udp"
+      - "127.0.0.1:8006:8006"
+      - "127.0.0.1:3389:3389/tcp"
+      - "127.0.0.1:3389:3389/udp"
 
     volumes:
       - ${HOME}/VMs/windows/storage:/storage
@@ -26,5 +26,5 @@ services:
       RAM_SIZE: "4G"
       CPU_CORES: "4"
       DISK_SIZE: "64G"
-      USERNAME: "Docker"
-      PASSWORD: "admin"
+      USERNAME: ${WINDOWS_USERNAME:-Docker}
+      PASSWORD: ${WINDOWS_PASSWORD:?Run windows-install to save WINDOWS_PASSWORD in ~/NixOS/.env}

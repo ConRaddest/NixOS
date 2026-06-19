@@ -54,14 +54,19 @@ let
       self.lib.homeModules.hyprlock
       self.lib.homeModules.hyprpaper
       self.lib.homeModules.theme
+      self.lib.homeModules.unimatrix
 
+      self.lib.homeModules.apps
       self.lib.homeModules.bash
       self.lib.homeModules.btop
+      self.lib.homeModules.dev
+      self.lib.homeModules.fastfetch
       self.lib.homeModules.fzf
       self.lib.homeModules.directories
       self.lib.homeModules.firefox
       self.lib.homeModules.git
       self.lib.homeModules.kitty
+      self.lib.homeModules.lazydocker
       self.lib.homeModules.npm
       self.lib.homeModules.nvim
       self.lib.homeModules.ssh
@@ -69,9 +74,9 @@ let
 
       self.lib.homeModules.quickshell
       self.lib.homeModules.windows
+      self.lib.homeModules.vscode
       self.lib.homeModules.packages
       self.lib.homeModules.yazi
-      self.lib.homeModules.icons
     ];
 
     _module.args = { inherit font colors; };
@@ -88,7 +93,7 @@ in
   # System modules
   # ============================================================
 
-  flake.systemModules.homeManager =
+  flake.nixosModules.homeManager =
     { ... }:
     {
       imports = [ inputs.home-manager.nixosModules.home-manager ];
@@ -102,33 +107,32 @@ in
       };
     };
 
-  flake.systemModules.legionConfiguration =
+  flake.nixosModules.legionConfiguration =
     { stateVersion, ... }:
     {
       imports = [
-        self.systemModules.legionHardware
+        self.nixosModules.legionHardware
 
-        self.systemModules.core
-        self.systemModules.rsa
-        self.systemModules.networking
-        self.systemModules.nix
-        self.systemModules.security
+        self.nixosModules.core
+        self.nixosModules.rsa
+        self.nixosModules.networking
+        self.nixosModules.nix
+        self.nixosModules.security
 
-        self.systemModules.fonts
-        self.systemModules.hyprland
-        self.systemModules.portals
+        self.nixosModules.fonts
+        self.nixosModules.hyprland
+        self.nixosModules.portals
 
-        self.systemModules.bluetooth
-        self.systemModules.nvidia
+        self.nixosModules.bluetooth
+        self.nixosModules.nvidia
 
-        self.systemModules.audio
-        self.systemModules.battery
-        self.systemModules.printing
+        self.nixosModules.audio
+        self.nixosModules.battery
+        self.nixosModules.printing
 
-        self.systemModules.docker
-        self.systemModules.onepassword
-        self.systemModules.packages
-        self.systemModules.homeManager
+        self.nixosModules.docker
+        self.nixosModules.onepassword
+        self.nixosModules.homeManager
       ];
 
       networking.hostName = hostName;
@@ -143,7 +147,7 @@ in
     ${hostName} = inputs.nixpkgs.lib.nixosSystem {
       inherit specialArgs;
       system = host.system;
-      modules = [ self.systemModules.legionConfiguration ];
+      modules = [ self.nixosModules.legionConfiguration ];
     };
 
     nixos = self.nixosConfigurations.${hostName};

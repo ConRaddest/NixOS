@@ -13,7 +13,7 @@
         name: script:
         pkgs.writeShellScriptBin name ''
           export NOS_DIR="$HOME/NixOS"
-          export PATH="${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.imagemagick}/bin:$PATH"
+          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.imagemagick}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
@@ -30,11 +30,24 @@
           ls = "eza --icons";
           ll = "eza -la --icons";
           cd = "z";
+          ff = "fastfetch";
           startw = "uwsm start hyprland-uwsm.desktop";
         };
         initExtra = ''
           if [ -f "$HOME/NixOS/.env" ]; then
             source "$HOME/NixOS/.env"
+          fi
+
+          # Show the terminal rice header once for each new interactive terminal.
+          if [[ $- == *i* ]] && [ -z "''${FASTFETCH_SHOWN:-}" ]; then
+            export FASTFETCH_SHOWN=1
+            if command -v fastfetch >/dev/null 2>&1; then
+              # Prevent terminal reflow from wrapping the header into a jumble
+              # when resizing from a wide terminal to a narrow one.
+              tput rmam 2>/dev/null || true
+              fastfetch
+              tput smam 2>/dev/null || true
+            fi
           fi
         '';
       };

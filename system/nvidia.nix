@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.nvidia =
+  flake.nixosModules.nvidia =
     { config, ... }:
 
     {

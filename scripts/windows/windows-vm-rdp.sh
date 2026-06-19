@@ -2,7 +2,7 @@
 set -euo pipefail
 
 viewer_class="windows-vm"
-config_file="${HOME}/VMs/windows/config.env"
+env_file="${HOME}/NixOS/.env"
 log_file="${HOME}/.local/state/windows-vm.log"
 
 mode="foreground"
@@ -11,13 +11,13 @@ if [[ "${1:-}" == "--background" ]]; then
   shift
 fi
 
-if [[ -f "$config_file" ]]; then
+if [[ -f "$env_file" ]]; then
   # shellcheck disable=SC1090
-  source "$config_file"
+  source "$env_file"
 fi
 
-user="${1:-${USERNAME:-}}"
-pass="${PASSWORD:-}"
+user="${1:-${WINDOWS_USERNAME:-Docker}}"
+pass="${WINDOWS_PASSWORD:-}"
 args_file="$(mktemp --tmpdir windows-vm-rdp.XXXXXX)"
 chmod 600 "$args_file"
 

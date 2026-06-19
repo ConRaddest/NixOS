@@ -15,8 +15,22 @@ container="Windows"
 base_dir="${HOME}/VMs/windows"
 storage="${base_dir}/storage"
 shared="${HOME}/Windows"
-config_file="${base_dir}/config.env"
+env_file="${NOS_DIR}/.env"
 compose_file="${HOME}/.config/windows/docker-compose.yaml"
+
+set_env_var() {
+  local key="$1"
+  local value="$2"
+  local tmp
+  tmp="$(mktemp)"
+
+  touch "$env_file"
+  chmod 600 "$env_file"
+  grep -Ev "^(export[[:space:]]+)?${key}=" "$env_file" > "$tmp" || true
+  printf 'export %s=%q\n' "$key" "$value" >> "$tmp"
+  cat "$tmp" > "$env_file"
+  rm -f "$tmp"
+}
 
 if ! [[ -e /dev/kvm ]]; then
   echo "error: /dev/kvm is missing. Reboot or check that virtualization is enabled." >&2
@@ -32,12 +46,16 @@ fi
 echo "Windows VM install"
 echo
 
-echo "Modify $NOS_DIR/config/windows/docker-compose.yaml to change vm settings..."
+echo "Modify $NOS_DIR/config/windows/docker-compose.yaml to change VM settings."
 
-username="$(grep -E '^      USERNAME:' "$compose_file" | sed -E 's/^ *USERNAME: *"?([^" ]+)"?.*/\1/' | tail -1)"
-password="$(grep -E '^      PASSWORD:' "$compose_file" | sed -E 's/^ *PASSWORD: *"?([^" ]+)"?.*/\1/' | tail -1)"
-username="${username:-}"
-password="${password:-admin}"
+read -rp "Windows username [Docker]: " username
+username="${username:-Docker}"
+read -rsp "Windows password: " password
+echo
+if [[ -z "$password" ]]; then
+  echo "error: password cannot be empty." >&2
+  exit 1
+fi
 
 if docker ps -a --format '{{.Names}}' | grep -qx "$container"; then
   echo "A Windows VM container already exists."
@@ -54,11 +72,10 @@ if docker ps -a --format '{{.Names}}' | grep -qx "$container"; then
 fi
 
 mkdir -p "$storage" "$shared"
-cat > "$config_file" <<EOF
-USERNAME=$username
-PASSWORD=$password
-EOF
-chmod 600 "$config_file"
+set_env_var WINDOWS_USERNAME "$username"
+set_env_var WINDOWS_PASSWORD "$password"
+export WINDOWS_USERNAME="$username"
+export WINDOWS_PASSWORD="$password"
 
 echo
 echo "Pulling latest dockurr/windows image..."

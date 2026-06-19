@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.portals =
+  flake.nixosModules.portals =
     { pkgs, lib, ... }:
 
     {
@@ -36,7 +36,6 @@
         config.common."org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
         config.common."org.freedesktop.impl.portal.RemoteDesktop" = [ "hyprland" ];
         config.common."org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
-        # config.common."org.freedesktop.impl.portal.Settings" = [ "gtk" ];
       };
     };
 }

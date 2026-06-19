@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.security =
+  flake.nixosModules.security =
     {
       pkgs,
       username,

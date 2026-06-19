@@ -73,6 +73,7 @@ hl.config({
 		rounding = 1,
 		active_opacity = 0.93,
 		inactive_opacity = 0.90,
+		fullscreen_opacity = 0.93,
 		blur = {
 			enabled = true,
 			special = true,
@@ -205,6 +206,19 @@ end)
 hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
 hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+
+local fullscreen_uses_normal_opacity = true
+local refresh_active_fullscreen_opacity = "sh -c 'if hyprctl activewindow -j | grep -Eq '\"fullscreen\": [1-9]'; then hyprctl dispatch fullscreen; sleep 0.05; hyprctl dispatch fullscreen; fi'"
+
+hl.bind("SUPER + SHIFT + F", function()
+	fullscreen_uses_normal_opacity = not fullscreen_uses_normal_opacity
+	hl.config({
+		decoration = {
+			fullscreen_opacity = fullscreen_uses_normal_opacity and 0.93 or 1.0,
+		},
+	})
+	hl.dispatch(hl.dsp.exec_cmd(refresh_active_fullscreen_opacity))
+end, { desc = "Toggle fullscreen opacity" })
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("scratchpad"))
 

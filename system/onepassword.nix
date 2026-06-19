@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.onepassword =
+  flake.nixosModules.onepassword =
     { username, ... }:
 
     {

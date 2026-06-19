@@ -1,8 +1,8 @@
 { ... }:
 
 {
-  flake.systemModules.audio =
-    { ... }:
+  flake.nixosModules.audio =
+    { pkgs, ... }:
 
     {
       services.pulseaudio.enable = false;
@@ -14,5 +14,11 @@
         alsa.support32Bit = true;
         pulse.enable = true;
       };
+
+      environment.systemPackages = with pkgs; [
+        pamixer
+        playerctl
+        wiremix
+      ];
     };
 }

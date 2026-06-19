@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.systemModules.hyprland =
+  flake.nixosModules.hyprland =
     { pkgs, ... }:
 
     {
@@ -10,6 +10,15 @@
         xwayland.enable = true;
         withUWSM = true;
       };
+
+      environment.systemPackages = with pkgs; [
+        cliphist
+        grim
+        hyprpicker
+        hyprpolkitagent
+        slurp
+        wl-clipboard
+      ];
 
       environment.sessionVariables = {
         GTK_USE_PORTAL = "1";

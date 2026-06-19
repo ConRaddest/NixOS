@@ -6,6 +6,9 @@
 # and the loop must stay alive after a failure to offer the retry prompt.
 set -uo pipefail
 
+# shellcheck source=scripts/system/progress.sh
+source "$NOS_DIR/scripts/system/progress.sh"
+
 # Use an array so the offline flag expands cleanly as separate words,
 # and expands to nothing at all when not set.
 offline_opts=()
@@ -14,13 +17,17 @@ if [[ "${1:-}" == "--offline" ]]; then
 fi
 
 run_refresh() {
-  printf '\033[1;36mSyncing home manager configuration...\033[0m\n\n'
+  printf '\033[1;36mSyncing home manager configuration...\033[0m\n'
 
   # Format and stage first so the applied configuration matches the source tree
   # and the git index is clean for inspection after a successful switch.
-  find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" | xargs -r nixfmt \
+  find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && home-manager switch "${offline_opts[@]}" --flake "$NOS_DIR#$USER"
+    && nos_stage "switch home-manager" \
+    && home-manager switch "${offline_opts[@]}" --flake "$NOS_DIR#$USER" \
+    && nos_stage "restart quickshell" \
+    && restart_qs \
+    && nos_done
 }
 
 restart_qs() {
@@ -35,10 +42,10 @@ restart_qs() {
 
 while true; do
   if run_refresh; then
-    restart_qs
     exit 0
   fi
 
+  nos_fail "refresh failed"
   printf '\n\033[1;31mSomething went wrong... Would you like to retry? [Y/n]\033[0m '
   read -r -n 1 answer
   printf '\n'

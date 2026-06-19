@@ -42,7 +42,13 @@
       '';
     in
     {
-      home.packages = [ yazi-wrapper ];
+      home.packages = with pkgs; [
+        imv
+        mpv
+        yazi
+        yazi-wrapper
+        xdg-desktop-portal-termfilechooser
+      ];
 
       xdg.desktopEntries.yazi = {
         name = "Yazi";
