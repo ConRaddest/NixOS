@@ -29,7 +29,7 @@
           --color=prompt:${colors.accent} \
           --color=pointer:${colors.accent} \
           --color=marker:${colors.purple} \
-          --color=spinner:${colors.teal} \
+          --color=spinner:${colors.accent} \
           --color=header:${colors.muted} \
           --color=gutter:${colors.overlay} \
           --color=query:${colors.text}"

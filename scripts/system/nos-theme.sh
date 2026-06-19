@@ -25,14 +25,14 @@ if [ ! -f "$themes_dir/${name}/theme.nix" ]; then
 fi
 
 # ─── Apply ───────────────────────────────────────────────────────────────────
-printf '\033[1;36mApplying theme: %s\033[0m\n' "$name"
+nos_info "applying theme: $name..."
 
 # current.nix is a relative symlink so the flake stays portable — it points to
 # e.g. tokyo-night/theme.nix rather than an absolute path on this machine.
-nos_stage "select theme"
+nos_stage "selecting theme..."
 ln -sf "${name}/theme.nix" "$themes_dir/current.nix"
 
-nos_stage "refresh home-manager"
+nos_stage "refreshing home-manager..."
 nos-refresh
 
 # ─── Wallpaper ───────────────────────────────────────────────────────────────
@@ -43,12 +43,12 @@ default_wallpaper=$(grep 'wallpaper = ' "$themes_dir/${name}/theme.nix" | head -
 wallpaper_path="$themes_dir/$name/wallpapers/$default_wallpaper"
 
 if [ -n "$default_wallpaper" ] && [ -f "$wallpaper_path" ]; then
-  nos_stage "apply wallpaper"
+  nos_stage "applying wallpaper..."
   bash "$NOS_DIR/scripts/shell/wallpaper.sh" "$wallpaper_path"
 fi
 
 # ─── Reload applications ─────────────────────────────────────────────────────
-nos_stage "reload applications"
+nos_stage "reloading applications..."
 
 # Nautilus caches its own icon theme; quitting it forces a clean reload on next open.
 nautilus -q >/dev/null 2>&1 || true
@@ -64,7 +64,7 @@ if command -v hyprctl >/dev/null 2>&1; then
 fi
 
 if [ "$file_picker_open" = true ]; then
-  printf '\033[1;33mSkipping file picker portal refresh; close open file pickers and re-apply theme to refresh them.\033[0m\n'
+  nos_info "skipping file picker portal refresh; close open file pickers and re-apply theme to refresh them."
 else
   systemctl --user restart xdg-desktop-portal-gtk.service >/dev/null 2>&1 || true
 fi

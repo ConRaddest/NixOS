@@ -3,6 +3,7 @@
 -- ============================================================
 
 local startup_apps = {
+	"nos-lock", -- cold boot enters the same lock surface used after resume
 	"uwsm app -- hyprpaper", -- load the wallpaper
 	"uwsm app -- qs", -- load quickshell
 	"systemctl --user enable --now hyprpolkitagent.service", -- load polkitagent
@@ -180,7 +181,7 @@ hl.bind("SUPER + P", hl.dsp.exec_cmd("qs ipc call processes open"))
 hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call bar toggle"))
 
 -- suspend on power off
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
 
 -- apps
 local app_binds = {
@@ -239,7 +240,7 @@ hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 -- hypr shortcuts
 hl.bind("CTRL + SHIFT + H", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind("CTRL + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
-hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("nos-lock"))
 
 -- laptop lid disables display
 for _, s in ipairs({ { "on", true }, { "off", false } }) do
@@ -255,7 +256,8 @@ local screenshot_cmd = "mkdir -p ~/Screenshots && "
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
 -- nixos helpers
-local function terminal(klass, cmd)
+local function terminal(klass, cmd, pause)
+	local tail = pause == false and "" or '; echo; printf "\\033[38;5;141mPress Enter to close...\\033[0m"; read -r'
 	return hl.dsp.exec_cmd(
 		"uwsm app -- kitty --class "
 			.. klass
@@ -263,17 +265,20 @@ local function terminal(klass, cmd)
 			.. klass
 			.. " -e bash -lic '"
 			.. cmd
-			.. '; echo; read -rp "Press Enter to close..."\''
+			.. tail
+			.. "'"
 	)
 end
 
 local nixos_binds = {
-	{ "SUPER + SHIFT + R", "nixos-refresh", "nos-refresh --offline" },
-	{ "SUPER + SHIFT + B", "nixos-build", "nos-build" },
+	{ "SUPER + SHIFT + R", "nixos-refresh", "nos-refresh --offline", false },
+	{ "SUPER + SHIFT + B", "nixos-build", "nos-build", false },
 	{ "SUPER + SHIFT + U", "nixos-update", "nos-update" },
+	{ "SUPER + SHIFT + I", "nixos-install", "nos-install", false },
+	{ "SUPER + SHIFT + X", "nixos-remove", "nos-remove", false },
 }
 for _, b in ipairs(nixos_binds) do
-	hl.bind(b[1], terminal(b[2], b[3]))
+	hl.bind(b[1], terminal(b[2], b[3], b[4]))
 end
 
 -- universal copy / paste
@@ -368,6 +373,8 @@ local popup_windows = {
 	{ title = "nixos-build" },
 	{ title = "nixos-update" },
 	{ title = "nixos-check" },
+	{ title = "nixos-install" },
+	{ title = "nixos-remove" },
 
 	{ title = "webapp-install" },
 	{ title = "webapp-uninstall" },

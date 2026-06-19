@@ -112,6 +112,15 @@ FloatingWindow {
             icon: "󰇚",
             items: [
                 {
+                    name: "Packages",
+                    icon: "󰏖",
+                    terminal: {
+                        klass: "nixos-install",
+                        title: "nixos-install",
+                        cmd: "nos-install"
+                    }
+                },
+                {
                     name: "Windows",
                     icon: "",
                     command: "windows-install"
@@ -122,6 +131,15 @@ FloatingWindow {
             name: "Remove",
             icon: "󰆴",
             items: [
+                {
+                    name: "Packages",
+                    icon: "󰏗",
+                    terminal: {
+                        klass: "nixos-remove",
+                        title: "nixos-remove",
+                        cmd: "nos-remove"
+                    }
+                },
                 {
                     name: "Windows",
                     icon: "",
@@ -237,7 +255,7 @@ FloatingWindow {
                 {
                     name: "Lock",
                     icon: "󰌾",
-                    command: "hyprlock"
+                    command: "nos-lock"
                 },
                 {
                     name: "Logout",
@@ -252,7 +270,7 @@ FloatingWindow {
                 {
                     name: "Sleep",
                     icon: "󰒲",
-                    command: "systemctl suspend",
+                    command: "nos-suspend",
                     confirm: true
                 },
                 {

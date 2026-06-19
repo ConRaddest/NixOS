@@ -66,7 +66,7 @@ ShellRoot {
     readonly property string stateDir: theme.stateDir
 
     // ─── Bar state ───────────────────────────────────────────────────────────
-    property bool barVisible: false
+    property bool barVisible: true
 
     // Updated every second by bar.sh via statusProcess.
     property string cpuText: "--"
@@ -374,7 +374,7 @@ ShellRoot {
     }
 
     function launchTerminal(klass, title, cmd, pause) {
-        const shellCmd = pause ? cmd + "; echo; read -rp 'Press Enter to close...'" : cmd;
+        const shellCmd = pause ? cmd + "; echo; printf '\\033[38;5;141mPress Enter to close...\\033[0m'; read -r" : cmd;
         const terminalCmd = "exec " + terminal + " --class " + shellQuote(klass) + " --title " + shellQuote(title) + " -e bash -lic " + shellQuote(shellCmd);
         const finalCmd = "uwsm app -- bash -lc " + shellQuote(terminalCmd);
 

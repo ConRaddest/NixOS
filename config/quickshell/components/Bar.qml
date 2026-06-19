@@ -22,7 +22,9 @@ PanelWindow {
     exclusiveZone: shell.barVisible ? 28 : 0
     color: "#66000000"
     WlrLayershell.namespace: "bar"
-    WlrLayershell.layer: WlrLayer.Bottom
+    // Keep the bar above Hyprland's special-workspace blur layer so scratchpads
+    // still blur the background without blurring the status bar itself.
+    WlrLayershell.layer: WlrLayer.Top
 
     // ─── Inline component: StatusPill ────────────────────────────────────────
     // Small clickable status indicator used in the right section of the bar.

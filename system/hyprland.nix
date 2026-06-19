@@ -2,9 +2,16 @@
 
 {
   flake.nixosModules.hyprland =
-    { pkgs, ... }:
+    { pkgs, username, ... }:
 
     {
+      # Boot lands in the same graphical lock path as resume, while rescue
+      # consoles stay available on Ctrl+Alt+F2/F3/etc.
+      services.getty = {
+        autologinUser = username;
+        autologinOnce = true;
+      };
+
       programs.hyprland = {
         enable = true;
         xwayland.enable = true;

@@ -15,7 +15,12 @@ let
   };
 
   specialArgs = {
-    inherit inputs self hostName;
+    inherit
+      inputs
+      self
+      hostName
+      font
+      ;
     inherit (host)
       username
       fullName
@@ -57,8 +62,10 @@ let
       self.lib.homeModules.unimatrix
 
       self.lib.homeModules.apps
+      self.lib.homeModules.desktop
       self.lib.homeModules.bash
       self.lib.homeModules.btop
+      self.lib.homeModules.gdu
       self.lib.homeModules.dev
       self.lib.homeModules.fastfetch
       self.lib.homeModules.fzf
@@ -76,7 +83,6 @@ let
       self.lib.homeModules.screenSharePicker
       self.lib.homeModules.windows
       self.lib.homeModules.vscode
-      self.lib.homeModules.packages
       self.lib.homeModules.yazi
     ];
 

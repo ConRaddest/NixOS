@@ -25,6 +25,7 @@
 
       programs.kitty = {
         enable = true;
+
         keybindings = {
           "shift+delete" = "copy_to_clipboard";
           "ctrl+insert" = "copy_to_clipboard";
