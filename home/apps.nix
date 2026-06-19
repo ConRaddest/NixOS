@@ -15,6 +15,7 @@
         slacky
         teams-for-linux
         trash-cli
+        whatsapp-electron
         whatsie
       ];
     };
