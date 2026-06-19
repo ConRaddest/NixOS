@@ -93,7 +93,6 @@ ShellRoot {
     property bool menuOpen: false
     property bool processOpen: false
     property bool wallpaperOpen: false
-    property bool screenShareOpen: false
     property bool themeOpen: false
     property string menuQuery: ""
     property var menuStack: []
@@ -619,19 +618,6 @@ ShellRoot {
     }
 
     IpcHandler {
-        target: "screenshare"
-        function open(resultPath: string, sourcePath: string): void {
-            if (root.screenShareOpen) {
-                root.screenShareOpen = false;
-            }
-            screenShare.openPicker(resultPath, sourcePath);
-        }
-        function close(): void {
-            root.screenShareOpen = false;
-        }
-    }
-
-    IpcHandler {
         target: "osd"
         // Expects a single "icon:value" string, e.g. "󰕾:75"
         function trigger(data: string): void {
@@ -707,10 +693,6 @@ ShellRoot {
     }
     Launcher {
         id: launcher
-        shell: root
-    }
-    PickerScreen {
-        id: screenShare
         shell: root
     }
     PickerWallpaper {

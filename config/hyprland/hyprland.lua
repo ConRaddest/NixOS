@@ -391,4 +391,26 @@ for _, w in ipairs(popup_windows) do
 	})
 end
 
+-- Some apps open a normal Wayland/X11 client that previews the shared screen
+-- after a portal screencast starts. Hide those generic sharing-preview windows
+-- on a never-used special workspace so they do not take screen space or expose
+-- the shared content locally. This is intentionally title-based instead of
+-- app/class-based so it works across Teams, Chromium/Electron apps, etc.
+hl.window_rule({
+	match = { title = ".*(Screen is being shared|Screen Share Active).*" },
+	workspace = "special:screenshare-preview silent",
+	no_focus = true,
+	suppress_event = "activate activatefocus",
+})
+
+-- The share picker is a layer-shell surface, not a normal client window, so
+-- regular window decoration/blur rules do not apply. Match its layer namespace
+-- and apply the same kind of translucent xray blur used by other overlays.
+hl.layer_rule({
+	match = { namespace = "^ch\\.wysbd\\.hyprland-preview-share-picker$" },
+	blur = true,
+	xray = true,
+	ignore_alpha = 0.01,
+})
+
 hl.window_rule({ match = { float = true }, opacity = "0.935 override" })

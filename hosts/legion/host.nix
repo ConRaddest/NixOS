@@ -73,6 +73,7 @@ let
       self.lib.homeModules.starship
 
       self.lib.homeModules.quickshell
+      self.lib.homeModules.screenSharePicker
       self.lib.homeModules.windows
       self.lib.homeModules.vscode
       self.lib.homeModules.packages

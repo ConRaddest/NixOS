@@ -83,11 +83,5 @@
       xdg.configFile."quickshell/shell.qml".source = sym "${nos}/config/quickshell/shell.qml";
       xdg.configFile."quickshell/components".source = sym "${nos}/config/quickshell/components";
       xdg.configFile."quickshell/scripts".source = sym "${nos}/scripts";
-
-      xdg.configFile."hypr/xdph.conf".text = ''
-        screencopy {
-          custom_picker_binary = ${nos}/scripts/shell/screen.sh
-        }
-      '';
     };
 }
