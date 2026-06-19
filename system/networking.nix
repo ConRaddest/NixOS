@@ -6,6 +6,19 @@
       networking.networkmanager.enable = false;
       networking.useDHCP = false;
 
+      # IWD manages Wi-Fi; systemd-networkd handles wired LAN DHCP.
+      systemd.network = {
+        enable = true;
+        wait-online.enable = false;
+        networks."20-wired" = {
+          matchConfig.Name = "en*";
+          networkConfig = {
+            DHCP = "yes";
+            IPv6AcceptRA = true;
+          };
+        };
+      };
+
       networking.wireless.iwd = {
         enable = true;
         settings = {

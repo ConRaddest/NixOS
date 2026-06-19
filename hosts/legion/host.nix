@@ -11,6 +11,7 @@ let
     username = "cdt";
     fullName = "Connor du Toit";
     homeDirectory = "/home/cdt";
+    flakeDirectory = "/home/cdt/NixOS";
     stateVersion = "26.05";
   };
 
@@ -25,6 +26,7 @@ let
       username
       fullName
       homeDirectory
+      flakeDirectory
       stateVersion
       ;
   };

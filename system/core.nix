@@ -19,7 +19,6 @@
         "systemd.show_status=true"
       ];
 
-
       environment.systemPackages = with pkgs; [
         pciutils
         usbutils

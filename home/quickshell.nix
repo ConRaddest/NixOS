@@ -8,11 +8,12 @@
       self,
       colors,
       font,
+      flakeDirectory,
       ...
     }:
 
     let
-      nos = "${config.home.homeDirectory}/NixOS";
+      nos = flakeDirectory;
       theme = import "${self}/themes/current.nix";
       stateDir = "${config.xdg.stateHome}/nos";
       sym = config.lib.file.mkOutOfStoreSymlink;
@@ -80,6 +81,9 @@
         }
       '';
 
+      # Intentional live symlinks: Quickshell QML/scripts can be edited and
+      # restarted without a Home Manager switch. This trades generation purity
+      # for fast desktop iteration.
       xdg.configFile."quickshell/shell.qml".source = sym "${nos}/config/quickshell/shell.qml";
       xdg.configFile."quickshell/components".source = sym "${nos}/config/quickshell/components";
       xdg.configFile."quickshell/scripts".source = sym "${nos}/scripts";

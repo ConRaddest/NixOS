@@ -10,7 +10,6 @@
     }:
     {
       home.packages = with pkgs; [
-        xdg-desktop-portal-gtk
         adwaita-qt
         adwaita-qt6
       ];

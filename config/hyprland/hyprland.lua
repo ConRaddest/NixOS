@@ -6,7 +6,6 @@ local startup_apps = {
 	"nos-lock", -- cold boot enters the same lock surface used after resume
 	"uwsm app -- hyprpaper", -- load the wallpaper
 	"uwsm app -- qs", -- load quickshell
-	"systemctl --user enable --now hyprpolkitagent.service", -- load polkitagent
 }
 
 hl.on("hyprland.start", function()
@@ -189,7 +188,7 @@ local app_binds = {
 	{ "SUPER + B", "firefox" },
 }
 for _, b in ipairs(app_binds) do
-	hl.bind(b[1], hl.dsp.exec_cmd("uwsm -- app " .. b[2]))
+	hl.bind(b[1], hl.dsp.exec_cmd("uwsm app -- " .. b[2]))
 end
 
 hl.bind("SUPER + Grave", hl.dsp.workspace.toggle_special("terminal"))
@@ -209,7 +208,6 @@ hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 
 local fullscreen_uses_normal_opacity = true
-local refresh_active_fullscreen_opacity = "sh -c 'if hyprctl activewindow -j | grep -Eq '\"fullscreen\": [1-9]'; then hyprctl dispatch fullscreen; sleep 0.05; hyprctl dispatch fullscreen; fi'"
 
 hl.bind("SUPER + SHIFT + F", function()
 	fullscreen_uses_normal_opacity = not fullscreen_uses_normal_opacity
@@ -218,7 +216,6 @@ hl.bind("SUPER + SHIFT + F", function()
 			fullscreen_opacity = fullscreen_uses_normal_opacity and 0.93 or 1.0,
 		},
 	})
-	hl.dispatch(hl.dsp.exec_cmd(refresh_active_fullscreen_opacity))
 end, { desc = "Toggle fullscreen opacity" })
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("scratchpad"))
@@ -329,7 +326,7 @@ hl.bind("SUPER + M", function()
 end, { desc = "Toggle single-window max width" })
 
 -- media / brightness
-local osd = os.getenv("HOME") .. "/NixOS/scripts/shell/osd.sh"
+local osd = (os.getenv("NOS_DIR") or (os.getenv("HOME") .. "/NixOS")) .. "/scripts/shell/osd.sh"
 
 local media = {
 	{ "XF86AudioRaiseVolume", "bash " .. osd .. " volume up" },

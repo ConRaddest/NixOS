@@ -8,7 +8,6 @@
       hardware.bluetooth = {
         enable = true;
         powerOnBoot = true;
-        settings.General.AutoEnable = true;
       };
 
       # systemd-rfkill can persist a previous soft-blocked Bluetooth state.

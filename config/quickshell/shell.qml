@@ -69,12 +69,12 @@ ShellRoot {
     property bool barVisible: true
 
     // Updated every second by bar.sh via statusProcess.
-    property string cpuText: "--"
     property string ramText: "--"
     property string wifiText: "󰖪"
     property string bluetoothText: "󰂲"
     property string batteryText: "󰚥 AC"
     property string volumeText: "󰕾"
+    property string screenShareText: ""
     property string timeText: Qt.formatDateTime(new Date(), "ddd dd MMM HH:mm:ss")
 
     // ─── OSD state ───────────────────────────────────────────────────────────
@@ -510,13 +510,12 @@ ShellRoot {
             onStreamFinished: {
                 const parts = this.text.trim().split("|");
                 if (parts.length >= 5) {
-                    root.cpuText = parts[0];
-                    root.ramText = parts[1];
-                    root.wifiText = parts[2];
-                    root.bluetoothText = parts[3];
-                    root.batteryText = parts[4];
-                    if (parts.length >= 6)
-                        root.volumeText = parts[5];
+                    root.ramText = parts[0];
+                    root.wifiText = parts[1];
+                    root.bluetoothText = parts[2];
+                    root.batteryText = parts[3];
+                    root.volumeText = parts[4];
+                    root.screenShareText = parts.length >= 6 ? parts[5] : "";
                 }
             }
         }

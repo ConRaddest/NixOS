@@ -174,6 +174,12 @@ PanelWindow {
 
             StatusPill {
                 shell: bar.shell
+                text: bar.shell.screenShareText
+                textColor: bar.shell.red
+                visible: bar.shell.screenShareText !== ""
+            }
+            StatusPill {
+                shell: bar.shell
                 text: bar.shell.wifiText
                 clickable: true
                 onClicked: bar.shell.launchTerminal("wifi-manager", "wifi-manager", "impala")
@@ -192,17 +198,15 @@ PanelWindow {
             }
             StatusPill {
                 shell: bar.shell
-                text: bar.shell.batteryText
+                text: "  " + bar.shell.ramText
                 clickable: true
                 onClicked: bar.shell.launchTerminal("performance-monitor", "performance-monitor", "btop")
             }
             StatusPill {
                 shell: bar.shell
-                text: "󰍛 " + bar.shell.cpuText
-            }
-            StatusPill {
-                shell: bar.shell
-                text: "  " + bar.shell.ramText
+                text: bar.shell.batteryText
+                clickable: true
+                onClicked: bar.shell.launchTerminal("performance-monitor", "performance-monitor", "btop")
             }
         }
     }

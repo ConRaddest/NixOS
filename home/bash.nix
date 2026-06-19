@@ -5,6 +5,7 @@
     {
       self,
       pkgs,
+      flakeDirectory,
       ...
     }:
 
@@ -12,7 +13,7 @@
       mkNosScript =
         name: script:
         pkgs.writeShellScriptBin name ''
-          export NOS_DIR="$HOME/NixOS"
+          export NOS_DIR="${flakeDirectory}"
           export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.imagemagick}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
@@ -35,6 +36,8 @@
 
     in
     {
+      home.sessionVariables.NOS_DIR = flakeDirectory;
+
       programs.bash = {
         enable = true;
         shellAliases = {
@@ -54,8 +57,8 @@
         '';
 
         initExtra = ''
-          if [ -f "$HOME/NixOS/.env" ]; then
-            source "$HOME/NixOS/.env"
+          if [ -f "${flakeDirectory}/.env" ]; then
+            source "${flakeDirectory}/.env"
           fi
 
           # Show the terminal rice header once for each new interactive shell.
