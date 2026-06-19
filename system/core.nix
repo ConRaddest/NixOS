@@ -19,10 +19,6 @@
         "systemd.show_status=true"
       ];
 
-      # Larger virtual-console/TTY font, roughly 1.5x the default 16px size.
-      console.packages = [ pkgs.terminus_font ];
-      console.font = "ter-v24n";
-      console.earlySetup = true;
 
       environment.systemPackages = with pkgs; [
         pciutils
