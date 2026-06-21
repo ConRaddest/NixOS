@@ -111,3 +111,37 @@ search_apps() {
     }
   '
 }
+
+toggle_selected_app() {
+  local file="$1"
+  local attr="${2:-}"
+  [[ -n "$attr" ]] || return 0
+
+  touch "$file"
+  if grep -Fxq -- "$attr" "$file"; then
+    grep -Fvx -- "$attr" "$file" > "$file.tmp" || true
+    mv "$file.tmp" "$file"
+  else
+    printf '%s\n' "$attr" >> "$file"
+    sort -u -o "$file" "$file"
+  fi
+}
+
+search_apps_with_selected_file() {
+  local query="${1:-}"
+  local selected_file="$2"
+
+  touch "$selected_file"
+
+  while IFS= read -r attr; do
+    [[ -n "$attr" ]] && printf '%s\t[selected]\t✓ %s\n' "$attr" "$attr"
+  done < "$selected_file"
+
+  search_apps "$query" | awk -F '\t' -v selected_file="$selected_file" '
+    BEGIN {
+      while ((getline app < selected_file) > 0) selected_app[app] = 1
+      close(selected_file)
+    }
+    NF && !selected_app[$1] { print $0 "\t  " $1 }
+  '
+}

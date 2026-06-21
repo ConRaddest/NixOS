@@ -239,12 +239,8 @@ hl.bind("CTRL + SHIFT + H", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind("CTRL + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
 hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("nos-lock"))
 
--- laptop lid disables display
-for _, s in ipairs({ { "on", true }, { "off", false } }) do
-	hl.bind("switch:" .. s[1] .. ":Lid Switch", function()
-		hl.monitor({ output = "eDP-1", disabled = s[2] })
-	end, { locked = true })
-end
+-- laptop lid suspends the computer
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
 
 -- screenshot
 local screenshot_cmd = "mkdir -p ~/Screenshots && "

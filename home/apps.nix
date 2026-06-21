@@ -11,11 +11,11 @@
     {
       home.packages = with pkgs; [
         audacity
+        librewolf
         localsend
         slacky
         teams-for-linux
         trash-cli
-        whatsapp-electron
         whatsie
       ];
     };

@@ -24,10 +24,5 @@ pkg_names=$(current_apps | fzf "${fzf_args[@]}")
 
 if [[ -n "${pkg_names:-}" ]]; then
   grep -Fvx -f <(printf '%s\n' "$pkg_names") <(current_apps) | write_apps_file
-  set +e
-  nos-build
-  status=$?
-  set -e
-  nos_press_enter_to_close
-  exit "$status"
+  exec nos-build
 fi
