@@ -18,14 +18,14 @@ end)
 -- Monitors
 -- ============================================================
 
-local function assign_workspaces(monitor, workspaces)
+local function assignWorkspaces(monitor, workspaces)
 	for _, ws in ipairs(workspaces) do
 		hl.workspace_rule({ workspace = tostring(ws), monitor = monitor, default = true })
 	end
 end
 
-assign_workspaces("eDP-1", { 1, 2, 3 })
-assign_workspaces("HDMI-A-1", { 4, 5, 6 })
+assignWorkspaces("eDP-1", { 1, 2, 3 })
+assignWorkspaces("HDMI-A-1", { 4, 5, 6, 7, 8, 9 })
 
 hl.monitor({
 	output = "eDP-1",
@@ -44,7 +44,6 @@ hl.monitor({
 -- ============================================================
 -- Config
 -- ============================================================
-
 hl.config({
 	-- input
 	input = {
@@ -114,7 +113,7 @@ hl.device({
 })
 
 -- ============================================================
--- Animations
+-- animations
 -- ============================================================
 
 hl.curve("spring", {
@@ -142,57 +141,49 @@ for _, animation in ipairs(animations) do
 end
 
 -- ============================================================
--- Keybindings
+-- keybinds
 -- ============================================================
 
 -- launchers
-local function place_launcher_on_active_workspace(workspace, monitor)
-	for _, win in ipairs(hl.get_windows()) do
-		if win.title == "shell-launcher" then
-			hl.dispatch(hl.dsp.window.move({ window = win, workspace = workspace }))
-			hl.dispatch(hl.dsp.window.move({ window = win, monitor = monitor }))
-			hl.dispatch(hl.dsp.window.center({ window = win }))
-			hl.dispatch(hl.dsp.focus({ window = win }))
-			return
-		end
-	end
-end
-
-local function open_launcher(cmd)
+local function openLauncher(cmd)
 	local workspace = hl.get_active_workspace()
 	local monitor = hl.get_active_monitor()
 	hl.dispatch(hl.dsp.exec_cmd(cmd))
 	hl.timer(function()
-		place_launcher_on_active_workspace(workspace, monitor)
+		for _, win in ipairs(hl.get_windows()) do
+			if win.title == "shell-launcher" then
+				hl.dispatch(hl.dsp.window.move({ window = win, workspace = workspace }))
+				hl.dispatch(hl.dsp.window.move({ window = win, monitor = monitor }))
+				hl.dispatch(hl.dsp.window.center({ window = win }))
+				hl.dispatch(hl.dsp.focus({ window = win }))
+				return
+			end
+		end
 	end, { timeout = 120, type = "oneshot" })
 end
 
 hl.bind("SUPER + SHIFT + Space", function()
-	open_launcher("qs ipc call launcher open")
+	openLauncher("qs ipc call launcher open")
 end)
 hl.bind("SUPER + Space", function()
-	open_launcher("qs ipc call launcher openSubmenu Apps")
+	openLauncher("qs ipc call launcher openSubmenu Apps")
 end)
 hl.bind("SUPER + ALT + Space", function()
-	open_launcher("qs ipc call launcher openSubmenu System")
+	openLauncher("qs ipc call launcher openSubmenu System")
 end)
+
 hl.bind("SUPER + P", hl.dsp.exec_cmd("qs ipc call processes open"))
 hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call bar toggle"))
 
 -- suspend on power off
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
+-- laptop lid suspends the computer
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
 
 -- apps
-local app_binds = {
-	{ "SUPER + Return", "kitty" },
-	{ "SUPER + B", "firefox" },
-}
-for _, b in ipairs(app_binds) do
-	hl.bind(b[1], hl.dsp.exec_cmd("uwsm app -- " .. b[2]))
-end
-
 hl.bind("SUPER + Grave", hl.dsp.workspace.toggle_special("terminal"))
 hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi -e yazi"))
+hl.bind("SUPER + Return", hl.dsp.exec_cmd("uwsm app -- kitty"))
 
 -- workspaces
 hl.bind("SUPER + W", function()
@@ -205,7 +196,6 @@ hl.bind("SUPER + W", function()
 end)
 hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
 hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
-hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 
 local fullscreen_uses_normal_opacity = true
 
@@ -217,8 +207,8 @@ hl.bind("SUPER + SHIFT + F", function()
 		},
 	})
 end, { desc = "Toggle fullscreen opacity" })
+
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
-hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("scratchpad"))
 
 for _, dir in ipairs({ "left", "right", "up", "down" }) do
 	hl.bind("SUPER + " .. dir, hl.dsp.focus({ direction = dir }))
@@ -235,12 +225,8 @@ hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- hypr shortcuts
-hl.bind("CTRL + SHIFT + H", hl.dsp.exec_cmd("hyprctl reload"))
-hl.bind("CTRL + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
-hl.bind("CTRL + SHIFT + L", hl.dsp.exec_cmd("nos-lock"))
-
--- laptop lid suspends the computer
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
+hl.bind("SUPER + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
+hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("nos-lock"))
 
 -- screenshot
 local screenshot_cmd = "mkdir -p ~/Screenshots && "
@@ -249,17 +235,10 @@ local screenshot_cmd = "mkdir -p ~/Screenshots && "
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
 -- nixos helpers
-local function terminal(klass, cmd, pause)
+local function openTerminal(klass, cmd, pause)
 	local tail = pause == false and "" or '; echo; printf "\\033[38;5;141mPress Enter to close...\\033[0m"; read -r'
 	return hl.dsp.exec_cmd(
-		"uwsm app -- kitty --class "
-			.. klass
-			.. " --title "
-			.. klass
-			.. " -e bash -lic '"
-			.. cmd
-			.. tail
-			.. "'"
+		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. tail .. "'"
 	)
 end
 
@@ -271,13 +250,13 @@ local nixos_binds = {
 	{ "SUPER + SHIFT + X", "nixos-remove", "nos-remove", false },
 }
 for _, b in ipairs(nixos_binds) do
-	hl.bind(b[1], terminal(b[2], b[3], b[4]))
+	hl.bind(b[1], openTerminal(b[2], b[3], b[4]))
 end
 
 -- universal copy / paste
 local universal_shortcut_pressed = {}
 
-local function send_shortcut_once(mods, key)
+local function sendShortcutOnce(mods, key)
 	-- Clear any stale synthetic state, then send a short, real-looking tap.
 	hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
 	hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
@@ -286,13 +265,13 @@ local function send_shortcut_once(mods, key)
 	end, { timeout = 90, type = "oneshot" })
 end
 
-local function bind_shortcut(bind, mods, key, desc)
+local function bindShortcut(bind, mods, key, desc)
 	hl.bind(bind, function()
 		if universal_shortcut_pressed[bind] then
 			return
 		end
 		universal_shortcut_pressed[bind] = true
-		send_shortcut_once(mods, key)
+		sendShortcutOnce(mods, key)
 
 		-- Safety reset in case Hyprland misses the release event during focus churn.
 		hl.timer(function()
@@ -306,9 +285,9 @@ local function bind_shortcut(bind, mods, key, desc)
 	end, { release = true })
 end
 
-bind_shortcut("SUPER + X", "SHIFT", "Delete", "Universal cut")
-bind_shortcut("SUPER + C", "CTRL", "Insert", "Universal copy")
-bind_shortcut("SUPER + V", "SHIFT", "Insert", "Universal paste")
+bindShortcut("SUPER + X", "SHIFT", "Delete", "Universal cut")
+bindShortcut("SUPER + C", "CTRL", "Insert", "Universal copy")
+bindShortcut("SUPER + V", "SHIFT", "Insert", "Universal paste")
 
 -- toggle single window aspect ratio
 local single_window_aspect_enabled = true
@@ -337,10 +316,8 @@ for _, b in ipairs(media) do
 end
 
 -- ============================================================
--- Window Rules
+-- Window  & Layer Rules
 -- ============================================================
-
-local POPUP_SIZE = { 1300, 800 }
 
 local popup_windows = {
 	{ title = "shell-launcher", size = { 700, 710 }, stay_focused = true },
@@ -385,17 +362,12 @@ for _, w in ipairs(popup_windows) do
 		match = w.title and { title = w.title } or { class = w.class },
 		float = true,
 		center = true,
-		size = w.size or POPUP_SIZE,
+		size = w.size or { 1300, 800 },
 		pin = w.pin,
 		stay_focused = w.stay_focused,
 	})
 end
 
--- Some apps open a normal Wayland/X11 client that previews the shared screen
--- after a portal screencast starts. Hide those generic sharing-preview windows
--- on a never-used special workspace so they do not take screen space or expose
--- the shared content locally. This is intentionally title-based instead of
--- app/class-based so it works across Teams, Chromium/Electron apps, etc.
 hl.window_rule({
 	match = { title = ".*(Screen is being shared|Screen Share Active).*" },
 	workspace = "special:screenshare-preview silent",
@@ -403,9 +375,6 @@ hl.window_rule({
 	suppress_event = "activate activatefocus",
 })
 
--- The share picker is a layer-shell surface, not a normal client window, so
--- regular window decoration/blur rules do not apply. Match its layer namespace
--- and apply the same kind of translucent xray blur used by other overlays.
 hl.layer_rule({
 	match = { namespace = "^ch\\.wysbd\\.hyprland-preview-share-picker$" },
 	blur = true,

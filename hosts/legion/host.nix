@@ -69,6 +69,7 @@ let
       self.lib.homeModules.btop
       self.lib.homeModules.gdu
       self.lib.homeModules.dev
+      self.lib.homeModules.pi
       self.lib.homeModules.fastfetch
       self.lib.homeModules.fzf
       self.lib.homeModules.directories
