@@ -112,6 +112,9 @@ hl.device({
 	sensitivity = 0.0,
 })
 
+-- Navigate workspaces horizontally
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+
 -- ============================================================
 -- animations
 -- ============================================================
@@ -181,7 +184,7 @@ hl.bind("XF86PowerOff", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
 hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
 
 -- apps
-hl.bind("SUPER + Grave", hl.dsp.workspace.toggle_special("terminal"))
+hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("terminal"))
 hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi -e yazi"))
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("uwsm app -- kitty"))
 

@@ -5,8 +5,26 @@
     { pkgs, ... }:
 
     let
-      dpmsOff = "hyprctl eval 'hl.dispatch(hl.dsp.dpms({ action = \"disable\" }))'";
-      dpmsOn = "hyprctl eval 'hl.dispatch(hl.dsp.dpms({ action = \"enable\" }))'";
+      dpmsOff = "hyprctl dispatch dpms off";
+      dpmsOn = "hyprctl dispatch dpms on";
+
+      nos-lock-idle = pkgs.writeShellScriptBin "nos-lock-idle" ''
+        set -euo pipefail
+
+        exec 9>"/tmp/nos-lock-idle-$UID.lock"
+        flock -n 9 || exit 0
+
+        # Fallback for locked-session idle. Some hypridle versions stop
+        # re-arming listeners after resume while ext-session-lock is active.
+        # If the user unlocks, hyprlock exits and this watcher becomes inert.
+        sleep 300
+        pgrep -u "$UID" -x hyprlock >/dev/null || exit 0
+        ${dpmsOff} >/dev/null 2>&1 || true
+
+        sleep 600
+        pgrep -u "$UID" -x hyprlock >/dev/null || exit 0
+        systemctl suspend
+      '';
 
       nos-lock = pkgs.writeShellScriptBin "nos-lock" ''
         set -euo pipefail
@@ -14,11 +32,13 @@
         # Never start a second hyprlock. Multiple lockers competing for the
         # session-lock protocol are a common cause of broken/black unlocks.
         if pgrep -u "$UID" -x hyprlock >/dev/null; then
+          ${nos-lock-idle}/bin/nos-lock-idle >/dev/null 2>&1 &
           exit 0
         fi
 
         ${dpmsOn} >/dev/null 2>&1 || true
         hyprlock --immediate-render --no-fade-in >/tmp/hyprlock-$UID.log 2>&1 &
+        ${nos-lock-idle}/bin/nos-lock-idle >/dev/null 2>&1 &
       '';
 
       nos-resume = pkgs.writeShellScriptBin "nos-resume" ''
@@ -27,6 +47,10 @@
         # Always bring outputs back before the locker redraws after resume.
         ${dpmsOn} >/dev/null 2>&1 || true
         hyprctl dispatch submap reset >/dev/null 2>&1 || true
+
+        if pgrep -u "$UID" -x hyprlock >/dev/null; then
+          ${nos-lock-idle}/bin/nos-lock-idle >/dev/null 2>&1 &
+        fi
       '';
 
       nos-suspend = pkgs.writeShellScriptBin "nos-suspend" ''
@@ -48,29 +72,13 @@
         systemctl suspend
       '';
 
-      nos-locked-dpms-off = pkgs.writeShellScriptBin "nos-locked-dpms-off" ''
-        set -euo pipefail
-
-        if pgrep -u "$UID" -x hyprlock >/dev/null; then
-          ${dpmsOff} >/dev/null 2>&1 || true
-        fi
-      '';
-
-      nos-locked-suspend = pkgs.writeShellScriptBin "nos-locked-suspend" ''
-        set -euo pipefail
-
-        if pgrep -u "$UID" -x hyprlock >/dev/null; then
-          ${nos-suspend}/bin/nos-suspend
-        fi
-      '';
     in
     {
       home.packages = [
+        nos-lock-idle
         nos-lock
         nos-resume
         nos-suspend
-        nos-locked-dpms-off
-        nos-locked-suspend
       ];
 
       services.hypridle = {
@@ -80,33 +88,23 @@
             lock_cmd = "${nos-lock}/bin/nos-lock";
             before_sleep_cmd = "${nos-lock}/bin/nos-lock";
             after_sleep_cmd = "${nos-resume}/bin/nos-resume";
+
+            # Browsers/Electron often leave idle inhibitors behind. If respected,
+            # hypridle will not blank again while hyprlock is already visible.
+            ignore_dbus_inhibit = true;
+            ignore_systemd_inhibit = true;
           };
 
           listener = [
-            # Once locked, blank the display after only 60 seconds of inactivity.
-            # When unlocked, this listener is a no-op and the normal 300s DPMS
-            # timeout below still applies.
-            {
-              timeout = 60;
-              on-timeout = "${nos-locked-dpms-off}/bin/nos-locked-dpms-off";
-              on-resume = "${nos-resume}/bin/nos-resume";
-            }
+            # Blank display after 5 minutes of inactivity.
             {
               timeout = 300;
               on-timeout = dpmsOff;
               on-resume = "${nos-resume}/bin/nos-resume";
             }
-            # If the session is already locked, suspend after 300 seconds of
-            # locked inactivity. If the lock was triggered by the normal 600s
-            # idle timeout, the 900s listener below provides the same 300s delay.
-            {
-              timeout = 300;
-              on-timeout = "${nos-locked-suspend}/bin/nos-locked-suspend";
-            }
-            {
-              timeout = 600;
-              on-timeout = "loginctl lock-session";
-            }
+            # After 15 minutes, lock and suspend together. nos-suspend invokes
+            # nos-lock before calling systemctl suspend, so the session is
+            # only ever locked when the machine is going to sleep.
             {
               timeout = 900;
               on-timeout = "${nos-suspend}/bin/nos-suspend";

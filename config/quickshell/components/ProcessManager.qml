@@ -570,7 +570,7 @@ FloatingWindow {
     }
 
     Timer {
-        interval: 2000
+        interval: 500
         running: processManager.visible && processManager.confirmItem === null
         repeat: true
         onTriggered: processManager.refresh()

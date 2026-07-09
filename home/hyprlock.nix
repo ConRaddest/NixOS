@@ -33,7 +33,7 @@
 
           label = [
             {
-              text = "$TIME";
+              text = ''cmd[update:1000] date +"%H:%M"'';
               color = rgb colors.text;
               font_family = font.system;
               font_size = 70;

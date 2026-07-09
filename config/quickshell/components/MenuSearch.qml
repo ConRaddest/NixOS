@@ -154,9 +154,6 @@ Rectangle {
                     input.text = "";
                     menu.clearRequested();
                     event.accepted = true;
-                } else if (menu.terminateKeyEnabled && event.modifiers === Qt.NoModifier && event.key === Qt.Key_T && menu.items.length > 0 && list.currentIndex >= 0) {
-                    menu.terminateRequested(menu.items[list.currentIndex]);
-                    event.accepted = true;
                 } else if (event.modifiers === Qt.NoModifier && event.key === Qt.Key_Period) {
                     menu.dotPressed();
                     event.accepted = true;
@@ -168,6 +165,8 @@ Rectangle {
                         menu.confirmAccepted();
                     else
                         menu.confirmCancelled();
+                } else if (menu.terminateKeyEnabled && menu.items.length > 0 && list.currentIndex >= 0) {
+                    menu.terminateRequested(menu.items[list.currentIndex]);
                 } else if (menu.items.length > 0 && list.currentIndex >= 0) {
                     menu.accepted(menu.items[list.currentIndex]);
                 }
@@ -367,7 +366,10 @@ Rectangle {
                     list.currentIndex = index
                 onClicked: {
                     list.currentIndex = index;
-                    menu.accepted(modelData);
+                    if (menu.terminateKeyEnabled)
+                        menu.terminateRequested(modelData);
+                    else
+                        menu.accepted(modelData);
                 }
             }
         }

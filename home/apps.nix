@@ -11,6 +11,8 @@
     {
       home.packages = with pkgs; [
         audacity
+        drawio
+        libreoffice
         librewolf
         localsend
         slacky
