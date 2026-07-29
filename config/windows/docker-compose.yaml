@@ -22,6 +22,7 @@ services:
       - ${HOME}/Windows:/shared
 
     environment:
+      TZ: "Africa/Johannesburg"
       VERSION: "11"
       RAM_SIZE: "4G"
       CPU_CORES: "4"

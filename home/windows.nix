@@ -47,6 +47,7 @@
             [[ -n "$pass" ]] && printf '%s\n' "/p:$pass"
             printf '%s\n' "/dynamic-resolution"
             printf '%s\n' "/clipboard"
+            printf '%s\n' "-grab-keyboard"
             printf '%s\n' "/cert:ignore"
             printf '%s\n' "/network:auto"
             printf '%s\n' "/scale:100"

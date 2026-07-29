@@ -72,7 +72,7 @@ hl.config({
 		rounding = 1,
 		active_opacity = 0.93,
 		inactive_opacity = 0.90,
-		fullscreen_opacity = 0.93,
+		fullscreen_opacity = 1.0,
 		blur = {
 			enabled = true,
 			special = true,
@@ -200,16 +200,11 @@ end)
 hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
 hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
 
-local fullscreen_uses_normal_opacity = true
-
-hl.bind("SUPER + SHIFT + F", function()
-	fullscreen_uses_normal_opacity = not fullscreen_uses_normal_opacity
-	hl.config({
-		decoration = {
-			fullscreen_opacity = fullscreen_uses_normal_opacity and 0.93 or 1.0,
-		},
-	})
-end, { desc = "Toggle fullscreen opacity" })
+hl.bind(
+	"SUPER + F",
+	hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }),
+	{ desc = "Toggle fullscreen" }
+)
 
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
 
@@ -268,18 +263,26 @@ local function sendShortcutOnce(mods, key)
 	end, { timeout = 90, type = "oneshot" })
 end
 
-local function bindShortcut(bind, mods, key, desc)
+local function bindShortcut(bind, mods, key, desc, windowsMods, windowsKey)
 	hl.bind(bind, function()
 		if universal_shortcut_pressed[bind] then
 			return
 		end
 		universal_shortcut_pressed[bind] = true
-		sendShortcutOnce(mods, key)
+
+		local shortcutMods = mods
+		local shortcutKey = key
+		local win = hl.get_active_window()
+		if win and win.class == "windows-vm" then
+			shortcutMods = windowsMods or mods
+			shortcutKey = windowsKey or key
+		end
+		sendShortcutOnce(shortcutMods, shortcutKey)
 
 		-- Safety reset in case Hyprland misses the release event during focus churn.
 		hl.timer(function()
 			universal_shortcut_pressed[bind] = false
-			hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
+			hl.dispatch(hl.dsp.send_key_state({ mods = shortcutMods, key = shortcutKey, state = "up" }))
 		end, { timeout = 1200, type = "oneshot" })
 	end, { desc = desc })
 
@@ -289,8 +292,8 @@ local function bindShortcut(bind, mods, key, desc)
 end
 
 bindShortcut("SUPER + X", "SHIFT", "Delete", "Universal cut")
-bindShortcut("SUPER + C", "CTRL", "Insert", "Universal copy")
-bindShortcut("SUPER + V", "SHIFT", "Insert", "Universal paste")
+bindShortcut("SUPER + C", "CTRL", "Insert", "Universal copy", "CTRL", "C")
+bindShortcut("SUPER + V", "SHIFT", "Insert", "Universal paste", "CTRL", "V")
 
 -- toggle single window aspect ratio
 local single_window_aspect_enabled = true
@@ -385,4 +388,4 @@ hl.layer_rule({
 	ignore_alpha = 0.01,
 })
 
-hl.window_rule({ match = { float = true }, opacity = "0.935 override" })
+hl.window_rule({ match = { float = true }, opacity = "0.935 override 0.935 override 1.0 override" })
