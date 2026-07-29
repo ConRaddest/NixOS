@@ -12,13 +12,14 @@
       home.packages = with pkgs; [
         audacity
         drawio
+        gimp
         libreoffice
         librewolf
         localsend
-        slacky
+        slack
         teams-for-linux
         trash-cli
-        whatsie
+        zapzap
       ];
     };
 }

@@ -57,7 +57,7 @@ FloatingWindow {
         {
             name: "Windows",
             icon: "",
-            command: "windows-vm"
+            command: "windows-vm-start"
         },
         {
             name: "Code",

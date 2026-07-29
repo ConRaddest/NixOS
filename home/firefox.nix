@@ -2,8 +2,16 @@
 
 {
   flake.lib.homeModules.firefox =
-    { config, pkgs, ... }:
+    {
+      config,
+      inputs,
+      pkgs,
+      ...
+    }:
 
+    let
+      firefoxPackage = inputs.firefox-nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.firefox;
+    in
     {
       home.packages = [ pkgs.mkcert ];
 
@@ -20,6 +28,7 @@
 
       programs.firefox = {
         enable = true;
+        package = firefoxPackage;
         policies.Certificates.Install = [
           "${config.home.homeDirectory}/.local/share/mkcert/rootCA.pem"
         ];

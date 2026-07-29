@@ -87,6 +87,7 @@ let
       self.lib.homeModules.windows
       self.lib.homeModules.vscode
       self.lib.homeModules.yazi
+      self.lib.homeModules.zapzap
     ];
 
     _module.args = { inherit font colors; };

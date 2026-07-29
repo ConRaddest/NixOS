@@ -92,13 +92,19 @@
 
         container="Windows"
         compose_file="''${HOME}/.config/windows/docker-compose.yaml"
+        env_file=${pkgs.lib.escapeShellArg envFile}
+
+        if [[ -f "$env_file" ]]; then
+          # shellcheck disable=SC1090
+          source "$env_file"
+        fi
 
         printf '\033[1;36mStarting Windows VM...\033[0m\n\n'
         echo "Starting Windows container..."
         docker rm -f "$container" >/dev/null 2>&1 || true
         docker compose --progress quiet --file "$compose_file" up -d >/dev/null
 
-        echo "Waiting for Windows to be ready..."
+        echo "Waiting for windows..."
         ready=false
         for i in $(seq 1 300); do
           if timeout 1 bash -c '</dev/tcp/127.0.0.1/3389' 2>/dev/null; then
@@ -112,7 +118,6 @@
 
         if [[ "$ready" != "true" ]]; then
           echo "Timed out. Windows may still be booting — check http://localhost:8006"
-          read -rp "Press Enter to close..."
           exit 1
         fi
 
@@ -126,19 +131,17 @@
             break
           fi
           wait "$rdp_pid" 2>/dev/null || true
-          echo "Windows is ready — attempting to start session..."
+          echo "Windows is ready, connecting..."
           sleep 3
         done
         printf "\r\033[K"
 
         if [[ "$connected" != "true" ]]; then
           echo "Failed to connect — check http://localhost:8006"
-          read -rp "Press Enter to close..."
           exit 1
         fi
 
         echo "Connected successfully."
-        read -rp "Press Enter to close..."
       '';
 
       windows-install = pkgs.writeShellScriptBin "windows-install" ''
@@ -300,145 +303,20 @@
         echo "Windows VM removed."
       '';
 
-      windows-vm = pkgs.writeShellScriptBin "windows-vm" ''
-        set -euo pipefail
-
-        container="Windows"
-        legacy_container="WinApps"
-        viewer_class="windows-vm"
-        credential_class="windows-credentials"
-        base_dir="''${HOME}/VMs/windows"
-        env_file=${pkgs.lib.escapeShellArg envFile}
-
-        container_exists() {
-          docker ps -a --format '{{.Names}}' | grep -qx "$container"
-        }
-
-        container_running() {
-          docker ps --format '{{.Names}}' | grep -qx "$container"
-        }
-
-        viewer_address() {
-          hyprctl clients -j 2>/dev/null \
-            | jq -r --arg klass "$viewer_class" '
-              .[]
-              | select(.class == $klass or .initialClass == $klass)
-              | .address
-            ' \
-            | head -n 1
-        }
-
-        focus_viewer() {
-          local address
-          address="$(viewer_address)"
-          if [[ -n "$address" && "$address" != "null" ]]; then
-            hyprctl dispatch focuswindow "address:$address" >/dev/null
-            return 0
-          fi
-          return 1
-        }
-
-        wait_for_rdp() {
-          for _ in $(seq 1 90); do
-            if timeout 1 bash -c '</dev/tcp/127.0.0.1/3389' >/dev/null 2>&1; then
-              return 0
-            fi
-            sleep 1
-          done
-          return 1
-        }
-
-        prompt_credentials() {
-          mkdir -p "$base_dir"
-          exec kitty \
-            --class "$credential_class" \
-            --title windows-credentials \
-            -e bash -lc ${pkgs.lib.escapeShellArg ''
-              set -euo pipefail
-              env_file='${envFile}'
-              set_env_var() {
-                local key="$1"
-                local value="$2"
-                local tmp
-                tmp="$(mktemp)"
-
-                mkdir -p "$(dirname "$env_file")"
-                touch "$env_file"
-                chmod 600 "$env_file"
-                grep -Ev "^(export[[:space:]]+)?''${key}=" "$env_file" > "$tmp" || true
-                printf "export %s=%q\n" "$key" "$value" >> "$tmp"
-                cat "$tmp" > "$env_file"
-                rm -f "$tmp"
-              }
-
-              read -rp "Windows username [Docker]: " user
-              user="''${user:-Docker}"
-              read -rsp "Windows password: " pass
-              echo
-              if [[ -z "$pass" ]]; then
-                echo "error: password cannot be empty." >&2
-                exit 1
-              fi
-              set_env_var WINDOWS_USERNAME "$user"
-              set_env_var WINDOWS_PASSWORD "$pass"
-              exec windows-vm
-            ''}
-        }
-
-        open_viewer() {
-          if focus_viewer; then
-            return 0
-          fi
-
-          if [[ ! -f "$env_file" ]] || ! grep -Eq '^(export[[:space:]]+)?WINDOWS_PASSWORD=' "$env_file"; then
-            prompt_credentials
-          fi
-
-          windows-vm-rdp --background
-        }
-
-        if ! container_exists && docker ps -a --format '{{.Names}}' | grep -qx "$legacy_container"; then
-          docker rename "$legacy_container" "$container"
-        fi
-
-        if ! container_exists; then
-          echo "Windows VM is not installed yet."
-          read -rp "Run windows-install now? [y/N] " answer
-          case "$answer" in
-            y|Y|yes|YES) exec windows-install ;;
-            *) echo "Cancelled. Run windows-install when you are ready."; exit 1 ;;
-          esac
-        fi
-
-        if container_running; then
-          if wait_for_rdp; then
-            open_viewer
-          else
-            echo "RDP is not ready." >&2
-            exit 1
-          fi
-          exit 0
-        fi
-
-        exec kitty \
-          --class windows-vm-start \
-          --title windows-vm-start \
-          -e windows-vm-start
-      '';
     in
     {
       xdg.desktopEntries.windows-vm = {
         name = "Windows";
         comment = "Launch Windows virtual machine";
-        exec = "windows-vm";
-        icon = "windows-vm";
+        exec = "kitty --class windows-vm-start --title windows-vm-start -e windows-vm-start";
+        icon = "windows";
         terminal = false;
         type = "Application";
         categories = [ "System" ];
       };
 
       home.file = {
-        ".local/share/icons/hicolor/scalable/apps/windows-vm.svg".text = ''
+        ".local/share/icons/hicolor/scalable/apps/windows.svg".text = ''
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
             <path fill="#0078d4" d="M67.328 67.331h60.669V128H67.328zm-67.325 0h60.669V128H.003zM67.328 0h60.669v60.669H67.328zM.003 0h60.669v60.669H.003z"/>
           </svg>
@@ -452,7 +330,6 @@
         freerdp
         qemu
 
-        windows-vm
         windows-vm-rdp
         windows-vm-start
         windows-install
