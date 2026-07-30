@@ -16,6 +16,7 @@ services:
       - "127.0.0.1:8006:8006"
       - "127.0.0.1:3389:3389/tcp"
       - "127.0.0.1:3389:3389/udp"
+      - "127.0.0.1:11433:11433/tcp"
 
     volumes:
       - ${HOME}/VMs/windows/storage:/storage
@@ -24,8 +25,8 @@ services:
     environment:
       TZ: "Africa/Johannesburg"
       VERSION: "11"
-      RAM_SIZE: "4G"
-      CPU_CORES: "4"
+      RAM_SIZE: "6G"
+      CPU_CORES: "6"
       DISK_SIZE: "64G"
       USERNAME: ${WINDOWS_USERNAME:-Docker}
       PASSWORD: ${WINDOWS_PASSWORD:?Run windows-install to save WINDOWS_PASSWORD in ~/NixOS/.env}
