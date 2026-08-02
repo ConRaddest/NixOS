@@ -80,13 +80,9 @@ FloatingWindow {
             command: "whatsie"
         },
         {
-            name: "Yazi",
+            name: "Dolphin",
             icon: "󰉋",
-            terminal: {
-                klass: "yazi",
-                title: "yazi",
-                cmd: "yazi"
-            }
+            command: "dolphin"
         },
         {
             name: "Docker",

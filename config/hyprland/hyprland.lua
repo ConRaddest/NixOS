@@ -3,8 +3,7 @@
 -- ============================================================
 
 local startup_apps = {
-	"nos-lock", -- cold boot enters the same lock surface used after resume
-	"uwsm app -- hyprpaper", -- load the wallpaper
+
 	"uwsm app -- qs", -- load quickshell
 }
 

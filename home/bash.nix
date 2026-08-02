@@ -47,33 +47,11 @@
           ff = "fastfetch";
           startw = "uwsm start hyprland-uwsm.desktop";
         };
-        profileExtra = ''
-          # On the first boot tty, enter Hyprland automatically. Other TTYs
-          # remain normal rescue consoles: Ctrl+Alt+F2/F3 and log in there.
-          # To disable this from a rescue TTY: mkdir -p ~/.cache && touch ~/.cache/nos-disable-autostart
-          if [[ -z "''${DISPLAY:-}" && -z "''${WAYLAND_DISPLAY:-}" && "$(tty)" == /dev/tty1 && ! -e "$HOME/.cache/nos-disable-autostart" ]]; then
-            exec uwsm start hyprland-uwsm.desktop
-          fi
-        '';
-
         initExtra = ''
           if [ -f "${flakeDirectory}/.env" ]; then
             source "${flakeDirectory}/.env"
           fi
 
-          # Show the terminal rice header once for each new interactive shell.
-          # Use a shell-local marker so inherited environment variables cannot
-          # suppress fastfetch in newly opened terminals.
-          if [[ $- == *i* ]] && [ -z "''${__NOS_FASTFETCH_SHOWN:-}" ]; then
-            __NOS_FASTFETCH_SHOWN=1
-            if command -v fastfetch >/dev/null 2>&1; then
-              # Prevent terminal reflow from wrapping the header into a jumble
-              # when resizing from a wide terminal to a narrow one.
-              tput rmam 2>/dev/null || true
-              fastfetch
-              tput smam 2>/dev/null || true
-            fi
-          fi
         '';
       };
 

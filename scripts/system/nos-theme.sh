@@ -50,23 +50,21 @@ fi
 # ─── Reload applications ─────────────────────────────────────────────────────
 nos_stage "reloading applications..."
 
-# Nautilus caches its own icon theme; quitting it forces a clean reload on next open.
-nautilus -q >/dev/null 2>&1 || true
-
-# xdg-desktop-portal-gtk keeps GTK CSS in memory. Killing it while a file picker
-# is open will wedge any client (e.g. VS Code) until it restarts, so we check
-# first. We only restart the GTK backend, not xdg-desktop-portal itself.
-file_picker_open=false
-if command -v hyprctl >/dev/null 2>&1; then
-  if hyprctl clients 2>/dev/null | grep -qi 'xdg-desktop-portal-gtk'; then
-    file_picker_open=true
+# KDE's portal owns file dialogs. Restart it under Hyprland so newly opened
+# dialogs inherit refreshed settings, but never interrupt an open picker.
+if [[ "${XDG_CURRENT_DESKTOP:-}" == *Hyprland* ]]; then
+  file_picker_open=false
+  if command -v hyprctl >/dev/null 2>&1; then
+    if hyprctl clients 2>/dev/null | grep -qi 'xdg-desktop-portal-kde'; then
+      file_picker_open=true
+    fi
   fi
-fi
 
-if [ "$file_picker_open" = true ]; then
-  nos_info "skipping file picker portal refresh; close open file pickers and re-apply theme to refresh them."
-else
-  systemctl --user restart xdg-desktop-portal-gtk.service >/dev/null 2>&1 || true
+  if [ "$file_picker_open" = true ]; then
+    nos_info "skipping file picker portal refresh; close open file pickers and re-apply theme to refresh them."
+  else
+    systemctl --user restart xdg-desktop-portal-kde.service >/dev/null 2>&1 || true
+  fi
 fi
 
 # btop reads its color config at startup, so it must be restarted to pick up changes.

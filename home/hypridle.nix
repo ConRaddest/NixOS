@@ -2,7 +2,7 @@
 
 {
   flake.lib.homeModules.hypridle =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
 
     let
       dpmsOff = "hyprctl dispatch dpms off";
@@ -79,6 +79,11 @@
         nos-lock
         nos-resume
         nos-suspend
+      ];
+
+      systemd.user.services.hypridle.Unit.ConditionEnvironment = lib.mkForce [
+        "WAYLAND_DISPLAY"
+        "XDG_CURRENT_DESKTOP=Hyprland"
       ];
 
       services.hypridle = {

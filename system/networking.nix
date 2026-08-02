@@ -3,32 +3,13 @@
     { pkgs, ... }:
 
     {
-      networking.networkmanager.enable = false;
-      networking.useDHCP = false;
-
-      # IWD manages Wi-Fi; systemd-networkd handles wired LAN DHCP.
-      systemd.network = {
+      # COSMIC and Plasma use NetworkManager's D-Bus API for their network
+      # widgets. Keep IWD as the Wi-Fi backend while NetworkManager owns device
+      # configuration for both wireless and wired connections.
+      networking.networkmanager = {
         enable = true;
-        wait-online.enable = false;
-        networks."20-wired" = {
-          matchConfig.Name = "en*";
-          networkConfig = {
-            DHCP = "yes";
-            IPv6AcceptRA = true;
-          };
-        };
-      };
-
-      networking.wireless.iwd = {
-        enable = true;
-        settings = {
-          Settings.AutoConnect = true;
-          General.EnableNetworkConfiguration = true;
-          Network = {
-            EnableIPv6 = true;
-            NameResolvingService = "systemd";
-          };
-        };
+        wifi.backend = "iwd";
+        dns = "systemd-resolved";
       };
 
       environment.systemPackages = with pkgs; [

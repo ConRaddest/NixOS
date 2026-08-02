@@ -2,7 +2,12 @@
 
 {
   flake.lib.homeModules.hyprpaper =
-    { self, config, ... }:
+    {
+      self,
+      config,
+      lib,
+      ...
+    }:
 
     let
       theme = import "${self}/themes/current.nix";
@@ -18,6 +23,11 @@
           ln -s "${defaultWallpaper}" "${currentWallpaper}"
         fi
       '';
+
+      systemd.user.services.hyprpaper.Unit.ConditionEnvironment = lib.mkForce [
+        "WAYLAND_DISPLAY"
+        "XDG_CURRENT_DESKTOP=Hyprland"
+      ];
 
       services.hyprpaper = {
         enable = true;

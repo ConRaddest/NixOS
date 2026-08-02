@@ -38,6 +38,7 @@
           path = "td4m60gg.default";
           settings = {
             "media.webrtc.pipewire.enabled" = true;
+            "widget.gtk.libadwaita-colors.enabled" = false;
           };
         };
       };
