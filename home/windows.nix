@@ -91,7 +91,6 @@
       windows-vm-start = pkgs.writeShellScriptBin "windows-vm-start" ''
         set -euo pipefail
 
-        container="Windows"
         compose_file="''${HOME}/.config/windows/docker-compose.yaml"
         env_file=${pkgs.lib.escapeShellArg envFile}
 
@@ -102,7 +101,6 @@
 
         printf '\033[1;36mStarting Windows VM...\033[0m\n\n'
         echo "Starting Windows container..."
-        docker rm -f "$container" >/dev/null 2>&1 || true
         docker compose --progress quiet --file "$compose_file" up -d >/dev/null
 
         echo "Waiting for windows..."
