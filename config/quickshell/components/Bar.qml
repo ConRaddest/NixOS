@@ -107,14 +107,14 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 6
 
-            StatusPill {
-                shell: bar.shell
-                text: ""
-                textColor: bar.shell.text
-                fontPixelSize: 20
-                clickable: true
-                onClicked: bar.shell.runDetached("qs ipc call launcher open")
-            }
+            // StatusPill {
+            //     shell: bar.shell
+            //     text: ""
+            //     textColor: bar.shell.text
+            //     fontPixelSize: 20
+            //     clickable: true
+            //     onClicked: bar.shell.runDetached("qs ipc call launcher open")
+            // }
 
             Repeater {
                 model: bar.monitorWorkspaceIds
@@ -174,12 +174,6 @@ PanelWindow {
 
             StatusPill {
                 shell: bar.shell
-                text: bar.shell.screenShareText
-                textColor: bar.shell.red
-                visible: bar.shell.screenShareText !== ""
-            }
-            StatusPill {
-                shell: bar.shell
                 text: bar.shell.wifiText
                 clickable: true
                 onClicked: bar.shell.launchTerminal("wifi-manager", "wifi-manager", "impala")
@@ -207,6 +201,12 @@ PanelWindow {
                 text: bar.shell.batteryText
                 clickable: true
                 onClicked: bar.shell.launchTerminal("performance-monitor", "performance-monitor", "btop")
+            }
+            StatusPill {
+                shell: bar.shell
+                text: bar.shell.screenShareText
+                textColor: bar.shell.red
+                visible: bar.shell.screenShareText !== ""
             }
         }
     }

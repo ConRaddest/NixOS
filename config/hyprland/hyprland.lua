@@ -178,9 +178,9 @@ hl.bind("SUPER + P", hl.dsp.exec_cmd("qs ipc call processes open"))
 hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call bar toggle"))
 
 -- suspend on power off
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 -- laptop lid suspends the computer
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("nos-suspend"), { locked = true })
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 
 -- apps
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("terminal"))

@@ -143,6 +143,7 @@ in
 
         self.nixosModules.docker
         self.nixosModules.onepassword
+        self.nixosModules.teams
         self.nixosModules.homeManager
       ];
 

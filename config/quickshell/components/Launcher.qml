@@ -266,7 +266,7 @@ FloatingWindow {
                 {
                     name: "Sleep",
                     icon: "󰒲",
-                    command: "nos-suspend",
+                    command: "systemctl suspend",
                     confirm: true
                 },
                 {

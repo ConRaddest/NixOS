@@ -23,6 +23,7 @@
           "x-scheme-handler/https" = "firefox.desktop";
           "x-scheme-handler/about" = "firefox.desktop";
           "x-scheme-handler/unknown" = "firefox.desktop";
+          "x-scheme-handler/slack" = "slack.desktop";
         };
       };
 

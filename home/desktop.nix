@@ -2,9 +2,21 @@
 
 {
   flake.lib.homeModules.desktop =
-    { ... }:
+    { pkgs, ... }:
 
+    let
+      slackX11 = pkgs.writeShellApplication {
+        name = "slack-x11";
+        runtimeInputs = [ pkgs.slack ];
+        text = ''
+          export NIXOS_OZONE_WL=0
+          exec slack --ozone-platform=x11 --disable-features=WebRTCPipeWireCapturer -s "$@"
+        '';
+      };
+    in
     {
+      home.packages = [ slackX11 ];
+
       # Hide upstream entries that have NoDisplay=true but still surface in launchers.
       xdg.desktopEntries.uuctl = {
         name = "uuctl";
@@ -13,16 +25,26 @@
         type = "Application";
       };
 
-      xdg.desktopEntries.slacky = {
-        name = "Slacky";
-        comment = "An unofficial Slack desktop client for arm64 Linux";
-        exec = "slacky %u";
+      xdg.desktopEntries.slack = {
+        name = "Slack";
+        comment = "Slack Desktop";
+        exec = "slack-x11 %U";
         icon = "slack";
-        mimeType = [ "x-scheme-handler/slack" ];
         type = "Application";
-        settings = {
-          StartupWMClass = "com.andersonlaverde.slacky";
-        };
+        mimeType = [ "x-scheme-handler/slack" ];
+        categories = [
+          "Network"
+          "InstantMessaging"
+        ];
+      };
+
+      xdg.desktopEntries.teams-for-linux = {
+        name = "Teams for Linux";
+        comment = "Unofficial Microsoft Teams client";
+        exec = "teams-for-linux --disable-gpu %U";
+        icon = "teams-for-linux";
+        type = "Application";
+        mimeType = [ "x-scheme-handler/msteams" ];
         categories = [
           "Network"
           "InstantMessaging"
