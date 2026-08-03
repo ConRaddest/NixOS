@@ -6,6 +6,7 @@
       self,
       pkgs,
       flakeDirectory,
+      desktopShell,
       ...
     }:
 
@@ -14,7 +15,8 @@
         name: script:
         pkgs.writeShellScriptBin name ''
           export NOS_DIR="${flakeDirectory}"
-          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.imagemagick}/bin:$PATH"
+          export NOS_DESKTOP_SHELL="${desktopShell}"
+          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
@@ -22,7 +24,6 @@
       nos-build = mkNosScript "nos-build" "${self}/scripts/system/nos-build.sh";
       nos-update = mkNosScript "nos-update" "${self}/scripts/system/nos-update.sh";
       nos-check = mkNosScript "nos-check" "${self}/scripts/system/nos-check.sh";
-      nos-theme = mkNosScript "nos-theme" "${self}/scripts/system/nos-theme.sh";
       nos-install = mkNosScript "nos-install" "${self}/scripts/system/nos-install.sh";
       nos-remove = mkNosScript "nos-remove" "${self}/scripts/system/nos-remove.sh";
 
@@ -65,7 +66,6 @@
         nos-build
         nos-update
         nos-check
-        nos-theme
         nos-install
         nos-remove
         nos-fonts

@@ -23,20 +23,17 @@ run_refresh() {
     && git -C "$NOS_DIR" add . \
     && nos_stage "refreshing home-manager config..." \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER" \
-    && nos_stage "restarting quickshell..." \
-    && restart_qs \
+    && nos_stage "restarting desktop shell..." \
+    && restart_desktop_shell \
     && nos_done
 }
 
-restart_qs() {
-  qs kill >/dev/null 2>&1 || true
-  sleep 0.2
-  if command -v uwsm >/dev/null 2>&1; then
-    setsid uwsm app -- qs >/dev/null 2>&1 &
-    disown
-  else
-    qs --daemonize >/dev/null 2>&1 || true
-  fi
+restart_desktop_shell() {
+  case "${NOS_DESKTOP_SHELL:-none}" in
+    dms) systemctl --user restart dms.service ;;
+    none) ;;
+    *) nos_error "unsupported desktop shell: ${NOS_DESKTOP_SHELL}"; return 1 ;;
+  esac
 }
 
 while true; do

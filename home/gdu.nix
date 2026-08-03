@@ -2,54 +2,12 @@
 
 {
   flake.lib.homeModules.gdu =
-    { pkgs, colors, ... }:
+    { pkgs, ... }:
 
     {
       home.packages = [ pkgs.gdu ];
 
       xdg.configFile."gdu/gdu.yaml".text = ''
-        # --- Detailed Interface Styling ---
-        style:
-          selected-row:
-            text-color: "${colors.text}"
-            background-color: "${colors.overlay}"
-
-          marked:
-            text-color: "${colors.base}"
-            background-color: "${colors.accent}"
-
-          header:
-            text-color: "${colors.subtext}"
-            number-color: "${colors.accent}"
-            background-color: "${colors.base}"
-            hidden: true
-
-          result-row:
-            directory-color: "${colors.accent}"
-            number-color: "${colors.accent}"
-
-          border:
-            text-color: "${colors.muted}"
-
-          footer:
-            text-color: "${colors.subtext}"
-            number-color: "${colors.accent}"
-            background-color: "${colors.base}"
-
-          progress-bar:
-            text-color: "${colors.green}"
-            background-color: "${colors.overlay}"
-
-          progress-modal:
-            current-item-path-max-len: 0
-            show-disk-progress-bar: true
-
-          dialog-box:
-            text-color: "${colors.text}"
-            background-color: "${colors.overlay}"
-
-          use-old-size-bar: false
-
         # --- Scanning & Engine Preferences ---
         sorting:
           by: size

@@ -127,9 +127,9 @@
         marker_cut      = { fg = "${colors.red}",    bg = "${colors.red}" }
         marker_marked   = { fg = "${colors.teal}",   bg = "${colors.teal}" }
         marker_selected = { fg = "${colors.yellow}", bg = "${colors.yellow}" }
-        count_copied    = { fg = "${colors.base}", bg = "${colors.green}" }
-        count_cut       = { fg = "${colors.base}", bg = "${colors.red}" }
-        count_selected  = { fg = "${colors.base}", bg = "${colors.yellow}" }
+        count_copied    = { bg = "${colors.green}" }
+        count_cut       = { bg = "${colors.red}" }
+        count_selected  = { bg = "${colors.yellow}" }
         border_symbol   = "│"
         border_style    = { fg = "${colors.muted}" }
 
@@ -140,17 +140,17 @@
         padding = { open = "▐", close = "▌" }
 
         [tabs]
-        active    = { fg = "${colors.base}",   bg = "${colors.accent}", bold = true }
+        active    = { bg = "${colors.accent}", bold = true }
         inactive  = { fg = "${colors.accent}", bg = "${colors.overlay}" }
         sep_inner = { open = " ", close = " " }
         sep_outer = { open = " ", close = " " }
 
         [mode]
-        normal_main = { fg = "${colors.base}",   bg = "${colors.accent}", bold = true }
+        normal_main = { bg = "${colors.accent}", bold = true }
         normal_alt  = { fg = "${colors.accent}", bg = "${colors.overlay}" }
-        select_main = { fg = "${colors.base}",   bg = "${colors.teal}",   bold = true }
+        select_main = { bg = "${colors.teal}",   bold = true }
         select_alt  = { fg = "${colors.teal}",   bg = "${colors.overlay}" }
-        unset_main  = { fg = "${colors.base}",   bg = "${colors.subtext}", bold = true }
+        unset_main  = { bg = "${colors.subtext}", bold = true }
         unset_alt   = { fg = "${colors.subtext}", bg = "${colors.overlay}" }
 
         [status]
@@ -170,7 +170,7 @@
         title   = { fg = "${colors.accent}", bold = true }
         body    = { fg = "${colors.text}" }
         list    = { fg = "${colors.subtext}" }
-        btn_yes = { fg = "${colors.base}", bg = "${colors.accent}", bold = true }
+        btn_yes = { bg = "${colors.accent}", bold = true }
         btn_no  = { fg = "${colors.text}", bg = "${colors.overlay}" }
 
         [pick]
@@ -186,7 +186,7 @@
 
         [cmp]
         border   = { fg = "${colors.accent}" }
-        active   = { fg = "${colors.base}", bg = "${colors.accent}" }
+        active   = { bg = "${colors.accent}" }
         inactive = { fg = "${colors.subtext}" }
 
         [tasks]
@@ -196,7 +196,6 @@
 
         [which]
         mask            = { bg = "${colors.overlay}" }
-        cand            = { fg = "${colors.teal}" }
         rest            = { fg = "${colors.muted}" }
         desc            = { fg = "${colors.text}" }
         separator       = "  "
@@ -206,18 +205,12 @@
         on      = { fg = "${colors.teal}" }
         run     = { fg = "${colors.text}" }
         hovered = { reversed = true, bold = true }
-        footer  = { fg = "${colors.base}", bg = "${colors.subtext}" }
+        footer  = { bg = "${colors.subtext}" }
 
         [spot]
         border   = { fg = "${colors.accent}" }
         title    = { fg = "${colors.accent}" }
-        tbl_col  = { fg = "${colors.teal}" }
         tbl_cell = { fg = "${colors.text}", bg = "${colors.overlay}" }
-
-        [notify]
-        title_info  = { fg = "${colors.green}" }
-        title_warn  = { fg = "${colors.yellow}" }
-        title_error = { fg = "${colors.red}" }
 
         [icon]
         dirs = []
@@ -228,13 +221,13 @@
 
         [filetype]
         rules = [
-          { mime = "image/*",                                                                                              fg = "${colors.text}", bg = "${colors.base}" },
-          { mime = "{audio,video}/*",                                                                                     fg = "${colors.text}", bg = "${colors.base}" },
-          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${colors.text}", bg = "${colors.base}" },
-          { mime = "application/{pdf,doc,rtf}",                                                                          fg = "${colors.text}", bg = "${colors.base}" },
-          { mime = "vfs/{absent,stale}",                                                                                  fg = "${colors.muted}",   bg = "${colors.base}" },
-          { url = "*/", fg = "${colors.subtext}", bg = "${colors.base}" },
-          { url = "*",  fg = "${colors.text}",    bg = "${colors.base}" },
+          { mime = "image/*",                                                                                              fg = "${colors.text}" },
+          { mime = "{audio,video}/*",                                                                                     fg = "${colors.text}" },
+          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${colors.text}"},
+          { mime = "application/{pdf,doc,rtf}",                                                                          fg = "${colors.text}" },
+          { mime = "vfs/{absent,stale}",                                                                                  fg = "${colors.muted}" },
+          { url = "*/", fg = "${colors.subtext}" },
+          { url = "*",  fg = "${colors.text}" },
         ]
       '';
     };

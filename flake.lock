@@ -1,5 +1,43 @@
 {
   "nodes": {
+    "dank-qml-common": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785445867,
+        "narHash": "sha256-l9IRsLIVZ7bV+KMuTdCga89tGt4lpdMXhQR7f/2qoe4=",
+        "owner": "AvengeMedia",
+        "repo": "dank-qml-common",
+        "rev": "3b06bd9372e18bc8086cc3958d4f677d57fbfdd8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dank-qml-common",
+        "type": "github"
+      }
+    },
+    "dms": {
+      "inputs": {
+        "dank-qml-common": "dank-qml-common",
+        "flake-compat": "flake-compat",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785711699,
+        "narHash": "sha256-NdC9+f+cyeVzBWStn7iQzZIByVB9ibywr2ZId6QIR+w=",
+        "owner": "AvengeMedia",
+        "repo": "DankMaterialShell",
+        "rev": "400a18a8ed54f3ac8e44d7178f9ac94d7621ee7f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "DankMaterialShell",
+        "type": "github"
+      }
+    },
     "firefox-nixpkgs": {
       "locked": {
         "lastModified": 1783389287,
@@ -13,6 +51,22 @@
         "owner": "nixos",
         "repo": "nixpkgs",
         "rev": "0ad6f47ea4fe188f4bc8f0380f93ae8523337c6c",
+        "type": "github"
+      }
+    },
+    "flake-compat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767039857,
+        "narHash": "sha256-vNpUSpF5Nuw8xvDLj2KCwwksIbjua2LZCqhV1LNRDns=",
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "flake-compat",
         "type": "github"
       }
     },
@@ -141,6 +195,7 @@
     },
     "root": {
       "inputs": {
+        "dms": "dms",
         "firefox-nixpkgs": "firefox-nixpkgs",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",

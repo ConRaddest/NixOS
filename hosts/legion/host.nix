@@ -8,6 +8,7 @@ let
   hostName = "legion";
   host = {
     system = "x86_64-linux";
+    desktopShell = "dms"; # Supported: "dms", "none"
     username = "cdt";
     fullName = "Connor du Toit";
     homeDirectory = "/home/cdt";
@@ -28,6 +29,7 @@ let
       homeDirectory
       flakeDirectory
       stateVersion
+      desktopShell
       ;
   };
 
@@ -47,8 +49,7 @@ let
     monoSize = 10;
   };
 
-  theme = import "${self}/themes/current.nix";
-  colors = theme.colors;
+  colors = import "${self}/config/palette.nix";
 
   # ============================================================
   # Home
@@ -56,10 +57,9 @@ let
 
   homeConfig = {
     imports = [
-      self.lib.homeModules.hypridle
       self.lib.homeModules.hyprland
-      self.lib.homeModules.hyprpaper
-      self.lib.homeModules.theme
+      self.lib.homeModules.desktopShell
+      self.lib.homeModules.appearance
       self.lib.homeModules.unimatrix
 
       self.lib.homeModules.apps
@@ -81,7 +81,6 @@ let
       self.lib.homeModules.ssh
       self.lib.homeModules.starship
 
-      self.lib.homeModules.quickshell
       self.lib.homeModules.screenSharePicker
       self.lib.homeModules.windows
       self.lib.homeModules.vscode

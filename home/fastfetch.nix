@@ -2,7 +2,7 @@
 
 {
   flake.lib.homeModules.fastfetch =
-    { pkgs, colors, ... }:
+    { pkgs, ... }:
 
     {
       home.packages = [ pkgs.fastfetch ];
@@ -22,17 +22,13 @@
           "logo": {
             "type": "file",
             "source": "~/.config/fastfetch/logo.txt",
-            "color": {
-              "1": "${colors.accent}"
-            },
             "padding": {
               "top": 0,
               "right": 3
             }
           },
           "display": {
-            "separator": "  ",
-            "color": "${colors.accent}"
+            "separator": "  "
           },
           "modules": [
             {

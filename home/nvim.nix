@@ -2,7 +2,7 @@
 
 {
   flake.lib.homeModules.nvim =
-    { pkgs, colors, ... }:
+    { pkgs, ... }:
 
     {
       xdg.desktopEntries.nvim = {
@@ -85,78 +85,19 @@
           vim.opt.undodir = vim.fn.stdpath("state") .. "/undo"
           vim.fn.mkdir(vim.opt.undodir:get()[1], "p")
 
-          -- ─── Theme ─────────────────────────────────────────────────────────
-          vim.cmd("highlight clear")
-          vim.g.colors_name = "nixos-theme"
-
-          local c = {
-            crust = "${colors.crust}",
-            mantle = "${colors.mantle}",
-            base = "${colors.base}",
-            surface = "${colors.surface}",
-            overlay = "${colors.overlay}",
-            border = "${colors.border}",
-            text = "${colors.text}",
-            subtext = "${colors.subtext}",
-            muted = "${colors.muted}",
-            faint = "${colors.faint}",
-            accent = "${colors.accent}",
-            red = "${colors.red}",
-            orange = "${colors.orange}",
-            yellow = "${colors.yellow}",
-            green = "${colors.green}",
-            teal = "${colors.teal}",
-            cyan = "${colors.cyan}",
-            blue = "${colors.blue}",
-            purple = "${colors.purple}",
-          }
-
-          local function hi(group, opts)
-            vim.api.nvim_set_hl(0, group, opts)
-          end
-
-          hi("Normal", { fg = c.text, bg = c.base })
-          hi("NormalFloat", { fg = c.text, bg = c.surface })
-          hi("FloatBorder", { fg = c.border, bg = c.surface })
-          hi("CursorLine", { bg = c.surface })
-          hi("CursorLineNr", { fg = c.accent, bold = true })
-          hi("LineNr", { fg = c.faint })
-          hi("SignColumn", { bg = c.base })
-          hi("StatusLine", { fg = c.text, bg = c.mantle })
-          hi("StatusLineNC", { fg = c.muted, bg = c.crust })
-          hi("VertSplit", { fg = c.border })
-          hi("WinSeparator", { fg = c.border })
-          hi("Visual", { bg = c.overlay })
-          hi("Search", { fg = c.crust, bg = c.yellow })
-          hi("IncSearch", { fg = c.crust, bg = c.orange })
-          hi("Pmenu", { fg = c.text, bg = c.surface })
-          hi("PmenuSel", { fg = c.text, bg = c.overlay })
-          hi("Comment", { fg = c.muted, italic = true })
-          hi("String", { fg = c.green })
-          hi("Number", { fg = c.orange })
-          hi("Boolean", { fg = c.orange })
-          hi("Function", { fg = c.blue })
-          hi("Keyword", { fg = c.purple })
-          hi("Type", { fg = c.cyan })
-          hi("Identifier", { fg = c.text })
-          hi("Statement", { fg = c.purple })
-          hi("Constant", { fg = c.orange })
-          hi("Error", { fg = c.red })
-          hi("DiagnosticError", { fg = c.red })
-          hi("DiagnosticWarn", { fg = c.yellow })
-          hi("DiagnosticInfo", { fg = c.blue })
-          hi("DiagnosticHint", { fg = c.teal })
+          -- DMS writes this colorscheme whenever wallpaper/theme changes.
+          pcall(vim.cmd.colorscheme, "dms")
 
           -- ─── Notes / todo.txt highlighting ─────────────────────────────────
-          hi("NoteNumber", { fg = c.purple, bold = true })
-          hi("NoteLetter", { fg = c.purple, bold = true })
-          hi("NoteArrow", { fg = c.accent, bold = true })
-          hi("NoteBullet", { fg = c.accent, bold = true })
-          hi("NoteBracket", { fg = c.yellow })
-          hi("NoteParen", { fg = c.teal, italic = true })
-          hi("NoteEmail", { fg = c.blue, underline = true })
-          hi("NoteImportant", { fg = c.red, bold = true })
-          hi("NoteStatus", { fg = c.green, bold = true })
+          vim.api.nvim_set_hl(0, "NoteNumber", { link = "Number" })
+          vim.api.nvim_set_hl(0, "NoteLetter", { link = "Number" })
+          vim.api.nvim_set_hl(0, "NoteArrow", { link = "Special" })
+          vim.api.nvim_set_hl(0, "NoteBullet", { link = "Special" })
+          vim.api.nvim_set_hl(0, "NoteBracket", { link = "Type" })
+          vim.api.nvim_set_hl(0, "NoteParen", { link = "Comment" })
+          vim.api.nvim_set_hl(0, "NoteEmail", { link = "Underlined" })
+          vim.api.nvim_set_hl(0, "NoteImportant", { link = "Error" })
+          vim.api.nvim_set_hl(0, "NoteStatus", { link = "String" })
 
           vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
             pattern = { "*.txt", "TODO", "todo" },

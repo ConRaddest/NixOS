@@ -19,6 +19,7 @@
         slack
         teams-for-linux
         trash-cli
+        vlc
         zapzap
       ];
     };

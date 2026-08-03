@@ -18,6 +18,11 @@
       url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
