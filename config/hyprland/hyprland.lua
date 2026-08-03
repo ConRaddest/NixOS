@@ -223,7 +223,6 @@ hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- hypr shortcuts
 hl.bind("SUPER + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
-hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("nos-lock"))
 
 -- screenshot
 local screenshot_cmd = "mkdir -p ~/Screenshots && "

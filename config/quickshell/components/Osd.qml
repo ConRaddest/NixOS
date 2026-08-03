@@ -19,13 +19,17 @@ PanelWindow {
     implicitHeight: 40
     color: "transparent"
 
-    visible: shell.osdVisible
+    // Keep layer surface mapped. Mapping it on every key press requires a
+    // Wayland configure round-trip, which made OSD appear hundreds of ms late.
+    visible: true
+    mask: Region {}
 
     readonly property bool isVolumeOsd: shell.osdIcon === "󰕾" || shell.osdIcon === "󰖁" || shell.osdIcon === "󰍬" || shell.osdIcon === "󰍭"
     readonly property int maxValue: isVolumeOsd ? 150 : 100
 
     Rectangle {
         anchors.fill: parent
+        visible: osd.shell.osdVisible
         color: osd.shell.base
         border.color: osd.shell.overlay
         border.width: 1

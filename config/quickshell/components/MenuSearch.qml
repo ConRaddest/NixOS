@@ -11,7 +11,6 @@ Rectangle {
     property var items: []
     property string searchIcon: "󰍉"
     property string placeholderText: "Search apps / the web · do math"
-    property string rightPillText: "esc"
     property bool rightPillBorder: true
     property string headerCommandText: ""
     property string headerCategoryText: ""
@@ -211,21 +210,6 @@ Rectangle {
             border.color: menu.rightPillBorder ? menu.shell.border : "transparent"
             border.width: menu.rightPillBorder ? 1 : 0
             visible: !headerCategoryLabel.visible
-
-            Text {
-                id: escLabel
-                anchors.centerIn: parent
-                text: menu.rightPillText
-                color: menu.shell.muted
-                font.family: menu.shell.monoFont
-                font.pixelSize: menu.rightPillBorder ? 12 : 13
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: menu.rightPillText === "esc"
-                onClicked: menu.back()
-            }
         }
 
         // Bottom divider
@@ -311,34 +295,6 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
                         asynchronous: true
                     }
-                }
-
-                // Category label — fixed width on the far right
-                Text {
-                    id: categoryLabel
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: menu.itemCategory(modelData)
-                    color: isCurrent ? menu.shell.accent : menu.shell.muted
-                    font.family: menu.shell.monoFont
-                    font.pixelSize: 13
-                    font.weight: isCurrent ? Font.Bold : Font.Normal
-                    width: 72
-                    horizontalAlignment: Text.AlignRight
-                    visible: text !== ""
-                }
-
-                // Command hint — just left of category
-                Text {
-                    id: commandLabel
-                    anchors.right: categoryLabel.visible ? categoryLabel.left : parent.right
-                    anchors.rightMargin: categoryLabel.visible ? 16 : 0
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: menu.itemCommand(modelData)
-                    color: menu.shell.muted
-                    font.family: menu.shell.monoFont
-                    font.pixelSize: 13
-                    visible: text !== ""
                 }
 
                 // App name — fills remaining space between badge and command

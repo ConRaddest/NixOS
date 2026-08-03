@@ -249,11 +249,6 @@ FloatingWindow {
             icon: "󰐥",
             items: [
                 {
-                    name: "Lock",
-                    icon: "󰌾",
-                    command: "nos-lock"
-                },
-                {
                     name: "Logout",
                     icon: "󰍃",
                     // Let Hyprland exit normally; UWSM will then tear down the

@@ -58,7 +58,6 @@ let
     imports = [
       self.lib.homeModules.hypridle
       self.lib.homeModules.hyprland
-      self.lib.homeModules.hyprlock
       self.lib.homeModules.hyprpaper
       self.lib.homeModules.theme
       self.lib.homeModules.unimatrix
