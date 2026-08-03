@@ -282,11 +282,11 @@ local popup_windows = {
 	{ title = "windows-credentials" },
 	{ title = "windows-vm-start" },
 
-	{ title = "nos-build", size = { 750, 550 } },
-	{ title = "nos-refresh", size = { 750, 550 } },
-	{ title = "nos-update", size = { 750, 550 } },
-	{ title = "nos-install", size = { 750, 550 } },
-	{ title = "nos-remove", size = { 750, 550 } },
+	{ title = "nos-build", size = { 1000, 650 } },
+	{ title = "nos-refresh", size = { 1000, 650 } },
+	{ title = "nos-update", size = { 1000, 650 } },
+	{ title = "nos-install", size = { 1000, 650 } },
+	{ title = "nos-remove", size = { 1000, 650 } },
 
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },
