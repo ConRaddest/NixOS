@@ -6,8 +6,8 @@
 # and the loop must stay alive after a failure to offer the retry prompt.
 set -uo pipefail
 
-# shellcheck source=scripts/system/progress.sh
-source "$NOS_DIR/scripts/system/progress.sh"
+# shellcheck source=scripts/system/nos-ui.sh
+source "$NOS_DIR/scripts/system/nos-ui.sh"
 
 # Use an array so the offline flag expands cleanly as separate words,
 # and expands to nothing at all when not set.
@@ -21,7 +21,7 @@ run_build() {
   # and the git index is clean for inspection after a successful build.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && nos_stage "building system..." \
+    && nos_stage "Building system" \
     && nos_run sudo nixos-rebuild switch "${nix_opts[@]}" --flake "$NOS_DIR#$HOSTNAME" \
     && nos_done
 }
@@ -34,7 +34,7 @@ while true; do
     [[ "$answer" =~ ^[rR]$ ]] || exit 0
     printf '\n'
   else
-    nos_fail "build failed"
+    nos_fail "Build failed"
     nos_retry_prompt
     read -r -n 1 answer
     printf '\n'

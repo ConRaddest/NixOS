@@ -4,18 +4,13 @@
 
     {
       # COSMIC and Plasma use NetworkManager's D-Bus API for their network
-      # widgets. Keep IWD as the Wi-Fi backend while NetworkManager owns device
-      # configuration for both wireless and wired connections.
+      # widgets. NetworkManager owns wireless and wired connections using its
+      # default wpa_supplicant Wi-Fi backend.
       networking.networkmanager = {
         enable = true;
-        wifi.backend = "iwd";
+        wifi.backend = "wpa_supplicant";
         dns = "systemd-resolved";
       };
-
-      environment.systemPackages = with pkgs; [
-        impala
-        iwd
-      ];
 
       services.resolved = {
         enable = true;

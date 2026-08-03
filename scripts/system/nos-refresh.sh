@@ -6,8 +6,8 @@
 # and the loop must stay alive after a failure to offer the retry prompt.
 set -uo pipefail
 
-# shellcheck source=scripts/system/progress.sh
-source "$NOS_DIR/scripts/system/progress.sh"
+# shellcheck source=scripts/system/nos-ui.sh
+source "$NOS_DIR/scripts/system/nos-ui.sh"
 
 # Use an array so the offline flag expands cleanly as separate words,
 # and expands to nothing at all when not set.
@@ -21,9 +21,9 @@ run_refresh() {
   # and the git index is clean for inspection after a successful switch.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && nos_stage "refreshing home-manager config..." \
+    && nos_stage "Refreshing Home Manager configuration" \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER" \
-    && nos_stage "restarting desktop shell..." \
+    && nos_stage "Restarting desktop shell" \
     && restart_desktop_shell \
     && nos_done
 }
@@ -32,7 +32,7 @@ restart_desktop_shell() {
   case "${NOS_DESKTOP_SHELL:-none}" in
     dms) systemctl --user restart dms.service ;;
     none) ;;
-    *) nos_error "unsupported desktop shell: ${NOS_DESKTOP_SHELL}"; return 1 ;;
+    *) nos_fail "Unsupported desktop shell: ${NOS_DESKTOP_SHELL}"; return 1 ;;
   esac
 }
 
@@ -44,7 +44,7 @@ while true; do
     [[ "$answer" =~ ^[rR]$ ]] || exit 0
     printf '\n'
   else
-    nos_fail "refresh failed"
+    nos_fail "Refresh failed"
     nos_retry_prompt
     read -r -n 1 answer
     printf '\n'

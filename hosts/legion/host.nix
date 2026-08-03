@@ -8,7 +8,6 @@ let
   hostName = "legion";
   host = {
     system = "x86_64-linux";
-    desktopShell = "dms"; # Supported: "dms", "none"
     username = "cdt";
     fullName = "Connor du Toit";
     homeDirectory = "/home/cdt";
@@ -29,7 +28,6 @@ let
       homeDirectory
       flakeDirectory
       stateVersion
-      desktopShell
       ;
   };
 
@@ -58,9 +56,8 @@ let
   homeConfig = {
     imports = [
       self.lib.homeModules.hyprland
-      self.lib.homeModules.desktopShell
+      self.lib.homeModules.dms
       self.lib.homeModules.appearance
-      self.lib.homeModules.unimatrix
 
       self.lib.homeModules.apps
       self.lib.homeModules.desktop
@@ -83,7 +80,6 @@ let
 
       self.lib.homeModules.screenSharePicker
       self.lib.homeModules.windows
-      self.lib.homeModules.vscode
       self.lib.homeModules.yazi
       self.lib.homeModules.zapzap
     ];
@@ -141,7 +137,6 @@ in
 
         self.nixosModules.docker
         self.nixosModules.onepassword
-        self.nixosModules.teams
         self.nixosModules.homeManager
       ];
 

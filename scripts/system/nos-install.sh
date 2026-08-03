@@ -4,8 +4,6 @@ set -euo pipefail
 
 # shellcheck source=scripts/system/nos-apps-lib.sh
 source "${NOS_DIR:-$HOME/NixOS}/scripts/system/nos-apps-lib.sh"
-# shellcheck source=scripts/system/progress.sh
-source "${NOS_DIR:-$HOME/NixOS}/scripts/system/progress.sh"
 
 selected_file=$(mktemp)
 trap 'rm -f "$selected_file"' EXIT

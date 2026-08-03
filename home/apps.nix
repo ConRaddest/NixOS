@@ -16,10 +16,12 @@
         libreoffice
         librewolf
         localsend
+        nautilus
         slack
         teams-for-linux
         trash-cli
         vlc
+        vscode
         zapzap
       ];
     };

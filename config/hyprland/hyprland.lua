@@ -54,8 +54,8 @@ hl.config({
 
 	decoration = {
 		rounding = 1,
-		active_opacity = 0.93,
-		inactive_opacity = 0.90,
+		active_opacity = 0.95,
+		inactive_opacity = 0.93,
 		fullscreen_opacity = 1.0,
 		blur = {
 			enabled = true,
@@ -190,13 +190,19 @@ local screenshot_cmd = "mkdir -p ~/Screenshots && "
 	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
--- nixos helpers
+-- NOS helpers
 local function openTerminal(klass, cmd, pause)
-	local tail = pause == false and "" or '; echo; printf "\\033[38;5;141mPress Enter to close...\\033[0m"; read -r'
+	local tail = pause == false and "" or '; echo; printf "\\033[38;5;141m[?] Press Enter to close\\033[0m "; read -r'
 	return hl.dsp.exec_cmd(
 		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. tail .. "'"
 	)
 end
+
+hl.bind("SUPER + SHIFT + B", openTerminal("nos-build", "nos-build", false), { desc = "Build NixOS configuration" })
+hl.bind("SUPER + SHIFT + U", openTerminal("nos-update", "nos-update", true), { desc = "Update NixOS configuration" })
+hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", false), { desc = "Install Nix package" })
+hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", false), { desc = "Remove Nix package" })
+hl.bind("SUPER + SHIFT + R", openTerminal("nos-refresh", "nos-refresh", false), { desc = "Refresh Home Manager" })
 
 -- universal copy / paste
 local universal_shortcut_pressed = {}
@@ -271,25 +277,16 @@ end
 -- ============================================================
 
 local popup_windows = {
-	{ title = "wifi-manager" },
-	{ title = "bluetooth-manager" },
-	{ title = "performance-monitor" },
-	{ title = "audio-manager" },
-
 	{ title = "windows-install" },
 	{ title = "windows-uninstall" },
 	{ title = "windows-credentials" },
 	{ title = "windows-vm-start" },
 
-	{ title = "nixos-refresh" },
-	{ title = "nixos-build" },
-	{ title = "nixos-update" },
-	{ title = "nixos-check" },
-	{ title = "nixos-install" },
-	{ title = "nixos-remove" },
-
-	{ title = "webapp-install" },
-	{ title = "webapp-uninstall" },
+	{ title = "nos-build", size = { 750, 550 } },
+	{ title = "nos-refresh", size = { 750, 550 } },
+	{ title = "nos-update", size = { 750, 550 } },
+	{ title = "nos-install", size = { 750, 550 } },
+	{ title = "nos-remove", size = { 750, 550 } },
 
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },
@@ -310,12 +307,12 @@ for _, w in ipairs(popup_windows) do
 	})
 end
 
-hl.window_rule({
-	match = { title = ".*(Screen is being shared|Screen Share Active).*" },
-	workspace = "special:screenshare-preview silent",
-	no_focus = true,
-	suppress_event = "activate activatefocus",
-})
+-- hl.window_rule({
+-- 	match = { title = ".*(Screen is being shared|Screen Share Active).*" },
+-- 	workspace = "special:screenshare-preview silent",
+-- 	no_focus = true,
+-- 	suppress_event = "activate activatefocus",
+-- })
 
 hl.layer_rule({
 	match = { namespace = "^ch\\.wysbd\\.hyprland-preview-share-picker$" },

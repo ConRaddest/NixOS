@@ -26,15 +26,5 @@
       };
 
       nixpkgs.config.allowUnfree = true;
-
-      # VS Code extensions such as MSSQL ship standard Linux executables.
-      programs.nix-ld = {
-        enable = true;
-        libraries = with pkgs; [
-          icu
-          krb5
-          libunwind
-        ];
-      };
     };
 }

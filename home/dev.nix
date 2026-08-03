@@ -22,11 +22,6 @@
         # Formatters
         nixfmt
         stylua
-
-        # AI coding agents
-        claude-code
-        # pi-coding-agent installed imperatively via npm so `pi update self` works.
-        # See home/pi.nix; npm prefix set in home/npm.nix.
       ];
     };
 }
