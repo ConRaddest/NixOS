@@ -99,8 +99,8 @@ hl.device({
 	sensitivity = 0.0,
 })
 
--- Navigate workspaces horizontally
-hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+-- Navigate workspaces vertically
+hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
 
 -- ============================================================
 -- animations
@@ -121,7 +121,7 @@ hl.curve("fast", {
 local animations = {
 	{ enabled = true, leaf = "windows", speed = 2, spring = "spring" },
 	{ enabled = true, leaf = "windowsOut", speed = 2, spring = "spring" },
-	{ enabled = true, leaf = "workspaces", speed = 2, bezier = "fast" },
+	{ enabled = true, leaf = "workspaces", speed = 2, bezier = "fast", style = "slidevert" },
 	{ enabled = true, leaf = "specialWorkspace", speed = 2, bezier = "fast", style = "slidevert" },
 	{ enabled = true, leaf = "fade", speed = 1, bezier = "fast" },
 }
@@ -172,6 +172,12 @@ for ws = 1, 9 do
 end
 
 -- window resizing
+-- Expand horizontally (increase width)
+hl.bind("SUPER + equal", hl.dsp.window.resize({ x = 100, y = 0, relative = true }))
+
+-- Shrink horizontally (decrease width)
+hl.bind("SUPER + minus", hl.dsp.window.resize({ x = -100, y = 0, relative = true }))
+
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
