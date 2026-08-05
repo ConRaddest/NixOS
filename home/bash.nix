@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.lib.homeModules.bash =
+  flake.lib.homeModules.shell =
     {
       self,
       pkgs,
@@ -36,7 +36,7 @@
     {
       home.sessionVariables.NOS_DIR = flakeDirectory;
 
-      programs.bash = {
+      programs.fish = {
         enable = true;
         shellAliases = {
           ls = "eza --icons";
@@ -45,17 +45,24 @@
           ff = "fastfetch";
           startw = "uwsm start hyprland-uwsm.desktop";
         };
-        initExtra = ''
-          if [ -f "${flakeDirectory}/.env" ]; then
-            source "${flakeDirectory}/.env"
-          fi
+        plugins = [
+          {
+            name = "foreign-env";
+            src = pkgs.fishPlugins.foreign-env.src;
+          }
+        ];
+        interactiveShellInit = ''
+          set -g fish_greeting
 
+          if test -f "${flakeDirectory}/.env"
+            fenv source "${flakeDirectory}/.env"
+          end
         '';
       };
 
       programs.zoxide = {
         enable = true;
-        enableBashIntegration = true;
+        enableFishIntegration = true;
       };
 
       home.packages = with pkgs; [
@@ -76,6 +83,6 @@
         unzip # unzip files
       ];
 
-      programs.kitty.shellIntegration.enableBashIntegration = true;
+      programs.kitty.shellIntegration.enableFishIntegration = true;
     };
 }

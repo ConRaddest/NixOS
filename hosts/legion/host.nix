@@ -59,7 +59,7 @@ let
 
       self.lib.homeModules.apps
       self.lib.homeModules.desktop
-      self.lib.homeModules.bash
+      self.lib.homeModules.shell
       self.lib.homeModules.btop
       self.lib.homeModules.gdu
       self.lib.homeModules.dev

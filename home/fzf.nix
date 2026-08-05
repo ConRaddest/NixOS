@@ -21,7 +21,7 @@
       programs.fzf = {
         enable = true;
         package = fzf;
-        enableBashIntegration = true;
+        enableFishIntegration = true;
       };
 
       home.sessionVariables.FZF_DEFAULT_OPTS_FILE = "${config.xdg.configHome}/fzf/dms-options";

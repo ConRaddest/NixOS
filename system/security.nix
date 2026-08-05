@@ -10,10 +10,12 @@
     }:
 
     {
+      programs.fish.enable = true;
+
       users.users.${username} = {
         isNormalUser = true;
         description = fullName;
-        shell = pkgs.bash;
+        shell = pkgs.fish;
         extraGroups = [
           "wheel"
           "networkmanager"

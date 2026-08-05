@@ -7,7 +7,7 @@
     {
       programs.starship = {
         enable = true;
-        enableBashIntegration = true;
+        enableFishIntegration = true;
       };
 
       xdg.configFile."matugen/templates/starship.toml".text = ''
