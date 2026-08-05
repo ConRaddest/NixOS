@@ -6,7 +6,6 @@
       config,
       pkgs,
       inputs,
-      colors,
       font,
       ...
     }:
@@ -64,16 +63,18 @@
         debug: false
       '';
 
-      xdg.configFile."hyprland-preview-share-picker/hyprland-preview-share-picker.css".text = ''
-        @define-color foreground ${colors.text};
-        @define-color background ${colors.base};
-        @define-color accent ${colors.accent};
-        @define-color muted ${colors.brightBlack};
-        @define-color card_bg ${colors.black};
-        @define-color text_dark ${colors.base};
-        @define-color accent_hover ${colors.border};
-        @define-color selected_tab ${colors.accent};
-        @define-color text ${colors.text};
+      xdg.configFile."matugen/templates/screen-share-picker.css".text = ''
+        @define-color foreground {{colors.on_surface.default.hex}};
+        @define-color background {{colors.surface.default.hex}};
+        @define-color accent {{colors.primary.default.hex}};
+        @define-color muted {{colors.outline.default.hex}};
+        @define-color card_bg {{colors.surface_container.default.hex}};
+        @define-color text_dark {{colors.on_primary.default.hex}};
+        @define-color accent_hover {{colors.primary_container.default.hex}};
+        @define-color accent_hover_text {{colors.on_primary_container.default.hex}};
+        @define-color selected_tab {{colors.primary.default.hex}};
+        @define-color text {{colors.on_surface.default.hex}};
+        @define-color shadow {{colors.shadow.default.hex}};
 
         * {
           all: unset;
@@ -135,7 +136,7 @@
 
         .image {
           border-radius: 5px;
-          box-shadow: 0 4px 30px alpha(black, 0.33);
+          box-shadow: 0 4px 30px alpha(@shadow, 0.33);
         }
 
         .region-button {
@@ -152,11 +153,11 @@
 
         .region-button:not(:disabled):hover, .region-button:not(:disabled):focus {
           background-color: @accent_hover;
-          color: @foreground;
+          color: @accent_hover_text;
         }
 
         .region-button:not(:disabled):hover > label, .region-button:not(:disabled):focus > label {
-          color: @foreground;
+          color: @accent_hover_text;
         }
 
         .region-button:disabled {

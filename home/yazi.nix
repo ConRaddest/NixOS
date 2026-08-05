@@ -2,13 +2,32 @@
 
 {
   flake.lib.homeModules.yazi =
-    {
-      pkgs,
-      colors,
-      ...
-    }:
+    { config, pkgs, ... }:
 
     let
+      yaziDms = pkgs.symlinkJoin {
+        name = "yazi-dms";
+        paths = [ pkgs.yazi ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram "$out/bin/yazi" \
+            --set FZF_DEFAULT_OPTS_FILE "${config.xdg.configHome}/fzf/dms-options"
+        '';
+      };
+
+      # DMS renders these Material roles when its runtime theme changes.
+      colors = {
+        accent = "{{colors.primary.default.hex}}";
+        text = "{{colors.on_surface.default.hex}}";
+        subtext = "{{colors.on_surface_variant.default.hex}}";
+        muted = "{{colors.outline.default.hex}}";
+        overlay = "{{colors.surface_container_highest.default.hex}}";
+        red = "{{colors.error.default.hex}}";
+        yellow = "{{dank16.color3.default.hex}}";
+        green = "{{dank16.color2.default.hex}}";
+        teal = "{{colors.secondary.default.hex}}";
+      };
+
       yazi-wrapper = pkgs.writeShellScriptBin "yazi-wrapper.sh" ''
         multiple="$1"
         directory="$2"
@@ -45,7 +64,7 @@
       home.packages = with pkgs; [
         imv
         mpv
-        yazi
+        yaziDms
         yazi-wrapper
         xdg-desktop-portal-termfilechooser
       ];
@@ -118,7 +137,8 @@
         ]
       '';
 
-      xdg.configFile."yazi/theme.toml".text = ''
+      # Home Manager owns the custom theme source; Matugen owns Yazi's output.
+      xdg.configFile."matugen/templates/yazi.toml".text = ''
         [mgr]
         cwd             = { fg = "${colors.accent}" }
         find_keyword    = { fg = "${colors.yellow}", bold = true, underline = true }

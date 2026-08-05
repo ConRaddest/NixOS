@@ -2,9 +2,9 @@
 # Shared terminal output helpers for nos-* scripts.
 
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
-  readonly NOS_ACCENT=$'\033[38;5;141m'
-  readonly NOS_OK=$'\033[38;5;120m'
-  readonly NOS_ERROR=$'\033[38;5;203m'
+  readonly NOS_ACCENT=$'\033[95m'
+  readonly NOS_OK=$'\033[92m'
+  readonly NOS_ERROR=$'\033[91m'
   readonly NOS_BOLD=$'\033[1m'
   readonly NOS_RESET=$'\033[0m'
 else

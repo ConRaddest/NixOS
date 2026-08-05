@@ -15,7 +15,6 @@ fzf_args=(
   --bind 'alt-p:toggle-preview'
   --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
   --bind 'alt-k:preview-up,alt-j:preview-down'
-  --color 'pointer:red,marker:red'
 )
 
 pkg_names=$(current_apps | fzf "${fzf_args[@]}")

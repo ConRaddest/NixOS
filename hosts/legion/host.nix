@@ -47,8 +47,6 @@ let
     monoSize = 10;
   };
 
-  colors = import "${self}/config/palette.nix";
-
   # ============================================================
   # Home
   # ============================================================
@@ -84,7 +82,7 @@ let
       self.lib.homeModules.zapzap
     ];
 
-    _module.args = { inherit font colors; };
+    _module.args = { inherit font; };
 
     home.username = host.username;
     home.homeDirectory = host.homeDirectory;

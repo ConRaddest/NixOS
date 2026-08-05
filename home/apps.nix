@@ -14,13 +14,11 @@
         drawio
         gimp
         libreoffice
-        librewolf
         localsend
         nautilus
         slack
         steam
         teams-for-linux
-        trash-cli
         vlc
         vscode
         zapzap

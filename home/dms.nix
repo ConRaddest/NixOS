@@ -8,6 +8,17 @@
       ...
     }:
 
+    let
+      dms = "${config.programs.dank-material-shell.package}/bin/dms";
+      regenerateUserTemplates = pkgs.writeShellScript "regenerate-dms-user-templates" ''
+        for _ in {1..30}; do
+          mode="$(${dms} ipc call theme getMode 2>/dev/null || true)"
+          [[ "$mode" =~ ^(dark|light)$ ]] && exec ${dms} ipc call theme "$mode"
+          ${pkgs.coreutils}/bin/sleep 0.5
+        done
+        exit 1
+      '';
+    in
     {
       imports = [ inputs.dms.homeModules.dank-material-shell ];
 
@@ -22,25 +33,36 @@
         enableDynamicTheming = true;
       };
 
-      home.sessionVariables.NOS_DESKTOP_SHELL = "dms";
+      systemd.user.services.dms.Service = {
+        Environment = [ "QT_QPA_PLATFORMTHEME=qt6ct" ];
+        ExecStartPost = regenerateUserTemplates;
+      };
 
-      # Service managers keep environment from login time. Set this directly on
-      # DMS too, so switching Qt integration does not require logging out.
-      systemd.user.services.dms.Service.Environment = [
-        "QT_QPA_PLATFORMTHEME=qt6ct"
-      ];
+      xdg.configFile."matugen/config.toml".text = ''
+        [config]
 
-      home.activation.ensureShellThemeTargets = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p "$HOME/.config/kitty" "$HOME/.config/DankMaterialShell" "$HOME/.local/state/nos"
+        [templates.yazi]
+        input_path = '${config.xdg.configHome}/matugen/templates/yazi.toml'
+        output_path = '${config.xdg.configHome}/yazi/theme.toml'
 
-        migration="$HOME/.local/state/nos/dms-migration-complete"
-        if [ ! -e "$migration" ]; then
-          ${pkgs.quickshell}/bin/qs kill >/dev/null 2>&1 || true
-          touch "$migration"
-        fi
+        [templates.btop]
+        input_path = '${config.xdg.configHome}/matugen/templates/btop.theme'
+        output_path = '${config.xdg.configHome}/btop/themes/dms.theme'
 
-        touch "$HOME/.config/kitty/dank-theme.conf"
+        [templates.fzf]
+        input_path = '${config.xdg.configHome}/matugen/templates/fzf-options'
+        output_path = '${config.xdg.configHome}/fzf/dms-options'
 
+        [templates.starship]
+        input_path = '${config.xdg.configHome}/matugen/templates/starship.toml'
+        output_path = '${config.xdg.configHome}/starship.toml'
+
+        [templates.screen-share-picker]
+        input_path = '${config.xdg.configHome}/matugen/templates/screen-share-picker.css'
+        output_path = '${config.xdg.configHome}/hyprland-preview-share-picker/hyprland-preview-share-picker.css'
+      '';
+
+      home.activation.ensureDmsDefaults = config.lib.dag.entryAfter [ "writeBoundary" ] ''
         session="$HOME/.local/state/DankMaterialShell/session.json"
         if [ ! -e "$session" ]; then
           mkdir -p "$(dirname "$session")"
@@ -49,20 +71,8 @@
 
         settings="$HOME/.config/DankMaterialShell/settings.json"
         if [ ! -e "$settings" ]; then
-          cat > "$settings" <<'JSON'
-        {
-          "gtkThemingEnabled": true,
-          "qtThemingEnabled": true,
-          "runDmsMatugenTemplates": true,
-          "matugenTemplateGtk": true,
-          "matugenTemplateHyprland": true,
-          "matugenTemplateKitty": true,
-          "matugenTemplateNeovim": true,
-          "lockBeforeSuspend": false,
-          "loginctlLockIntegration": false,
-          "lockAtStartup": false
-        }
-        JSON
+          mkdir -p "$(dirname "$settings")"
+          printf '%s\n' '{"loginctlLockIntegration":false,"matugenTemplateNeovim":true}' > "$settings"
         fi
       '';
     };

@@ -233,7 +233,7 @@ hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
 -- NOS helpers
 local function openTerminal(klass, cmd, pause)
-	local tail = pause == false and "" or '; echo; printf "\\033[38;5;141m[?] press enter to close\\033[0m "; read -r'
+	local tail = pause == false and "" or '; echo; printf "\\033[95m[?] press enter to close\\033[0m "; read -r'
 	return hl.dsp.exec_cmd(
 		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. tail .. "'"
 	)

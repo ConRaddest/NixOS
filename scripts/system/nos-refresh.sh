@@ -23,17 +23,9 @@ run_refresh() {
     && git -C "$NOS_DIR" add . \
     && nos_stage "refreshing home manager configuration" \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER" \
-    && nos_stage "restarting desktop shell" \
-    && restart_desktop_shell \
+    && nos_stage "restarting dms" \
+    && systemctl --user restart dms.service \
     && nos_done
-}
-
-restart_desktop_shell() {
-  case "${NOS_DESKTOP_SHELL:-none}" in
-    dms) systemctl --user restart dms.service ;;
-    none) ;;
-    *) nos_fail "unsupported desktop shell: ${NOS_DESKTOP_SHELL}"; return 1 ;;
-  esac
 }
 
 while true; do
