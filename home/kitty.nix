@@ -2,24 +2,8 @@
 
 {
   flake.lib.homeModules.kitty =
-    {
-      font,
-      config,
-      pkgs,
-      ...
-    }:
+    { font, config, ... }:
 
-    let
-      kitty = pkgs.symlinkJoin {
-        name = "kitty-cosmic";
-        paths = [ pkgs.kitty ];
-        nativeBuildInputs = [ pkgs.makeWrapper ];
-        postBuild = ''
-          wrapProgram "$out/bin/kitty" \
-            --run 'if [[ ":''${XDG_CURRENT_DESKTOP:-}:" == *:COSMIC:* ]]; then set -- --override background_opacity=0.80 --override background_blur=1 "$@"; fi'
-        '';
-      };
-    in
     {
       xdg.configFile."kitty/open-url.sh" = {
         executable = true;
@@ -36,7 +20,6 @@
 
       programs.kitty = {
         enable = true;
-        package = kitty;
 
         keybindings = {
           "shift+delete" = "copy_to_clipboard";
@@ -55,6 +38,9 @@
           hide_window_decorations = "yes";
           confirm_os_window_close = 0;
           enable_audio_bell = false;
+          cursor_trail = 50;
+          cursor_trail_decay = "0.08 0.25";
+          cursor_trail_start_threshold = 2;
           open_url_with = "${config.home.homeDirectory}/.config/kitty/open-url.sh";
         };
       };

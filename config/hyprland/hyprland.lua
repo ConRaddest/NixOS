@@ -362,6 +362,14 @@ hl.layer_rule({
 
 hl.window_rule({ match = { float = true }, opacity = "0.935 override 0.935 override 1.0 override" })
 
+-- Electron renders transparent rounded corners on native VS Code dialogs.
+-- Force these surfaces opaque to prevent corner artifacts.
+hl.window_rule({
+	match = { class = "^code$", title = "^Visual Studio Code$", float = true },
+	opaque = true,
+	opacity = "1.0 override 1.0 override 1.0 override",
+})
+
 require("dms.binds")
 require("dms.binds-user")
 require("dms.outputs")

@@ -23,8 +23,8 @@ run_refresh() {
     && git -C "$NOS_DIR" add . \
     && nos_stage "refreshing home manager configuration" \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER" \
-    && nos_stage "restarting dms" \
-    && systemctl --user restart dms.service \
+    && nos_stage "rendering app themes" \
+    && nos_render_app_themes \
     && nos_done
 }
 

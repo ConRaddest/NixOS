@@ -45,3 +45,18 @@ nos_run() {
 
   NIX_CONFIG="$nix_config" "$@"
 }
+
+nos_render_app_themes() {
+  local mode
+
+  for _ in {1..20}; do
+    mode=$(dms ipc call theme getMode 2>/dev/null || true)
+    if [[ "$mode" =~ ^(dark|light)$ ]]; then
+      dms ipc call theme "$mode" >/dev/null
+      return
+    fi
+    sleep 0.25
+  done
+
+  return 1
+}

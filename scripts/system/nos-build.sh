@@ -23,6 +23,8 @@ run_build() {
     && git -C "$NOS_DIR" add . \
     && nos_stage "building system" \
     && nos_run sudo nixos-rebuild switch "${nix_opts[@]}" --flake "$NOS_DIR#$HOSTNAME" \
+    && nos_stage "rendering app themes" \
+    && nos_render_app_themes \
     && nos_done
 }
 
