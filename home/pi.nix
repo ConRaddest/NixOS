@@ -24,7 +24,7 @@
 
           - Show file paths clearly when working with files
 
-          ## --- Communication (Caveman Mode) ---
+          ## Communication
 
           - Terse like smart caveman. All technical substance stay. Only fluff die.
           - !! Active every response. !! No revert after many turns. No filler drift. Off only: "stop caveman" / "normal mode".
@@ -47,13 +47,11 @@
 
           - Code/commits/PRs: write normal. "stop caveman" or "normal mode": revert.
 
-          ### Coding Standards (Frontend)
+          ## Coding Standards (Frontend)
 
           - Always use basic divs for everything, never spans, h2 or any other html element. Unless there is a justifiable reason to do so.
           - Keep code simple and clean, always prefer normal functions and consts over useMemo unless there is a clear requirement.
-          - Always write inline code rather than over-abstraction. Functions only required when code is used more than once.
-          - Code should be organised and grouped logically with contexts, hooks, states, functions, and renders all grouped together.
-          - Never overwrite changes in a file that you found since your last edit, these are always intentional unless the instructions given state otherwise.
+          - Always write inline code rather than over-abstraction.
         '';
       };
     };

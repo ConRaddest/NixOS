@@ -18,6 +18,7 @@
         localsend
         nautilus
         slack
+        steam
         teams-for-linux
         trash-cli
         vlc

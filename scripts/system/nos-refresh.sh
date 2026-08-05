@@ -21,9 +21,9 @@ run_refresh() {
   # and the git index is clean for inspection after a successful switch.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && nos_stage "Refreshing Home Manager configuration" \
+    && nos_stage "refreshing home manager configuration" \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER" \
-    && nos_stage "Restarting desktop shell" \
+    && nos_stage "restarting desktop shell" \
     && restart_desktop_shell \
     && nos_done
 }
@@ -32,7 +32,7 @@ restart_desktop_shell() {
   case "${NOS_DESKTOP_SHELL:-none}" in
     dms) systemctl --user restart dms.service ;;
     none) ;;
-    *) nos_fail "Unsupported desktop shell: ${NOS_DESKTOP_SHELL}"; return 1 ;;
+    *) nos_fail "unsupported desktop shell: ${NOS_DESKTOP_SHELL}"; return 1 ;;
   esac
 }
 
@@ -41,10 +41,10 @@ while true; do
     nos_repeat_prompt
     read -r -n 1 answer
     printf '\n'
-    [[ "$answer" =~ ^[rR]$ ]] || exit 0
+    [[ "$answer" =~ ^[yY]$ ]] || exit 0
     printf '\n'
   else
-    nos_fail "Refresh failed"
+    nos_fail "refresh failed"
     nos_retry_prompt
     read -r -n 1 answer
     printf '\n'

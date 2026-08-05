@@ -15,11 +15,11 @@ source "$NOS_DIR/scripts/system/nos-ui.sh"
 run_update() {
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && nos_stage "Updating system" \
+    && nos_stage "updating system" \
     && nos_run nix flake update --option warn-dirty false --flake "$NOS_DIR" \
-    && nos_stage "Staging lockfile" \
+    && nos_stage "staging lockfile" \
     && git -C "$NOS_DIR" add flake.lock \
-    && nos_stage "Building system" \
+    && nos_stage "building system" \
     && nos_run sudo nixos-rebuild switch --option warn-dirty false --flake "$NOS_DIR#$HOSTNAME" \
     && nos_done
 }
@@ -29,7 +29,7 @@ while true; do
     exit 0
   fi
 
-  nos_fail "Update failed"
+  nos_fail "update failed"
   nos_retry_prompt
   read -r -n 1 answer
   printf '\n'

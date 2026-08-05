@@ -99,11 +99,11 @@
           source "$env_file"
         fi
 
-        printf '\033[1;36mStarting Windows VM...\033[0m\n\n'
-        echo "Starting Windows container..."
+        printf '\033[1;36mstarting windows vm...\033[0m\n\n'
+        echo "starting windows container..."
         docker compose --progress quiet --file "$compose_file" up -d >/dev/null
 
-        echo "Waiting for windows..."
+        echo "waiting for windows..."
         ready=false
         for i in $(seq 1 300); do
           if timeout 1 bash -c '</dev/tcp/127.0.0.1/3389' 2>/dev/null; then
@@ -116,7 +116,7 @@
         printf "\r\033[K"
 
         if [[ "$ready" != "true" ]]; then
-          echo "Timed out. Windows may still be booting — check http://localhost:8006"
+          echo "timed out. windows might still be booting — check http://localhost:8006"
           exit 1
         fi
 
@@ -130,17 +130,17 @@
             break
           fi
           wait "$rdp_pid" 2>/dev/null || true
-          echo "Windows is ready, connecting..."
+          echo "windows is ready — connecting..."
           sleep 3
         done
         printf "\r\033[K"
 
         if [[ "$connected" != "true" ]]; then
-          echo "Failed to connect — check http://localhost:8006"
+          echo "couldn't connect — check http://localhost:8006"
           exit 1
         fi
 
-        echo "Connected successfully."
+        echo "connected."
       '';
 
       windows-install = pkgs.writeShellScriptBin "windows-install" ''
@@ -176,23 +176,23 @@
         }
 
         if ! [[ -e /dev/kvm ]]; then
-          echo "error: /dev/kvm is missing. Reboot or check that virtualization is enabled." >&2
+          echo "error: /dev/kvm is missing. reboot or check that virtualization is enabled." >&2
           exit 1
         fi
 
         if ! [[ -f "$compose_file" ]]; then
           echo "error: missing compose file: $compose_file" >&2
-          echo "Run: home-manager switch --flake ${nosDir}#" >&2
+          echo "run: home-manager switch --flake ${nosDir}#" >&2
           exit 1
         fi
 
-        echo "Windows VM install"
+        echo "windows vm setup"
         echo
-        echo "Modify ${nosDir}/config/windows/docker-compose.yaml to change VM settings."
+        echo "tweak ${nosDir}/config/windows/docker-compose.yaml to change vm settings."
 
-        read -rp "Windows username [Docker]: " username
+        read -rp "windows username [docker]: " username
         username="''${username:-Docker}"
-        read -rsp "Windows password: " password
+        read -rsp "windows password: " password
         echo
         if [[ -z "$password" ]]; then
           echo "error: password cannot be empty." >&2
@@ -200,11 +200,11 @@
         fi
 
         if docker ps -a --format '{{.Names}}' | grep -qx "$container"; then
-          echo "A Windows VM container already exists."
-          read -rp "Remove and recreate it? This keeps files in $storage. [y/N] " recreate
+          echo "windows vm container already exists."
+          read -rp "recreate it? files in $storage stay put. [y/n, default: n] " recreate
           case "$recreate" in
             y|Y|yes|YES) docker rm -f "$container" >/dev/null ;;
-            *) echo "Cancelled."; exit 1 ;;
+            *) echo "cancelled."; exit 1 ;;
           esac
         fi
 
@@ -215,19 +215,19 @@
         export WINDOWS_PASSWORD="$password"
 
         echo
-        echo "Pulling latest dockurr/windows image..."
+        echo "pulling latest dockurr/windows image..."
         docker pull dockurr/windows:latest
 
         echo
-        echo "Starting Windows installer from compose file..."
+        echo "starting windows installer from compose file..."
         docker compose --file "$compose_file" up -d
 
         echo
-        echo "Windows installer is starting."
-        echo "Installer viewer: http://localhost:8006"
-        echo "After Windows finishes installing, Apps → Windows opens the VM."
+        echo "windows installer is starting."
+        echo "installer: http://localhost:8006"
+        echo "once windows is installed, apps → windows opens the vm."
         echo
-        read -rp "Press Enter to close..."
+        read -rp "press enter to close..."
       '';
 
       windows-uninstall = pkgs.writeShellScriptBin "windows-uninstall" ''
@@ -237,7 +237,7 @@
           exec kitty \
             --class windows-uninstall \
             --title windows-uninstall \
-            -e bash -lc "WINDOWS_UNINSTALL_IN_TERMINAL=1 windows-uninstall; echo; read -rp 'Press Enter to close...'"
+            -e bash -lc "WINDOWS_UNINSTALL_IN_TERMINAL=1 windows-uninstall; echo; read -rp 'press enter to close...'"
         fi
 
         container="Windows"
@@ -258,48 +258,48 @@
           rm -f "$tmp"
         }
 
-        echo "Windows VM uninstall"
+        echo "windows vm uninstall"
         echo
-        echo "This will permanently remove:"
-        echo "  - Docker container and image"
-        echo "  - VM disk:          $base_dir"
-        echo "  - Windows env vars: $env_file"
-        echo "  - Shared folder:    $shared"
+        echo "this permanently deletes:"
+        echo "  - docker container and image"
+        echo "  - vm disk:          $base_dir"
+        echo "  - windows env vars: $env_file"
+        echo "  - shared folder:    $shared"
         echo
-        read -rp "Are you sure? This cannot be undone. [y/N] " confirm
+        read -rp "you sure? can't undo this. [y/n, default: n] " confirm
         case "$confirm" in
           y|Y|yes|YES) ;;
-          *) echo "Cancelled."; exit 1 ;;
+          *) echo "cancelled."; exit 1 ;;
         esac
 
         if docker ps -a --format '{{.Names}}' | grep -qx "$container"; then
-          echo "Stopping and removing container..."
+          echo "stopping and removing container..."
           docker rm -f "$container" >/dev/null
         fi
 
         if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "dockurr/windows"; then
-          echo "Removing Docker image..."
+          echo "removing docker image..."
           docker rmi dockurr/windows:latest >/dev/null 2>&1 || true
         fi
 
         if [[ -d "$base_dir" ]]; then
-          echo "Removing VM disk..."
+          echo "removing vm disk..."
           rm -rf "$base_dir"
         fi
 
         if [[ -f "$env_file" ]]; then
-          echo "Removing Windows credentials from .env..."
+          echo "removing windows credentials from .env..."
           remove_env_var WINDOWS_USERNAME
           remove_env_var WINDOWS_PASSWORD
         fi
 
         if [[ -d "$shared" ]]; then
-          echo "Removing shared folder..."
+          echo "removing shared folder..."
           rm -rf "$shared"
         fi
 
         echo
-        echo "Windows VM removed."
+        echo "windows vm removed."
       '';
 
     in

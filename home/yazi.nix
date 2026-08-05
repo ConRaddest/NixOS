@@ -28,7 +28,7 @@
         : > "$out"
         $termcmd yazi --chooser-file="$out" ''${path:+"$path"} || true
 
-        echo "result=$(cat "$out" 2>/dev/null || echo EMPTY)" >> "$log"
+        echo "result=$(cat "$out" 2>/dev/null || echo empty)" >> "$log"
 
         if [ -s "$out" ] && [ "$directory" != "1" ] && [ "$save" != "1" ]; then
             selected=$(head -1 "$out")

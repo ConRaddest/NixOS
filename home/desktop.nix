@@ -13,9 +13,25 @@
           exec slack --ozone-platform=x11 --disable-features=WebRTCPipeWireCapturer -s "$@"
         '';
       };
+
+      steamLauncher = pkgs.writeShellApplication {
+        name = "steam-launcher";
+        runtimeInputs = [ pkgs.steam ];
+        text = ''
+          # DMS runs as a Qt systemd service. Do not leak its Qt/Wayland
+          # environment into Steam's older X11 UI and embedded browser.
+          unset NIXOS_OZONE_WL QT_PLUGIN_PATH QT_QPA_PLATFORM
+          unset QT_QPA_PLATFORMTHEME QT_QPA_PLATFORMTHEME_QT6
+          export GDK_BACKEND=x11
+          exec steam "$@"
+        '';
+      };
     in
     {
-      home.packages = [ slackX11 ];
+      home.packages = [
+        slackX11
+        steamLauncher
+      ];
 
       # Hide upstream entries that have NoDisplay=true but still surface in launchers.
       xdg.desktopEntries.uuctl = {
@@ -23,6 +39,23 @@
         exec = "uuctl";
         noDisplay = true;
         type = "Application";
+      };
+
+      xdg.desktopEntries.steam = {
+        name = "Steam";
+        comment = "Application for managing and playing games on Steam";
+        exec = "steam-launcher %U";
+        icon = "steam";
+        type = "Application";
+        mimeType = [
+          "x-scheme-handler/steam"
+          "x-scheme-handler/steamlink"
+        ];
+        categories = [
+          "Network"
+          "FileTransfer"
+          "Game"
+        ];
       };
 
       xdg.desktopEntries.slack = {

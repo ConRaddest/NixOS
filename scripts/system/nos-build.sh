@@ -21,7 +21,7 @@ run_build() {
   # and the git index is clean for inspection after a successful build.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && nos_stage "Building system" \
+    && nos_stage "building system" \
     && nos_run sudo nixos-rebuild switch "${nix_opts[@]}" --flake "$NOS_DIR#$HOSTNAME" \
     && nos_done
 }
@@ -31,10 +31,10 @@ while true; do
     nos_repeat_prompt
     read -r -n 1 answer
     printf '\n'
-    [[ "$answer" =~ ^[rR]$ ]] || exit 0
+    [[ "$answer" =~ ^[yY]$ ]] || exit 0
     printf '\n'
   else
-    nos_fail "Build failed"
+    nos_fail "build failed"
     nos_retry_prompt
     read -r -n 1 answer
     printf '\n'

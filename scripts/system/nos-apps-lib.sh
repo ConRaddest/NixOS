@@ -52,7 +52,7 @@ current_apps() {
 
 package_preview() {
   local attr="$1"
-  nix eval --raw "nixpkgs#$attr.meta.description" 2>/dev/null || true
+  nix eval --raw "nixpkgs#$attr.meta.description" 2>/dev/null | tr '[:upper:]' '[:lower:]' || true
   printf '\n\n'
   nix eval --raw "nixpkgs#$attr.meta.homepage" 2>/dev/null || true
 }
@@ -107,7 +107,7 @@ search_apps() {
       desc = $0
       sub(/^[^[:space:]]+[[:space:]]*/, "", desc)
       sub(/^@[[:space:]]*/, "", desc)
-      print name "\t" desc
+      print name "\t" tolower(desc)
     }
   '
 }

@@ -20,19 +20,19 @@ nos_stage() {
 }
 
 nos_done() {
-  printf '\n%s[✓] Done%s\n' "$NOS_OK" "$NOS_RESET"
+  printf '\n%s[✓] done%s\n' "$NOS_OK" "$NOS_RESET"
 }
 
 nos_fail() {
-  printf '\n%s[✗] %s%s\n' "$NOS_ERROR" "${1:-Failed}" "$NOS_RESET" >&2
+  printf '\n%s[✗] %s%s\n' "$NOS_ERROR" "${1:-failed}" "$NOS_RESET" >&2
 }
 
 nos_retry_prompt() {
-  printf '\n%s[?] Retry? [Y/n]%s ' "$NOS_ERROR" "$NOS_RESET"
+  printf '\n%s[?] retry? [Y/n]%s ' "$NOS_ERROR" "$NOS_RESET"
 }
 
 nos_repeat_prompt() {
-  printf '\n%s[?] Repeat? [r/N]%s ' "$NOS_ACCENT" "$NOS_RESET"
+  printf '\n%s[?] go again? [y/N]%s ' "$NOS_ACCENT" "$NOS_RESET"
 }
 
 nos_run() {
