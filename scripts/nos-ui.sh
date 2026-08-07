@@ -16,7 +16,9 @@ else
 fi
 
 nos_stage() {
-  printf '%s%s[>] %s%s\n\n' "$NOS_BOLD" "$NOS_ACCENT" "$1" "$NOS_RESET"
+  # Leading blank line separates headings from prior command output and also
+  # gives every script a consistent top margin before its first heading.
+  printf '\n%s%s[>] %s%s\n\n' "$NOS_BOLD" "$NOS_ACCENT" "$1" "$NOS_RESET"
 }
 
 nos_done() {
@@ -46,17 +48,3 @@ nos_run() {
   NIX_CONFIG="$nix_config" "$@"
 }
 
-nos_render_app_themes() {
-  local mode
-
-  for _ in {1..20}; do
-    mode=$(dms ipc call theme getMode 2>/dev/null || true)
-    if [[ "$mode" =~ ^(dark|light)$ ]]; then
-      dms ipc call theme "$mode" >/dev/null
-      return
-    fi
-    sleep 0.25
-  done
-
-  return 1
-}

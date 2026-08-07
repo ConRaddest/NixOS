@@ -4,14 +4,18 @@
   flake.lib.homeModules.windows =
     {
       self,
+      config,
       pkgs,
-      flakeDirectory,
       ...
     }:
 
     let
-      nosDir = flakeDirectory;
-      envFile = "${nosDir}/.env";
+      mutableConfigDir =
+        if config.nos.flakeDirectory != null then
+          config.nos.flakeDirectory
+        else
+          "${config.xdg.configHome}/nos";
+      envFile = "${mutableConfigDir}/.env";
 
       windows-vm-rdp = pkgs.writeShellScriptBin "windows-vm-rdp" ''
         set -euo pipefail
@@ -182,13 +186,13 @@
 
         if ! [[ -f "$compose_file" ]]; then
           echo "error: missing compose file: $compose_file" >&2
-          echo "run: home-manager switch --flake ${nosDir}#" >&2
+          echo "run: home-manager switch" >&2
           exit 1
         fi
 
         echo "windows vm setup"
         echo
-        echo "tweak ${nosDir}/config/windows/docker-compose.yaml to change vm settings."
+        echo "tweak $compose_file to change vm settings."
 
         read -rp "windows username [docker]: " username
         username="''${username:-Docker}"

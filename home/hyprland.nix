@@ -6,25 +6,60 @@
       config,
       lib,
       pkgs,
-      flakeDirectory,
+      inputs,
+      self,
       ...
     }:
 
+    let
+      scrollOverview = pkgs.hyprlandPlugins.mkHyprlandPlugin {
+        hyprland = pkgs.hyprland;
+        pluginName = "scrolloverview";
+        version = "0.1.0";
+        src = inputs.hyprland-scroll-overview;
+
+        buildInputs = [ pkgs.lua5_4 ];
+        enableParallelBuilding = true;
+        dontUseCmakeConfigure = true;
+
+        buildPhase = ''
+          runHook preBuild
+          make all
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out/lib"
+          install -Dm755 scrolloverview.so "$out/lib/libscrolloverview.so"
+          runHook postInstall
+        '';
+
+        meta = {
+          description = "Scrollable workspace overview plugin for Hyprland";
+          homepage = "https://github.com/yayuuu/hyprland-scroll-overview";
+          license = lib.licenses.bsd3;
+          platforms = lib.platforms.linux;
+        };
+      };
+    in
     {
       wayland.windowManager.hyprland = {
         enable = true;
         systemd.enable = false;
       };
 
-      # NixOS owns portal backends for every installed desktop. Prevent the
-      # Home Manager Hyprland module from narrowing portal discovery to only
-      # its per-user Hyprland backend.
-      xdg.portal.enable = lib.mkForce false;
+      # Keep plugin path declarative while preserving live, out-of-store Lua config.
+      xdg.configFile."hypr/nix/plugins.lua".text = ''
+        hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
+      '';
 
-      # Intentional live symlink: Hyprland Lua can be edited/reloaded without a
-      # Home Manager switch. This trades generation purity for fast iteration.
-      xdg.configFile."hypr/hyprland.lua".source =
-        config.lib.file.mkOutOfStoreSymlink "${flakeDirectory}/config/hyprland/hyprland.lua";
+      # NixOS owns system portal backends. Other distros need Home Manager's
+      # per-user Hyprland portal setup.
+      xdg.portal.enable = lib.mkIf config.nos.isNixOS (lib.mkForce false);
+
+      # Store-backed source works regardless of checkout location.
+      xdg.configFile."hypr/hyprland.lua".source = "${self}/config/hyprland/hyprland.lua";
 
       home.activation.removeLegacyHyprpolkitagent = config.lib.dag.entryBefore [ "writeBoundary" ] ''
         rm -f "$HOME/.config/systemd/user/hyprpolkitagent.service"

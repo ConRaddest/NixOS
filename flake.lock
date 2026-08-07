@@ -131,6 +131,23 @@
         "url": "https://github.com/WhySoBad/hyprland-preview-share-picker"
       }
     },
+    "hyprland-scroll-overview": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784111647,
+        "narHash": "sha256-hjzhIWCmaqVtyCy2ZE1+pM3Q2BvAGuC8zQZSj1AtORA=",
+        "owner": "yayuuu",
+        "repo": "hyprland-scroll-overview",
+        "rev": "cfc23b194ba9378d1606c7aa73060f6ffbe38445",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yayuuu",
+        "repo": "hyprland-scroll-overview",
+        "rev": "cfc23b194ba9378d1606c7aa73060f6ffbe38445",
+        "type": "github"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1784254960,
@@ -200,6 +217,7 @@
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
+        "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable"

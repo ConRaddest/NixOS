@@ -9,8 +9,8 @@
 # and the loop must stay alive after a failure to offer the retry prompt.
 set -uo pipefail
 
-# shellcheck source=scripts/system/nos-ui.sh
-source "$NOS_DIR/scripts/system/nos-ui.sh"
+# shellcheck source=scripts/nos-ui.sh
+source "$NOS_DIR/scripts/nos-ui.sh"
 
 run_update() {
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
@@ -37,5 +37,4 @@ while true; do
     ''|y|Y) ;;
     *) exit 1 ;;
   esac
-  printf '\n'
 done

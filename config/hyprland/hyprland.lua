@@ -1,3 +1,6 @@
+-- Load Nix-built plugins before applying their config.
+require("nix.plugins")
+
 -- ============================================================
 -- monitors
 -- ============================================================
@@ -32,6 +35,20 @@ hl.monitor({
 -- visuals
 -- ============================================================
 hl.config({
+	plugin = {
+		scrolloverview = {
+			gesture_distance = 300,
+			scale = 0.5,
+			workspace_gap = 100,
+			layout = "vertical",
+			wallpaper = 0,
+			blur = false,
+			shadow = {
+				enabled = false,
+			},
+		},
+	},
+
 	-- input
 	input = {
 		accel_profile = "flat",
@@ -165,6 +182,11 @@ hl.bind(
 
 -- quick switch between two most recent workspaces
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
+
+-- workspace overview
+hl.bind("SUPER + A", function()
+	hl.plugin.scrolloverview.overview("toggle")
+end)
 
 -- scroll through the workspaces with super + scroll
 local function scrollWorkspace(offset)
@@ -316,18 +338,18 @@ end
 -- ============================================================
 -- windows and layer rules
 -- ============================================================
-
+local popupSize = { 1000, 650 }
 local popup_windows = {
 	{ title = "windows-install" },
 	{ title = "windows-uninstall" },
 	{ title = "windows-credentials" },
 	{ title = "windows-vm-start" },
 
-	{ title = "nos-build", size = { 1000, 650 } },
-	{ title = "nos-refresh", size = { 1000, 650 } },
-	{ title = "nos-update", size = { 1000, 650 } },
-	{ title = "nos-install", size = { 1000, 650 } },
-	{ title = "nos-remove", size = { 1000, 650 } },
+	{ title = "nos-build", size = popupSize },
+	{ title = "nos-refresh", size = popupSize },
+	{ title = "nos-update", size = popupSize },
+	{ title = "nos-install", size = popupSize },
+	{ title = "nos-remove", size = popupSize },
 
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },

@@ -52,37 +52,14 @@ let
   # ============================================================
 
   homeConfig = {
-    imports = [
-      self.lib.homeModules.hyprland
-      self.lib.homeModules.dms
-      self.lib.homeModules.appearance
-
-      self.lib.homeModules.apps
-      self.lib.homeModules.desktop
-      self.lib.homeModules.shell
-      self.lib.homeModules.btop
-      self.lib.homeModules.gdu
-      self.lib.homeModules.dev
-      self.lib.homeModules.pi
-      self.lib.homeModules.fastfetch
-      self.lib.homeModules.fzf
-      self.lib.homeModules.directories
-      self.lib.homeModules.firefox
-      self.lib.homeModules.git
-      self.lib.homeModules.kitty
-      self.lib.homeModules.lazydocker
-      self.lib.homeModules.npm
-      self.lib.homeModules.nvim
-      self.lib.homeModules.ssh
-      self.lib.homeModules.starship
-
-      self.lib.homeModules.screenSharePicker
-      self.lib.homeModules.windows
-      self.lib.homeModules.yazi
-      self.lib.homeModules.zapzap
-    ];
+    imports = [ self.lib.homeModules.home ];
 
     _module.args = { inherit font; };
+
+    nos = {
+      isNixOS = true;
+      flakeDirectory = host.flakeDirectory;
+    };
 
     home.username = host.username;
     home.homeDirectory = host.homeDirectory;
@@ -95,20 +72,6 @@ in
   # ============================================================
   # System modules
   # ============================================================
-
-  flake.nixosModules.homeManager =
-    { ... }:
-    {
-      imports = [ inputs.home-manager.nixosModules.home-manager ];
-
-      home-manager = {
-        useGlobalPkgs = true;
-        useUserPackages = true;
-        backupFileExtension = "hm-backup";
-        extraSpecialArgs = specialArgs;
-        users.${host.username} = homeConfig;
-      };
-    };
 
   flake.nixosModules.legionConfiguration =
     { stateVersion, ... }:
@@ -135,7 +98,6 @@ in
 
         self.nixosModules.docker
         self.nixosModules.onepassword
-        self.nixosModules.homeManager
       ];
 
       networking.hostName = hostName;

@@ -4,12 +4,15 @@
   flake.lib.homeModules.shell =
     {
       self,
+      config,
+      lib,
       pkgs,
-      flakeDirectory,
       ...
     }:
 
     let
+      flakeDirectory = config.nos.flakeDirectory;
+
       mkNosScript =
         name: script:
         pkgs.writeShellScriptBin name ''
@@ -18,11 +21,20 @@
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
-      nos-refresh = mkNosScript "nos-refresh" "${self}/scripts/system/nos-refresh.sh";
-      nos-build = mkNosScript "nos-build" "${self}/scripts/system/nos-build.sh";
-      nos-update = mkNosScript "nos-update" "${self}/scripts/system/nos-update.sh";
-      nos-install = mkNosScript "nos-install" "${self}/scripts/system/nos-install.sh";
-      nos-remove = mkNosScript "nos-remove" "${self}/scripts/system/nos-remove.sh";
+      nos-refresh = mkNosScript "nos-refresh" "${self}/scripts/nos-refresh.sh";
+      nos-build = mkNosScript "nos-build" "${self}/scripts/nos-build.sh";
+      nos-update = mkNosScript "nos-update" "${self}/scripts/nos-update.sh";
+      nos-install = mkNosScript "nos-install" "${self}/scripts/nos-install.sh";
+      nos-remove = mkNosScript "nos-remove" "${self}/scripts/nos-remove.sh";
+
+      managementPackages =
+        lib.optionals (flakeDirectory != null) [ nos-refresh ]
+        ++ lib.optionals (flakeDirectory != null && config.nos.isNixOS) [
+          nos-build
+          nos-update
+          nos-install
+          nos-remove
+        ];
 
       nos-fonts = pkgs.writeShellScriptBin "nos-fonts" ''
         exec ${pkgs.fontconfig}/bin/fc-list : family | sort -u
@@ -34,7 +46,9 @@
 
     in
     {
-      home.sessionVariables.NOS_DIR = flakeDirectory;
+      home.sessionVariables = lib.optionalAttrs (flakeDirectory != null) {
+        NOS_DIR = flakeDirectory;
+      };
 
       programs.fish = {
         enable = true;
@@ -53,6 +67,8 @@
         ];
         interactiveShellInit = ''
           set -g fish_greeting
+        ''
+        + lib.optionalString (flakeDirectory != null) ''
 
           if test -f "${flakeDirectory}/.env"
             fenv source "${flakeDirectory}/.env"
@@ -65,23 +81,20 @@
         enableFishIntegration = true;
       };
 
-      home.packages = with pkgs; [
-        nos-refresh
-        nos-build
-        nos-update
-        nos-install
-        nos-remove
-        nos-fonts
-        nos-mono-fonts
+      home.packages =
+        managementPackages
+        ++ (with pkgs; [
+          nos-fonts
+          nos-mono-fonts
 
-        # cli utilities
-        eza # better ls
-        jq # json cli proccessor
-        nix-search-cli # search nix packages
-        tldr # command summaries
-        tree # folder
-        unzip # unzip files
-      ];
+          # cli utilities
+          eza # better ls
+          jq # json cli proccessor
+          nix-search-cli # search nix packages
+          tldr # command summaries
+          tree # folder
+          unzip # unzip files
+        ]);
 
       programs.kitty.shellIntegration.enableFishIntegration = true;
     };

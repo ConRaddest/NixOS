@@ -19,6 +19,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Pin matching Hyprland 0.55.4 commit from upstream's hyprpm.toml.
+    hyprland-scroll-overview = {
+      url = "github:yayuuu/hyprland-scroll-overview/cfc23b194ba9378d1606c7aa73060f6ffbe38445";
+      flake = false;
+    };
+
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,6 +37,7 @@
       { lib, ... }:
       {
         imports = [
+          ./home.nix
           (inputs.import-tree ./system)
           (inputs.import-tree ./home)
           (inputs.import-tree ./hosts)

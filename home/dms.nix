@@ -4,6 +4,7 @@
   flake.lib.homeModules.dms =
     {
       config,
+      font,
       pkgs,
       ...
     }:
@@ -74,6 +75,14 @@
           mkdir -p "$(dirname "$settings")"
           printf '%s\n' '{"loginctlLockIntegration":false,"matugenTemplateNeovim":true}' > "$settings"
         fi
+
+        # Keep mutable DMS settings, but follow shared system monospace font.
+        settings_tmp="$(${pkgs.coreutils}/bin/mktemp)"
+        ${pkgs.jq}/bin/jq \
+          --arg monoFont ${pkgs.lib.escapeShellArg font.mono} \
+          '.monoFontFamily = $monoFont' \
+          "$settings" > "$settings_tmp"
+        ${pkgs.coreutils}/bin/mv "$settings_tmp" "$settings"
       '';
     };
 }

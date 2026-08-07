@@ -6,8 +6,8 @@
 # and the loop must stay alive after a failure to offer the retry prompt.
 set -uo pipefail
 
-# shellcheck source=scripts/system/nos-ui.sh
-source "$NOS_DIR/scripts/system/nos-ui.sh"
+# shellcheck source=scripts/nos-ui.sh
+source "$NOS_DIR/scripts/nos-ui.sh"
 
 # Use an array so the offline flag expands cleanly as separate words,
 # and expands to nothing at all when not set.
@@ -23,8 +23,6 @@ run_refresh() {
     && git -C "$NOS_DIR" add . \
     && nos_stage "refreshing home manager configuration" \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER" \
-    && nos_stage "rendering app themes" \
-    && nos_render_app_themes \
     && nos_done
 }
 
@@ -34,7 +32,6 @@ while true; do
     read -r -n 1 answer
     printf '\n'
     [[ "$answer" =~ ^[yY]$ ]] || exit 0
-    printf '\n'
   else
     nos_fail "refresh failed"
     nos_retry_prompt
@@ -44,6 +41,5 @@ while true; do
       ''|y|Y) ;;
       *) exit 1 ;;
     esac
-    printf '\n'
   fi
 done
