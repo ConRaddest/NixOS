@@ -37,9 +37,8 @@
       { lib, ... }:
       {
         imports = [
-          ./home.nix
-          (inputs.import-tree ./system)
-          (inputs.import-tree ./home)
+          (inputs.import-tree ./modules/system)
+          (inputs.import-tree ./modules/home)
           (inputs.import-tree ./hosts)
         ];
 

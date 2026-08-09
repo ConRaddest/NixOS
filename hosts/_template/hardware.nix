@@ -14,30 +14,25 @@ in
     {
       imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
+      # Replace these values with output from:
+      # sudo nixos-generate-config --show-hardware-config
       boot.initrd.availableKernelModules = [
-        "xhci_pci"
-        "ahci"
         "nvme"
+        "xhci_pci"
         "usbhid"
         "usb_storage"
-        "sd_mod"
       ];
       boot.initrd.kernelModules = [ ];
-
-      boot.kernelModules = [
-        "kvm-intel" # Intel VT-x for virtualisation
-        "tun" # virtual network interfaces for Docker/VMs
-      ];
-
+      boot.kernelModules = [ "tun" ];
       boot.extraModulePackages = [ ];
 
       fileSystems."/" = {
-        device = "/dev/disk/by-uuid/fb1d081a-2de5-49ba-a19f-2df4274e9a90";
+        device = "/dev/disk/by-uuid/REPLACE_ROOT_UUID";
         fsType = "ext4";
       };
 
       fileSystems."/boot" = {
-        device = "/dev/disk/by-uuid/4B9E-C95A";
+        device = "/dev/disk/by-uuid/REPLACE_BOOT_UUID";
         fsType = "vfat";
         options = [
           "fmask=0077"
@@ -46,10 +41,13 @@ in
       };
 
       swapDevices = [
-        { device = "/dev/disk/by-uuid/2a076ad6-8875-49d8-81d0-0e654f2bee46"; }
+        { device = "/dev/disk/by-uuid/REPLACE_SWAP_UUID"; }
       ];
 
       nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-      hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+      # Add matching CPU microcode configuration when needed:
+      # hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      # hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
     };
 }

@@ -6,18 +6,24 @@
 }:
 
 let
-  # ============================================================
-  # Host
-  # ============================================================
-
+  # Copy this directory to hosts/<host-name>. hostName then derives from
+  # directory name, keeping NixOS and Home Manager outputs unique.
   hostName = builtins.baseNameOf (toString ./.);
+
   host = {
     system = "x86_64-linux";
-    username = "cdt";
-    fullName = "Connor du Toit";
-    homeDirectory = "/home/cdt";
-    flakeDirectory = "/home/cdt/NixOS";
+    username = "CHANGE_ME";
+    fullName = "CHANGE_ME";
+    homeDirectory = "/home/CHANGE_ME";
+    flakeDirectory = "/home/CHANGE_ME/NixOS";
     stateVersion = "26.05";
+  };
+
+  font = {
+    system = "Adwaita Sans";
+    size = 11;
+    mono = "JetBrainsMono Nerd Font";
+    monoSize = 10;
   };
 
   specialArgs = {
@@ -40,21 +46,6 @@ let
     system = host.system;
     config.allowUnfree = true;
   };
-
-  # ============================================================
-  # Theme
-  # ============================================================
-
-  font = {
-    system = "Adwaita Sans";
-    size = 11;
-    mono = "JetBrainsMono Nerd Font";
-    monoSize = 10;
-  };
-
-  # ============================================================
-  # Home
-  # ============================================================
 
   homeConfig = {
     imports = [
@@ -110,10 +101,6 @@ let
   };
 in
 {
-  # ============================================================
-  # System modules
-  # ============================================================
-
   flake.nixosModules."${hostName}Configuration" =
     { stateVersion, ... }:
     {
@@ -145,17 +132,12 @@ in
       system.stateVersion = stateVersion;
     };
 
-  # ============================================================
-  # Outputs
-  # ============================================================
-
   flake.nixosConfigurations = {
-    ${hostName} = inputs.nixpkgs.lib.nixosSystem {
+    "${hostName}" = inputs.nixpkgs.lib.nixosSystem {
       inherit specialArgs;
       system = host.system;
-      modules = [ self.nixosModules.legionConfiguration ];
+      modules = [ self.nixosModules."${hostName}Configuration" ];
     };
-
   };
 
   flake.homeConfigurations = {
