@@ -2,12 +2,35 @@
 
 {
   flake.lib.homeModules.gdu =
-    { host, pkgs, ... }:
+    {
+      config,
+      host,
+      pkgs,
+      ...
+    }:
 
+    let
+      colors = config.lib.stylix.colors.withHashtag;
+    in
     {
       home.packages = [ pkgs.gdu ];
 
       xdg.configFile."gdu/gdu.yaml".text = ''
+        style:
+          selected-row:
+            text-color: "${colors.base00}"
+            background-color: "${colors.base0D}"
+          result-row:
+            number-color: "${colors.base0E}"
+            directory-color: "${colors.base0D}"
+          footer:
+            text-color: "${colors.base05}"
+            background-color: "${colors.base00}"
+            number-color: "${colors.base0E}"
+          header:
+            text-color: "${colors.base05}"
+            background-color: "${colors.base00}"
+
         # --- Scanning & Engine Preferences ---
         sorting:
           by: size

@@ -132,6 +132,7 @@ let
       # Shell and core user environment
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
+      self.lib.homeModules.theme
       self.lib.homeModules.apps
       self.lib.homeModules.audio
       self.lib.homeModules.battery
@@ -193,6 +194,8 @@ let
       home.homeDirectory = host.homeDirectory;
       home.stateVersion = host.stateVersion;
 
+      nixpkgs.config.allowUnfree = true;
+
       programs.home-manager.enable = true;
     };
   };
@@ -242,7 +245,7 @@ in
       system.stateVersion = stateVersion;
 
       home-manager = {
-        useGlobalPkgs = true;
+        useGlobalPkgs = false;
         useUserPackages = true;
         extraSpecialArgs = specialArgs;
         users.${host.username} = homeConfig;

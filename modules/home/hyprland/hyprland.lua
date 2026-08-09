@@ -59,7 +59,7 @@ hl.config({
 	general = {
 		gaps_in = 4,
 		gaps_out = 8,
-		border_size = 1,
+		border_size = 2,
 		layout = "dwindle",
 		col = {
 			active_border = "rgba(1a1b26ff)",
@@ -68,7 +68,7 @@ hl.config({
 	},
 
 	decoration = {
-		rounding = 1,
+		rounding = 8,
 		active_opacity = 0.95,
 		inactive_opacity = 0.93,
 		fullscreen_opacity = 1.0,
@@ -81,7 +81,7 @@ hl.config({
 		},
 		shadow = {
 			enabled = true,
-			range = 30,
+			range = 50,
 			render_power = 100,
 			color = 0x33000000,
 			color_inactive = 0x22000000,
@@ -102,8 +102,8 @@ hl.config({
 	},
 })
 
--- optional dms colors
-pcall(require, "dms.colors")
+-- Stylix colors generated from the shared Base16 palette.
+-- require("nix.colors")
 
 -- ============================================================
 -- animations
@@ -449,5 +449,5 @@ require("dms.binds")
 require("dms.binds-user")
 require("dms.outputs")
 require("dms.windowrules")
-require("dms.layout")
+-- require("dms.layout")
 require("dms.cursor")

@@ -1,3 +1,2 @@
 1. seemless window app desktop integration with remote rdp viewer
-2. more robust theme management / mutagen management (can swap out shells easier)
-3. declerative shell config management
+2. declerative shell config management

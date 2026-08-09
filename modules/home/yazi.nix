@@ -5,30 +5,20 @@
     { config, pkgs, ... }:
 
     let
-      yaziDms = pkgs.symlinkJoin {
-        name = "yazi-dms";
-        paths = [ pkgs.yazi ];
-        nativeBuildInputs = [ pkgs.makeWrapper ];
-        postBuild = ''
-          wrapProgram "$out/bin/yazi" \
-            --set FZF_DEFAULT_OPTS_FILE "${config.xdg.configHome}/fzf/dms-options"
-        '';
-      };
-
-      # DMS renders these Material roles when its runtime theme changes.
+      stylix = config.lib.stylix.colors.withHashtag;
       colors = {
-        accent = "{{colors.primary.default.hex}}";
-        text = "{{colors.on_surface.default.hex}}";
-        subtext = "{{colors.on_surface_variant.default.hex}}";
-        muted = "{{colors.outline.default.hex}}";
-        overlay = "{{colors.surface_container_highest.default.hex}}";
-        red = "{{colors.error.default.hex}}";
-        yellow = "{{dank16.color3.default.hex}}";
-        green = "{{dank16.color2.default.hex}}";
-        teal = "{{colors.secondary.default.hex}}";
+        accent = stylix.base0D;
+        text = stylix.base05;
+        subtext = stylix.base04;
+        muted = stylix.base03;
+        overlay = stylix.base02;
+        red = stylix.base08;
+        yellow = stylix.base0A;
+        green = stylix.base0B;
+        teal = stylix.base0C;
       };
 
-      yazi-wrapper = pkgs.writeShellScriptBin "yazi-wrapper.sh" ''
+      yaziWrapper = pkgs.writeShellScriptBin "yazi-wrapper.sh" ''
         multiple="$1"
         directory="$2"
         save="$3"
@@ -50,10 +40,10 @@
         echo "result=$(cat "$out" 2>/dev/null || echo empty)" >> "$log"
 
         if [ -s "$out" ] && [ "$directory" != "1" ] && [ "$save" != "1" ]; then
-            selected=$(head -1 "$out")
-            if [ -d "$selected" ]; then
-                : > "$out"
-            fi
+          selected=$(head -1 "$out")
+          if [ -d "$selected" ]; then
+            : > "$out"
+          fi
         fi
 
         [ -s "$out" ] || : > "$out"
@@ -64,81 +54,95 @@
       home.packages = with pkgs; [
         imv
         mpv
-        yaziDms
-        yazi-wrapper
+        yaziWrapper
         xdg-desktop-portal-termfilechooser
       ];
 
-      xdg.desktopEntries.yazi = {
-        name = "Yazi";
-        comment = "Terminal file manager";
-        exec = "kitty --class yazi --title yazi -e yazi %f";
-        icon = "yazi";
-        terminal = false;
-        type = "Application";
-        mimeType = [
-          "inode/directory"
-          "application/x-directory"
-        ];
-        categories = [
-          "System"
-          "FileManager"
-          "FileTools"
-        ];
-      };
-
-      xdg.configFile."xdg-desktop-portal-termfilechooser/config".text = ''
-        [filechooser]
-        cmd=yazi-wrapper.sh
-        default_dir=$HOME
-        env=TERMCMD=kitty --class termfilechooser --title FileChooser -e
-        open_mode=suggested
-        save_mode=suggested
-        create_help_file=1
-      '';
-
-      xdg.mimeApps = {
+      programs.yazi = {
         enable = true;
-        defaultApplications = {
-          "inode/directory" = "yazi.desktop";
-          "application/x-directory" = "yazi.desktop";
+        settings = {
+          mgr = {
+            ratio = [
+              2
+              4
+              3
+            ];
+            show_hidden = false;
+          };
+
+          opener = {
+            edit = [
+              {
+                run = "uwsm app -- code --reuse-window %*";
+                block = false;
+                desc = "VS Code";
+              }
+            ];
+            view = [
+              {
+                run = "uwsm app -- imv %*";
+                block = false;
+                desc = "imv";
+              }
+              {
+                run = "xdg-open %*";
+                block = false;
+                desc = "Open";
+              }
+            ];
+            play = [
+              {
+                run = "uwsm app -- mpv %*";
+                block = false;
+                desc = "mpv";
+              }
+            ];
+            open = [
+              {
+                run = "xdg-open %*";
+                block = false;
+                desc = "Open";
+              }
+            ];
+          };
+
+          open.rules = [
+            {
+              mime = "inode/x-empty";
+              use = [ "edit" ];
+            }
+            {
+              mime = "text/*";
+              use = [ "edit" ];
+            }
+            {
+              mime = "application/{json,ld+json,javascript,typescript,x-yaml,toml,xml,x-sh,x-shellscript}";
+              use = [ "edit" ];
+            }
+            {
+              url = "*.{md,markdown,txt,log,csv,tsv,json,jsonc,yml,yaml,toml,xml,html,css,js,jsx,ts,tsx,py,sh,bash,zsh,lua,nix,rs,go,c,cpp,h,hpp}";
+              use = [ "edit" ];
+            }
+            {
+              mime = "image/*";
+              use = [
+                "view"
+                "edit"
+              ];
+            }
+            {
+              mime = "{audio,video}/*";
+              use = [ "play" ];
+            }
+            {
+              mime = "*";
+              use = [ "open" ];
+            }
+          ];
         };
       };
 
-      xdg.configFile."yazi/yazi.toml".text = ''
-        [mgr]
-        ratio = [2, 4, 3]
-        show_hidden = false
-
-        [opener]
-        edit = [
-          { run = "uwsm app -- code --reuse-window %*", block = false, desc = "VS Code" },
-        ]
-        view = [
-          { run = "uwsm app -- imv %*", block = false, desc = "imv" },
-          { run = "xdg-open %*", block = false, desc = "Open" },
-        ]
-        play = [
-          { run = "uwsm app -- mpv %*", block = false, desc = "mpv" },
-        ]
-        open = [
-          { run = "xdg-open %*", block = false, desc = "Open" },
-        ]
-
-        [open]
-        rules = [
-          { mime = "inode/x-empty",   use = ["edit"] },
-          { mime = "text/*",          use = ["edit"] },
-          { mime = "application/{json,ld+json,javascript,typescript,x-yaml,toml,xml,x-sh,x-shellscript}", use = ["edit"] },
-          { url = "*.{md,markdown,txt,log,csv,tsv,json,jsonc,yml,yaml,toml,xml,html,css,js,jsx,ts,tsx,py,sh,bash,zsh,lua,nix,rs,go,c,cpp,h,hpp}", use = ["edit"] },
-          { mime = "image/*",         use = ["view", "edit"] },
-          { mime = "{audio,video}/*", use = ["play"] },
-          { mime = "*",               use = ["open"] },
-        ]
-      '';
-
-      # Home Manager owns the custom theme source; Matugen owns Yazi's output.
-      xdg.configFile."matugen/templates/yazi.toml".text = ''
+      xdg.configFile."yazi/theme.toml".text = ''
         [mgr]
         cwd             = { fg = "${colors.accent}" }
         find_keyword    = { fg = "${colors.yellow}", bold = true, underline = true }
@@ -241,14 +245,50 @@
 
         [filetype]
         rules = [
-          { mime = "image/*",                                                                                              fg = "${colors.text}" },
-          { mime = "{audio,video}/*",                                                                                     fg = "${colors.text}" },
-          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${colors.text}"},
-          { mime = "application/{pdf,doc,rtf}",                                                                          fg = "${colors.text}" },
-          { mime = "vfs/{absent,stale}",                                                                                  fg = "${colors.muted}" },
+          { mime = "image/*", fg = "${colors.text}" },
+          { mime = "{audio,video}/*", fg = "${colors.text}" },
+          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${colors.text}" },
+          { mime = "application/{pdf,doc,rtf}", fg = "${colors.text}" },
+          { mime = "vfs/{absent,stale}", fg = "${colors.muted}" },
           { url = "*/", fg = "${colors.subtext}" },
-          { url = "*",  fg = "${colors.text}" },
+          { url = "*", fg = "${colors.text}" },
         ]
       '';
+
+      xdg.desktopEntries.yazi = {
+        name = "Yazi";
+        comment = "Terminal file manager";
+        exec = "kitty --class yazi --title yazi -e yazi %f";
+        icon = "yazi";
+        terminal = false;
+        type = "Application";
+        mimeType = [
+          "inode/directory"
+          "application/x-directory"
+        ];
+        categories = [
+          "System"
+          "FileManager"
+          "FileTools"
+        ];
+      };
+
+      xdg.configFile."xdg-desktop-portal-termfilechooser/config".text = ''
+        [filechooser]
+        cmd=yazi-wrapper.sh
+        default_dir=$HOME
+        env=TERMCMD=kitty --class termfilechooser --title FileChooser -e
+        open_mode=suggested
+        save_mode=suggested
+        create_help_file=1
+      '';
+
+      xdg.mimeApps = {
+        enable = true;
+        defaultApplications = {
+          "inode/directory" = "yazi.desktop";
+          "application/x-directory" = "yazi.desktop";
+        };
+      };
     };
 }

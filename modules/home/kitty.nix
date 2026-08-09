@@ -2,7 +2,7 @@
 
 {
   flake.lib.homeModules.kitty =
-    { font, config, ... }:
+    { config, ... }:
 
     {
       xdg.configFile."kitty/open-url.sh" = {
@@ -27,13 +27,7 @@
           "shift+insert" = "paste_from_clipboard";
         };
 
-        extraConfig = ''
-          include dank-theme.conf
-        '';
-
         settings = {
-          font_family = font.mono;
-          font_size = 12;
           window_padding_width = 6;
           hide_window_decorations = "yes";
           confirm_os_window_close = 0;

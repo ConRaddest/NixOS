@@ -1,4 +1,5 @@
 audacity
+cmatrix
 drawio
 gimp
 libreoffice

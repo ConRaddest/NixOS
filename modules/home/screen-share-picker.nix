@@ -16,6 +16,7 @@
       backgroundOpacity = "0.95";
       pickerPackage =
         inputs.hyprland-preview-share-picker.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      colors = config.lib.stylix.colors.withHashtag;
     in
     {
       home.packages = [ pickerPackage ];
@@ -63,18 +64,18 @@
         debug: false
       '';
 
-      xdg.configFile."matugen/templates/screen-share-picker.css".text = ''
-        @define-color foreground {{colors.on_surface.default.hex}};
-        @define-color background {{colors.surface.default.hex}};
-        @define-color accent {{colors.primary.default.hex}};
-        @define-color muted {{colors.outline.default.hex}};
-        @define-color card_bg {{colors.surface_container.default.hex}};
-        @define-color text_dark {{colors.on_primary.default.hex}};
-        @define-color accent_hover {{colors.primary_container.default.hex}};
-        @define-color accent_hover_text {{colors.on_primary_container.default.hex}};
-        @define-color selected_tab {{colors.primary.default.hex}};
-        @define-color text {{colors.on_surface.default.hex}};
-        @define-color shadow {{colors.shadow.default.hex}};
+      xdg.configFile."hyprland-preview-share-picker/hyprland-preview-share-picker.css".text = ''
+        @define-color foreground ${colors.base05};
+        @define-color background ${colors.base00};
+        @define-color accent ${colors.base0D};
+        @define-color muted ${colors.base04};
+        @define-color card_bg ${colors.base01};
+        @define-color text_dark ${colors.base00};
+        @define-color accent_hover ${colors.base0E};
+        @define-color accent_hover_text ${colors.base00};
+        @define-color selected_tab ${colors.base0D};
+        @define-color text ${colors.base05};
+        @define-color shadow #000000;
 
         * {
           all: unset;

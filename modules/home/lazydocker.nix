@@ -2,8 +2,11 @@
 
 {
   flake.lib.homeModules.lazydocker =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
 
+    let
+      colors = config.lib.stylix.colors.withHashtag;
+    in
     {
       xdg.desktopEntries.lazydocker = {
         name = "LazyDocker";
@@ -17,6 +20,16 @@
           "System"
         ];
       };
+
+      xdg.configFile."lazydocker/config.yml".text = ''
+        gui:
+          theme:
+            activeBorderColor: ["${colors.base0D}", "bold"]
+            inactiveBorderColor: ["${colors.base03}"]
+            selectedLineBgColor: ["${colors.base02}"]
+            optionsTextColor: ["${colors.base0E}"]
+            defaultFgColor: ["${colors.base05}"]
+      '';
 
       home.file = {
         # --- Docker ---

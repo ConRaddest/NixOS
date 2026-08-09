@@ -12,6 +12,7 @@
     }:
 
     let
+      colors = config.lib.stylix.colors;
       monitorLua = monitor: ''
         {
           output = ${builtins.toJSON monitor.output},
@@ -73,7 +74,6 @@
         systemd.enable = false;
       };
 
-      # Keep plugin path declarative while preserving live, out-of-store Lua config.
       xdg.configFile."hypr/nix/plugins.lua".text = ''
         hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
       '';
@@ -97,10 +97,31 @@
           })
         '';
 
+      xdg.configFile."hypr/nix/colors.lua".text = ''
+        hl.config({
+          general = {
+            col = {
+              active_border = "rgb(${colors.base0D})",
+              inactive_border = "rgb(${colors.base03})",
+            },
+          },
+          group = {
+            col = {
+              border_active = "rgb(${colors.base0D})",
+              border_inactive = "rgb(${colors.base03})",
+              border_locked_active = "rgb(${colors.base0C})",
+              border_locked_inactive = "rgb(${colors.base03})",
+            },
+          },
+        })
+      '';
+
       # NixOS system configuration owns portal backends.
       xdg.portal.enable = lib.mkForce false;
 
-      xdg.configFile."hypr/hyprland.lua".source = ./hyprland.lua;
+      # Keep Lua config live-editable while Nix owns generated support files.
+      xdg.configFile."hypr/hyprland.lua".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
 
       home.activation.removeLegacyHyprpolkitagent = config.lib.dag.entryBefore [ "writeBoundary" ] ''
         rm -f "$HOME/.config/systemd/user/hyprpolkitagent.service"

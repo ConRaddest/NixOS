@@ -4,7 +4,8 @@ Multi-host NixOS configuration for x86_64 workstations. It manages both system s
 
 ## Desktop stack
 
-- Hyprland with UWSM and DankMaterialShell
+- Hyprland with UWSM and swappable desktop-shell modules
+- Shared Stylix theming for GTK, Qt, Kitty, Neovim, Firefox, and CLI tools
 - Kitty with Fish and Starship
 - Firefox, Neovim, Yazi, btop, LazyDocker, GIMP, and LibreOffice
 - XDG portals, screen sharing, clipboard, screenshots, and Polkit support
@@ -390,6 +391,18 @@ Notes:
 - helper commands read `HOST_NAME`
 - every interactive Fish terminal loads all exported values from `.env`
 - Windows scripts also read Windows credentials directly from `.env`
+
+## Theming
+
+`homeModules.theme` imports Stylix and defines one shared Base16 palette, wallpaper, font set, cursor, and application targets. Theme changes are declarative and apply during the next Home Manager or NixOS rebuild.
+
+Current theme uses `modules/home/theme/tokyo-night-mauve.yaml`, with mauve `base0D` as the shared system accent. Stylix directly themes supported applications. Custom Fastfetch, GDU, Hyprland Lua, LazyDocker, and screen-share-picker adapters consume `config.lib.stylix.colors` from the same palette.
+
+Change `stylix.base16Scheme`, `stylix.override`, or `stylix.image` in `modules/home/theme/default.nix`, then rebuild:
+
+```bash
+nos-build
+```
 
 ## Common commands
 

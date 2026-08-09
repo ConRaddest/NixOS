@@ -85,9 +85,6 @@
           vim.opt.undodir = vim.fn.stdpath("state") .. "/undo"
           vim.fn.mkdir(vim.opt.undodir:get()[1], "p")
 
-          -- DMS writes this colorscheme whenever wallpaper/theme changes.
-          pcall(vim.cmd.colorscheme, "dms")
-
           -- ─── Notes / todo.txt highlighting ─────────────────────────────────
           vim.api.nvim_set_hl(0, "NoteNumber", { link = "Number" })
           vim.api.nvim_set_hl(0, "NoteLetter", { link = "Number" })
