@@ -5,9 +5,6 @@
 # │ Presentation                                             │
 # ╰──────────────────────────────────────────────────────────╯
 
-readonly NOS_HEADING_TOP='╭──────────────────────────────────────────────────────────╮'
-readonly NOS_HEADING_BOTTOM='╰──────────────────────────────────────────────────────────╯'
-
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   readonly NOS_ACCENT=$'\033[95m'
   readonly NOS_OK=$'\033[92m'
@@ -23,9 +20,14 @@ else
 fi
 
 nos_heading() {
-  printf '%s%s%s\n' "$NOS_BOLD" "$NOS_HEADING_TOP" "$NOS_RESET"
-  printf '%s%s│ %-56s │%s\n' "$NOS_BOLD" "$NOS_ACCENT" "$1" "$NOS_RESET"
-  printf '%s%s%s\n\n' "$NOS_BOLD" "$NOS_HEADING_BOTTOM" "$NOS_RESET"
+  local heading="$1"
+  local underline
+
+  printf -v underline '%*s' "${#heading}" ''
+  underline=${underline// /─}
+
+  printf '%s%s%s%s\n' "$NOS_BOLD" "$NOS_ACCENT" "$heading" "$NOS_RESET"
+  printf '%s%s%s\n\n' "$NOS_BOLD" "$underline" "$NOS_RESET"
 }
 
 nos_stage() {
@@ -33,7 +35,7 @@ nos_stage() {
 }
 
 nos_done() {
-  printf '\n%s%s%s\n' "$NOS_OK" "${1:-Operation completed successfully.}" "$NOS_RESET"
+  printf '%s%s%s\n' "$NOS_OK" "${1:-Operation completed successfully.}" "$NOS_RESET"
 }
 
 nos_fail() {

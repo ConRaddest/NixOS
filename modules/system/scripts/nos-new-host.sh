@@ -7,13 +7,15 @@ set -euo pipefail
 # │ Presentation                                             │
 # ╰──────────────────────────────────────────────────────────╯
 
-readonly NOS_HEADING_TOP='╭──────────────────────────────────────────────────────────╮'
-readonly NOS_HEADING_BOTTOM='╰──────────────────────────────────────────────────────────╯'
-
 print_heading() {
-  printf '\n%s\n' "$NOS_HEADING_TOP"
-  printf '│ %-56s │\n' "$1"
-  printf '%s\n\n' "$NOS_HEADING_BOTTOM"
+  local heading="$1"
+  local underline
+
+  printf -v underline '%*s' "${#heading}" ''
+  underline=${underline// /─}
+
+  printf '\n%s\n' "$heading"
+  printf '%s\n\n' "$underline"
 }
 
 # ╭──────────────────────────────────────────────────────────╮

@@ -37,13 +37,13 @@ while true; do
   if run_refresh; then
     nos_repeat_prompt
     read -r -n 1 answer
-    printf '\n'
+    printf '\n\n'
     [[ "$answer" =~ ^[yY]$ ]] || exit 0
   else
     nos_fail "Home Manager refresh failed."
     nos_retry_prompt
     read -r -n 1 answer
-    printf '\n'
+    printf '\n\n'
     case "$answer" in
       ''|y|Y) ;;
       *) exit 1 ;;

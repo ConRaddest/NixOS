@@ -1,7 +1,7 @@
 {
   "name": "pi-vscode-context",
   "displayName": "Pi VS Code Context",
-  "description": "Publishes currently open VS Code files for pi.",
+  "description": "Publishes current VS Code editor context for pi.",
   "version": "0.1.0",
   "publisher": "local",
   "license": "MIT",

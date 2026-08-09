@@ -16,8 +16,10 @@ run_update() {
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && nos_stage "Updating Flake Inputs" \
     && nos_run nix flake update --option warn-dirty false --flake "$NOS_DIR" \
+    && printf '\n' \
     && nos_stage "Building Updated NixOS Configuration" \
     && nos_run sudo nixos-rebuild switch --option warn-dirty false --flake "$NOS_DIR#$host_name" \
+    && printf '\n' \
     && nos_done "Flake inputs updated and NixOS configuration applied successfully."
 }
 
@@ -33,7 +35,7 @@ while true; do
   nos_fail "Update or rebuild failed."
   nos_retry_prompt
   read -r -n 1 answer
-  printf '\n'
+  printf '\n\n'
   case "$answer" in
     ''|y|Y) ;;
     *) exit 1 ;;

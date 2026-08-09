@@ -25,6 +25,7 @@ run_build() {
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && nos_stage "Building NixOS Configuration" \
     && nos_run sudo nixos-rebuild switch "${nix_opts[@]}" --flake "$NOS_DIR#$host_name" \
+    && printf '\n' \
     && nos_done "NixOS configuration applied successfully."
 }
 
@@ -36,13 +37,13 @@ while true; do
   if run_build; then
     nos_repeat_prompt
     read -r -n 1 answer
-    printf '\n'
+    printf '\n\n'
     [[ "$answer" =~ ^[yY]$ ]] || exit 0
   else
     nos_fail "NixOS rebuild failed."
     nos_retry_prompt
     read -r -n 1 answer
-    printf '\n'
+    printf '\n\n'
     case "$answer" in
       ''|y|Y) ;;
       *) exit 1 ;;
