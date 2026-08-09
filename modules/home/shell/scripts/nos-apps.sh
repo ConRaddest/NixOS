@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
+# Shared application-list and package-search helpers.
 set -euo pipefail
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Configuration                                            │
+# ╰──────────────────────────────────────────────────────────╯
 
 nos_dir="${NOS_DIR:-$HOME/NixOS}"
 NOS_DIR="$nos_dir"
@@ -7,6 +12,10 @@ NOS_DIR="$nos_dir"
 source "$nos_dir/modules/home/shell/scripts/nos-ui.sh"
 host_name=$(nos_host_name)
 apps_file="$nos_dir/hosts/$host_name/apps.txt"
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Application List                                         │
+# ╰──────────────────────────────────────────────────────────╯
 
 write_apps_file() {
   local tmp
@@ -20,12 +29,20 @@ current_apps() {
   sed '/^[[:space:]]*$/d; /^[[:space:]]*#/d' "$apps_file"
 }
 
+# ╭──────────────────────────────────────────────────────────╮
+# │ Package Metadata                                         │
+# ╰──────────────────────────────────────────────────────────╯
+
 package_preview() {
   local attr="$1"
-  nix eval --raw "nixpkgs#$attr.meta.description" 2>/dev/null | tr '[:upper:]' '[:lower:]' || true
+  nix eval --raw "nixpkgs#$attr.meta.description" 2>/dev/null || true
   printf '\n\n'
   nix eval --raw "nixpkgs#$attr.meta.homepage" 2>/dev/null || true
 }
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Package Search                                           │
+# ╰──────────────────────────────────────────────────────────╯
 
 installed_apps() {
   local cache_dir cache now stamp
@@ -77,10 +94,14 @@ search_apps() {
       desc = $0
       sub(/^[^[:space:]]+[[:space:]]*/, "", desc)
       sub(/^@[[:space:]]*/, "", desc)
-      print name "\t" tolower(desc)
+      print name "\t" desc
     }
   '
 }
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Selection State                                          │
+# ╰──────────────────────────────────────────────────────────╯
 
 toggle_selected_app() {
   local file="$1"
@@ -104,7 +125,7 @@ search_apps_with_selected_file() {
   touch "$selected_file"
 
   while IFS= read -r attr; do
-    [[ -n "$attr" ]] && printf '%s\t[selected]\t✓ %s\n' "$attr" "$attr"
+    [[ -n "$attr" ]] && printf '%s\t[Selected]\tSelected: %s\n' "$attr" "$attr"
   done < "$selected_file"
 
   search_apps "$query" | awk -F '\t' -v selected_file="$selected_file" '

@@ -6,19 +6,18 @@
 }:
 
 let
-  # ============================================================
-  # Host
-  # ============================================================
-
+  # Copy this directory to hosts/<host-name>. hostName then derives from
+  # directory name, keeping NixOS and Home Manager outputs unique.
   hostName = builtins.baseNameOf (toString ./.);
+
   host = {
     system = "x86_64-linux";
     username = "cdt";
-    fullName = "Connor du Toit";
+    fullName = "cdt";
     homeDirectory = "/home/cdt";
     flakeDirectory = "/home/cdt/NixOS";
     stateVersion = "26.05";
-    initialHashedPassword = null;
+    initialHashedPassword = "$y$j9T$0GcQYCQFpGg11RuTdnVdl0$jT7aBB4Q8giBYjEkLn.joN0tLcpsLs0foJN7ue3Saw7";
     gaming = true;
 
     boot = {
@@ -27,15 +26,15 @@ let
     };
 
     hardware = {
-      deepSleep = true;
+      deepSleep = false;
       thermald = true;
       nvidiaOpen = false;
       nvidiaPrime = null;
     };
 
     git = {
-      name = "Connor du Toit";
-      email = "connordutoit@gmail.com";
+      name = "cdt";
+      email = "cdt@legion";
     };
 
     region = {
@@ -44,50 +43,26 @@ let
       keyboardLayout = "za";
     };
 
-    localHosts = [
-      "management-local.pmis.servicesseta.org.za"
-      "partner-local.pmis.servicesseta.org.za"
-      "learner-local.pmis.servicesseta.org.za"
-    ];
-
-    monitors = [
-      {
-        output = "eDP-1";
-        mode = "1920x1080@60";
-        position = "0x0";
-        scale = 1;
-        workspaces = [
-          1
-          2
-          3
-        ];
-      }
-      {
-        output = "HDMI-A-1";
-        mode = "3440x1440@174.96";
-        position = "1920x0";
-        scale = 1;
-        workspaces = [
-          4
-          5
-          6
-          7
-          8
-          9
-        ];
-      }
-    ];
+    localHosts = [ ];
+    monitors = [ ];
 
     gduMaxCores = 12;
     firefoxProfilePath = "td4m60gg.default";
-    firefoxCertificatePath = "/home/cdt/.local/share/mkcert/rootCA.pem";
+    firefoxCertificatePath = null;
 
     windows = {
       timeZone = "Africa/Johannesburg";
-      memory = "6G";
-      cpuCores = 6;
+      memory = "4G";
+      cpuCores = 12;
       diskSize = "64G";
     };
+  };
+
+  font = {
+    system = "Adwaita Sans";
+    size = 11;
+    mono = "JetBrainsMono Nerd Font";
+    monoSize = 10;
   };
 
   specialArgs = {
@@ -112,30 +87,12 @@ let
     config.allowUnfree = true;
   };
 
-  # ============================================================
-  # Theme
-  # ============================================================
-
-  font = {
-    system = "Adwaita Sans";
-    size = 11;
-    mono = "JetBrainsMono Nerd Font";
-    monoSize = 10;
-  };
-
-  # ============================================================
-  # Home
-  # ============================================================
-
   homeConfig = {
     imports = [
       # Shell and core user environment
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
       self.lib.homeModules.apps
-      self.lib.homeModules.audio
-      self.lib.homeModules.battery
-      self.lib.homeModules.bluetooth
       self.lib.homeModules.btop
       self.lib.homeModules.directories
       self.lib.homeModules.dev
@@ -143,11 +100,9 @@ let
       self.lib.homeModules.fzf
       self.lib.homeModules.gdu
       self.lib.homeModules.git
-      self.lib.homeModules.lazydocker
       self.lib.homeModules.npm
       self.lib.homeModules.nvim
       self.lib.homeModules.pi
-      self.lib.homeModules.ssh
       self.lib.homeModules.starship
       self.lib.homeModules.yazi
 
@@ -158,7 +113,6 @@ let
       self.lib.homeModules.hyprland
       self.lib.homeModules.kitty
       self.lib.homeModules.screenSharePicker
-      self.lib.homeModules.windows
       self.lib.homeModules.zapzap
     ];
 
@@ -185,8 +139,8 @@ let
 
       nos = {
         flakeDirectory = host.flakeDirectory;
-        trackpad = true;
-        trackpadName = "msft0001:01-06cb:cd5f-touchpad";
+        trackpad = false;
+        trackpadName = null;
       };
 
       home.username = host.username;
@@ -198,10 +152,6 @@ let
   };
 in
 {
-  # ============================================================
-  # System modules
-  # ============================================================
-
   flake.nixosModules."${hostName}Configuration" =
     { stateVersion, ... }:
     {
@@ -222,12 +172,9 @@ in
         self.nixosModules.portals
 
         self.nixosModules.bluetooth
-        self.nixosModules.nvidia
-
         self.nixosModules.audio
         self.nixosModules.battery
         self.nixosModules.printing
-
         self.nixosModules.docker
         self.nixosModules.gaming
         self.nixosModules.onepassword
@@ -249,17 +196,12 @@ in
       };
     };
 
-  # ============================================================
-  # Outputs
-  # ============================================================
-
   flake.nixosConfigurations = {
-    ${hostName} = inputs.nixpkgs.lib.nixosSystem {
+    "${hostName}" = inputs.nixpkgs.lib.nixosSystem {
       inherit specialArgs;
       system = host.system;
-      modules = [ self.nixosModules.legionConfiguration ];
+      modules = [ self.nixosModules."${hostName}Configuration" ];
     };
-
   };
 
   flake.homeConfigurations = {

@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
-# Formats all Nix files, then runs Home Manager from the working tree.
-# Pass --offline to build from the local Nix store only (no downloads).
-#
-# set -uo rather than -euo: run_refresh uses && chaining to catch failures,
-# and the loop must stay alive after a failure to offer the retry prompt.
+# Format and apply the selected standalone Home Manager profile.
 set -uo pipefail
 
 # shellcheck source=modules/home/shell/scripts/nos-ui.sh
 source "$NOS_DIR/modules/home/shell/scripts/nos-ui.sh"
 
-# Use an array so the offline flag expands cleanly as separate words,
-# and expands to nothing at all when not set.
+# ╭──────────────────────────────────────────────────────────╮
+# │ Options                                                  │
+# ╰──────────────────────────────────────────────────────────╯
+
 nix_opts=(--option warn-dirty false)
 if [[ "${1:-}" == "--offline" ]]; then
   nix_opts+=(--option substitute false)
 fi
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Refresh                                                  │
+# ╰──────────────────────────────────────────────────────────╯
 
 run_refresh() {
   local host_name profile
@@ -22,10 +24,14 @@ run_refresh() {
   profile="$USER@$host_name"
 
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
-    && nos_stage "switching home manager" \
-    && nos_run home-manager switch "${nix_opts[@]}" --flake "path:$NOS_DIR#$profile" \
-    && nos_done
+    && nos_stage "Applying Home Manager Configuration" \
+    && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$profile" \
+    && nos_done "Home Manager configuration applied successfully."
 }
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Main                                                     │
+# ╰──────────────────────────────────────────────────────────╯
 
 while true; do
   if run_refresh; then
@@ -34,7 +40,7 @@ while true; do
     printf '\n'
     [[ "$answer" =~ ^[yY]$ ]] || exit 0
   else
-    nos_fail "refresh failed"
+    nos_fail "Home Manager refresh failed."
     nos_retry_prompt
     read -r -n 1 answer
     printf '\n'

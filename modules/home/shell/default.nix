@@ -17,7 +17,10 @@
         name: script:
         pkgs.writeShellScriptBin name ''
           export NOS_DIR="${flakeDirectory}"
-          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:$PATH"
+          export NOS_LOCALES_FILE="${pkgs.glibcLocales}/share/i18n/SUPPORTED"
+          export NOS_XKB_RULES_FILE="${pkgs.xkeyboard_config}/share/xkeyboard-config-2/rules/base.lst"
+          export NOS_ZONE_TAB_FILE="${pkgs.tzdata}/share/zoneinfo/zone1970.tab"
+          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
@@ -62,8 +65,20 @@
           ff = "fastfetch";
           startw = "uwsm start hyprland-uwsm.desktop";
         };
+        plugins = [
+          {
+            name = "foreign-env";
+            src = pkgs.fishPlugins.foreign-env.src;
+          }
+        ];
         interactiveShellInit = ''
           set -g fish_greeting
+        ''
+        + lib.optionalString (flakeDirectory != null) ''
+
+          if test -f "${flakeDirectory}/.env"
+            fenv source "${flakeDirectory}/.env"
+          end
         '';
       };
 

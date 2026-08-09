@@ -160,7 +160,7 @@
         container="Windows"
         base_dir="''${HOME}/VMs/windows"
         storage="''${base_dir}/storage"
-        shared="''${HOME}/Windows"
+        shared="''${base_dir}/shared"
         env_file=${pkgs.lib.escapeShellArg envFile}
         compose_file="''${HOME}/.config/windows/docker-compose.yaml"
 
@@ -172,7 +172,6 @@
 
           mkdir -p "$(dirname "$env_file")"
           touch "$env_file"
-          chmod 600 "$env_file"
           grep -Ev "^(export[[:space:]]+)?''${key}=" "$env_file" > "$tmp" || true
           printf 'export %s=%q\n' "$key" "$value" >> "$tmp"
           cat "$tmp" > "$env_file"
@@ -246,7 +245,6 @@
 
         container="Windows"
         base_dir="''${HOME}/VMs/windows"
-        shared="''${HOME}/Windows"
         env_file=${pkgs.lib.escapeShellArg envFile}
 
         remove_env_var() {
@@ -266,9 +264,8 @@
         echo
         echo "this permanently deletes:"
         echo "  - docker container and image"
-        echo "  - vm disk:          $base_dir"
-        echo "  - windows env vars: $env_file"
-        echo "  - shared folder:    $shared"
+        echo "  - vm disk and shared folder: $base_dir"
+        echo "  - windows env vars:          $env_file"
         echo
         read -rp "you sure? can't undo this. [y/n, default: n] " confirm
         case "$confirm" in
@@ -295,11 +292,6 @@
           echo "removing windows credentials from .env..."
           remove_env_var WINDOWS_USERNAME
           remove_env_var WINDOWS_PASSWORD
-        fi
-
-        if [[ -d "$shared" ]]; then
-          echo "removing shared folder..."
-          rm -rf "$shared"
         fi
 
         echo
@@ -349,7 +341,7 @@
 
             volumes:
               - ''${HOME}/VMs/windows/storage:/storage
-              - ''${HOME}/Windows:/shared
+              - ''${HOME}/VMs/windows/shared:/shared
 
             environment:
               TZ: "${host.windows.timeZone}"

@@ -47,6 +47,7 @@ let
     monitors = [ ];
 
     gduMaxCores = 4;
+    firefoxProfilePath = "default";
     firefoxCertificatePath = null;
 
     windows = {

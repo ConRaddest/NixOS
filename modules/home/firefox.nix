@@ -38,6 +38,7 @@
         profiles.default = {
           id = 0;
           isDefault = true;
+          path = host.firefoxProfilePath;
           settings = {
             "media.webrtc.pipewire.enabled" = true;
             "widget.gtk.libadwaita-colors.enabled" = false;
