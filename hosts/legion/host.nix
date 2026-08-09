@@ -18,12 +18,82 @@ let
     homeDirectory = "/home/cdt";
     flakeDirectory = "/home/cdt/NixOS";
     stateVersion = "26.05";
+    initialHashedPassword = null;
+    gaming = true;
+
+    boot = {
+      mode = "uefi";
+      device = null;
+    };
+
+    hardware = {
+      deepSleep = true;
+      thermald = true;
+      nvidiaOpen = false;
+      nvidiaPrime = null;
+    };
+
+    git = {
+      name = "Connor du Toit";
+      email = "connordutoit@gmail.com";
+    };
+
+    region = {
+      timeZone = "Africa/Johannesburg";
+      locale = "en_ZA.UTF-8";
+      keyboardLayout = "za";
+    };
+
+    localHosts = [
+      "management-local.pmis.servicesseta.org.za"
+      "partner-local.pmis.servicesseta.org.za"
+      "learner-local.pmis.servicesseta.org.za"
+    ];
+
+    monitors = [
+      {
+        output = "eDP-1";
+        mode = "1920x1080@60";
+        position = "0x0";
+        scale = 1;
+        workspaces = [
+          1
+          2
+          3
+        ];
+      }
+      {
+        output = "HDMI-A-1";
+        mode = "3440x1440@174.96";
+        position = "1920x0";
+        scale = 1;
+        workspaces = [
+          4
+          5
+          6
+          7
+          8
+          9
+        ];
+      }
+    ];
+
+    gduMaxCores = 12;
+    firefoxCertificatePath = "/home/cdt/.local/share/mkcert/rootCA.pem";
+
+    windows = {
+      timeZone = "Africa/Johannesburg";
+      memory = "6G";
+      cpuCores = 6;
+      diskSize = "64G";
+    };
   };
 
   specialArgs = {
     inherit
       inputs
       self
+      host
       hostName
       font
       ;
@@ -65,6 +135,7 @@ let
       self.lib.homeModules.audio
       self.lib.homeModules.battery
       self.lib.homeModules.bluetooth
+      self.lib.homeModules.btop
       self.lib.homeModules.directories
       self.lib.homeModules.dev
       self.lib.homeModules.fastfetch
@@ -135,7 +206,10 @@ in
     {
       imports = [
         self.nixosModules."${hostName}Hardware"
+        inputs.home-manager.nixosModules.home-manager
 
+        self.nixosModules.options
+        self.nixosModules.boot
         self.nixosModules.core
         self.nixosModules.rsa
         self.nixosModules.networking
@@ -154,11 +228,24 @@ in
         self.nixosModules.printing
 
         self.nixosModules.docker
+        self.nixosModules.gaming
         self.nixosModules.onepassword
       ];
 
+      nos = {
+        boot = host.boot;
+        hardware = host.hardware;
+      };
+
       networking.hostName = hostName;
       system.stateVersion = stateVersion;
+
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        extraSpecialArgs = specialArgs;
+        users.${host.username} = homeConfig;
+      };
     };
 
   # ============================================================

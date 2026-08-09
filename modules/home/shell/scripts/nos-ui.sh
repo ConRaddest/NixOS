@@ -37,18 +37,22 @@ nos_repeat_prompt() {
   printf '\n%sgo again? [y/N]%s ' "$NOS_ACCENT" "$NOS_RESET"
 }
 
-nos_load_local_env() {
+nos_load_host_name() {
   [[ -n "${NOS_DIR:-}" ]] || return 0
   local env_file="$NOS_DIR/.env"
+  local value
 
-  if [[ -f "$env_file" ]]; then
-    # shellcheck disable=SC1090
-    source "$env_file"
-  fi
+  [[ -f "$env_file" ]] || return 0
+  value=$(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?HOST_NAME[[:space:]]*=[[:space:]]*([^#[:space:]]+).*$/\2/p' "$env_file" | tail -n 1)
+  value="${value#\"}"
+  value="${value%\"}"
+  value="${value#\'}"
+  value="${value%\'}"
+  HOST_NAME="$value"
 }
 
 nos_host_name() {
-  nos_load_local_env
+  nos_load_host_name
 
   if [[ -z "${HOST_NAME:-}" ]]; then
     nos_fail "HOST_NAME missing; set export HOST_NAME=<host> in $NOS_DIR/.env"

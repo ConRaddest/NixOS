@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Formats all Nix files, stages them, then runs nixos-rebuild switch.
+# Formats all Nix files, then runs nixos-rebuild switch from the working tree.
 # Pass --offline to build from the local Nix store only (no downloads).
 #
 # set -uo rather than -euo: run_build uses && chaining to catch failures,
@@ -20,12 +20,9 @@ run_build() {
   local host_name
   host_name=$(nos_host_name)
 
-  # Format and stage first so the built configuration matches the source tree
-  # and the git index is clean for inspection after a successful build.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
-    && git -C "$NOS_DIR" add . \
     && nos_stage "building system" \
-    && nos_run sudo nixos-rebuild switch "${nix_opts[@]}" --flake "$NOS_DIR#$host_name" \
+    && nos_run sudo nixos-rebuild switch "${nix_opts[@]}" --flake "path:$NOS_DIR#$host_name" \
     && nos_done
 }
 

@@ -23,7 +23,10 @@
     {
       imports = [ inputs.dms.homeModules.dank-material-shell ];
 
-      home.file."Pictures/Wallpapers/sunset-lake.png".source = ./sunset-lake.png;
+      home.file."Pictures/Wallpapers/sunset-lake.png" = {
+        source = ./sunset-lake.png;
+        force = true;
+      };
 
       programs.dank-material-shell = {
         enable = true;
@@ -78,7 +81,12 @@
           printf '%s\n' '{"loginctlLockIntegration":false,"matugenTemplateNeovim":true}' > "$settings"
         fi
 
-        # Keep mutable DMS settings, but follow shared system monospace font.
+        # Recover invalid mutable state before applying shared font settings.
+        if ! ${pkgs.jq}/bin/jq empty "$settings" >/dev/null 2>&1; then
+          ${pkgs.coreutils}/bin/mv "$settings" "$settings.invalid"
+          printf '%s\n' '{"loginctlLockIntegration":false,"matugenTemplateNeovim":true}' > "$settings"
+        fi
+
         settings_tmp="$(${pkgs.coreutils}/bin/mktemp)"
         ${pkgs.jq}/bin/jq \
           --arg monoFont ${pkgs.lib.escapeShellArg font.mono} \

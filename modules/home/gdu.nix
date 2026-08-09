@@ -2,7 +2,7 @@
 
 {
   flake.lib.homeModules.gdu =
-    { pkgs, ... }:
+    { host, pkgs, ... }:
 
     {
       home.packages = [ pkgs.gdu ];
@@ -12,7 +12,7 @@
         sorting:
           by: size
           order: desc
-        max-cores: 12
+        max-cores: ${toString host.gduMaxCores}
         max-path-length: 70
         depth: 0
         top: 0

@@ -1,6 +1,6 @@
 {
   flake.nixosModules.networking =
-    { pkgs, ... }:
+    { host, ... }:
 
     {
       # COSMIC and Plasma use NetworkManager's D-Bus API for their network
@@ -21,16 +21,8 @@
       };
 
       networking.hosts = {
-        "127.0.0.1" = [
-          "management-local.pmis.servicesseta.org.za"
-          "partner-local.pmis.servicesseta.org.za"
-          "learner-local.pmis.servicesseta.org.za"
-        ];
-        "::1" = [
-          "management-local.pmis.servicesseta.org.za"
-          "partner-local.pmis.servicesseta.org.za"
-          "learner-local.pmis.servicesseta.org.za"
-        ];
+        "127.0.0.1" = host.localHosts;
+        "::1" = host.localHosts;
       };
     };
 }

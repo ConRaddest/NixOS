@@ -17,7 +17,7 @@
         name: script:
         pkgs.writeShellScriptBin name ''
           export NOS_DIR="${flakeDirectory}"
-          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:$PATH"
+          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
@@ -28,6 +28,7 @@
       nos-update = mkNosScript "nos-update" "${self}/modules/system/scripts/nos-update.sh";
       nos-install = mkNosScript "nos-install" "${scriptDirectory}/nos-install.sh";
       nos-remove = mkNosScript "nos-remove" "${scriptDirectory}/nos-remove.sh";
+      nos-new-host = mkNosScript "nos-new-host" "${self}/modules/system/scripts/nos-new-host.sh";
 
       managementPackages = lib.optionals (flakeDirectory != null) [
         nos-refresh
@@ -35,6 +36,7 @@
         nos-update
         nos-install
         nos-remove
+        nos-new-host
       ];
 
       nos-fonts = pkgs.writeShellScriptBin "nos-fonts" ''
@@ -60,20 +62,8 @@
           ff = "fastfetch";
           startw = "uwsm start hyprland-uwsm.desktop";
         };
-        plugins = [
-          {
-            name = "foreign-env";
-            src = pkgs.fishPlugins.foreign-env.src;
-          }
-        ];
         interactiveShellInit = ''
           set -g fish_greeting
-        ''
-        + lib.optionalString (flakeDirectory != null) ''
-
-          if test -f "${flakeDirectory}/.env"
-            fenv source "${flakeDirectory}/.env"
-          end
         '';
       };
 

@@ -15,22 +15,16 @@ local function assignWorkspaces(monitor, workspaces)
 	end
 end
 
-assignWorkspaces("eDP-1", { 1, 2, 3 })
-assignWorkspaces("HDMI-A-1", { 4, 5, 6, 7, 8, 9 })
-
-hl.monitor({
-	output = "eDP-1",
-	mode = "1920x1080@60",
-	position = "0x0",
-	scale = 1,
-})
-
-hl.monitor({
-	output = "HDMI-A-1",
-	mode = "3440x1440@174.96",
-	position = "1920x0",
-	scale = 1,
-})
+local configuredMonitors = require("nix.monitors")
+for _, monitor in ipairs(configuredMonitors) do
+	assignWorkspaces(monitor.output, monitor.workspaces)
+	hl.monitor({
+		output = monitor.output,
+		mode = monitor.mode,
+		position = monitor.position,
+		scale = monitor.scale,
+	})
+end
 
 -- ============================================================
 -- visuals
@@ -181,8 +175,8 @@ end)
 local function scrollWorkspace(offset)
 	local monitor = hl.get_active_monitor()
 	local workspace = monitor and monitor.active_workspace
-	local workspaces = monitor and monitorWorkspaces[monitor.name]
-	if not workspace or not workspaces then
+	local workspaces = monitor and monitorWorkspaces[monitor.name] or { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+	if not workspace then
 		return
 	end
 

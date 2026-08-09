@@ -1,8 +1,8 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   flake.nixosModules.intel =
-    { ... }:
+    { pkgs, ... }:
     {
       hardware.graphics = {
         enable = true;
@@ -11,7 +11,6 @@
         extraPackages32 = [ pkgs.pkgsi686Linux.intel-media-driver ];
       };
 
-      programs.steam.enable = true;
       services.xserver.videoDrivers = [ "modesetting" ];
     };
 }

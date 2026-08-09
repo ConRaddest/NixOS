@@ -3,6 +3,9 @@
 {
   flake.nixosModules.security =
     {
+      config,
+      host,
+      lib,
       pkgs,
       username,
       fullName,
@@ -21,9 +24,12 @@
           "networkmanager"
           "video"
           "audio"
-          "docker"
           "kvm"
-        ];
+        ]
+        ++ lib.optional config.virtualisation.docker.enable "docker";
+      }
+      // lib.optionalAttrs (host.initialHashedPassword != null) {
+        initialHashedPassword = host.initialHashedPassword;
       };
 
       security.sudo.wheelNeedsPassword = true;

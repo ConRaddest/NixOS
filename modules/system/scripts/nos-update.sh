@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # Updates all flake inputs to their latest versions, then rebuilds and switches.
-# Sequence: format → stage source → update lockfile → stage lockfile → rebuild.
-#
-# flake.lock is staged in a separate git-add call because it is written by
-# `nix flake update`, not by us, and must be picked up after that step.
+# Sequence: format → update lockfile → rebuild.
 #
 # set -uo rather than -euo: run_update uses && chaining to catch failures,
 # and the loop must stay alive after a failure to offer the retry prompt.
@@ -17,13 +14,10 @@ run_update() {
   host_name=$(nos_host_name)
 
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
-    && git -C "$NOS_DIR" add . \
     && nos_stage "updating system" \
-    && nos_run nix flake update --option warn-dirty false --flake "$NOS_DIR" \
-    && nos_stage "staging lockfile" \
-    && git -C "$NOS_DIR" add flake.lock \
+    && nos_run nix flake update --option warn-dirty false --flake "path:$NOS_DIR" \
     && nos_stage "building system" \
-    && nos_run sudo nixos-rebuild switch --option warn-dirty false --flake "$NOS_DIR#$host_name" \
+    && nos_run sudo nixos-rebuild switch --option warn-dirty false --flake "path:$NOS_DIR#$host_name" \
     && nos_done
 }
 

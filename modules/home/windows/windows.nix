@@ -4,6 +4,7 @@
   flake.lib.homeModules.windows =
     {
       config,
+      host,
       pkgs,
       ...
     }:
@@ -351,11 +352,11 @@
               - ''${HOME}/Windows:/shared
 
             environment:
-              TZ: "Africa/Johannesburg"
+              TZ: "${host.windows.timeZone}"
               VERSION: "11"
-              RAM_SIZE: "6G"
-              CPU_CORES: "6"
-              DISK_SIZE: "64G"
+              RAM_SIZE: "${host.windows.memory}"
+              CPU_CORES: "${toString host.windows.cpuCores}"
+              DISK_SIZE: "${host.windows.diskSize}"
               USERNAME: ''${WINDOWS_USERNAME:-Docker}
               PASSWORD: ''${WINDOWS_PASSWORD:?Run windows-install to save WINDOWS_PASSWORD in ~/NixOS/.env}
       '';

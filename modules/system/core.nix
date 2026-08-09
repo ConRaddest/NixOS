@@ -5,9 +5,6 @@
     { pkgs, ... }:
 
     {
-      boot.loader.systemd-boot.enable = true;
-      boot.loader.efi.canTouchEfiVariables = true;
-
       # Hide noisy early kernel/firmware warnings from the TTY while still
       # showing systemd boot progress. Warnings remain available in journalctl/dmesg.
       boot.consoleLogLevel = 0;

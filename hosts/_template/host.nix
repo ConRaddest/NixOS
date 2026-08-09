@@ -17,6 +17,44 @@ let
     homeDirectory = "/home/CHANGE_ME";
     flakeDirectory = "/home/CHANGE_ME/NixOS";
     stateVersion = "26.05";
+    initialHashedPassword = null;
+    gaming = true;
+
+    boot = {
+      mode = "uefi";
+      device = null;
+    };
+
+    hardware = {
+      deepSleep = false;
+      thermald = false;
+      nvidiaOpen = false;
+      nvidiaPrime = null;
+    };
+
+    git = {
+      name = "CHANGE_ME";
+      email = "CHANGE_ME";
+    };
+
+    region = {
+      timeZone = "UTC";
+      locale = "en_US.UTF-8";
+      keyboardLayout = "us";
+    };
+
+    localHosts = [ ];
+    monitors = [ ];
+
+    gduMaxCores = 4;
+    firefoxCertificatePath = null;
+
+    windows = {
+      timeZone = "UTC";
+      memory = "4G";
+      cpuCores = 4;
+      diskSize = "64G";
+    };
   };
 
   font = {
@@ -30,6 +68,7 @@ let
     inherit
       inputs
       self
+      host
       hostName
       font
       ;
@@ -56,6 +95,7 @@ let
       # AUDIO_HOME_MODULE
       # BATTERY_HOME_MODULE
       # BLUETOOTH_HOME_MODULE
+      self.lib.homeModules.btop
       self.lib.homeModules.directories
       self.lib.homeModules.dev
       self.lib.homeModules.fastfetch
@@ -122,7 +162,10 @@ in
     {
       imports = [
         self.nixosModules."${hostName}Hardware"
+        inputs.home-manager.nixosModules.home-manager
 
+        self.nixosModules.options
+        self.nixosModules.boot
         self.nixosModules.core
         self.nixosModules.rsa
         self.nixosModules.networking
@@ -134,16 +177,30 @@ in
         self.nixosModules.portals
 
         # GPU_MODULE
+        # INTEGRATED_GPU_MODULE
         # BLUETOOTH_SYSTEM_MODULE
         # AUDIO_SYSTEM_MODULE
         # BATTERY_SYSTEM_MODULE
         # PRINTING_SYSTEM_MODULE
         # DOCKER_SYSTEM_MODULE
+        # GAMING_SYSTEM_MODULE
         # ONEPASSWORD_SYSTEM_MODULE
       ];
 
+      nos = {
+        boot = host.boot;
+        hardware = host.hardware;
+      };
+
       networking.hostName = hostName;
       system.stateVersion = stateVersion;
+
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        extraSpecialArgs = specialArgs;
+        users.${host.username} = homeConfig;
+      };
     };
 
   flake.nixosConfigurations = {

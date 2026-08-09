@@ -4,7 +4,9 @@
   flake.lib.homeModules.firefox =
     {
       config,
+      host,
       inputs,
+      lib,
       pkgs,
       ...
     }:
@@ -30,13 +32,12 @@
       programs.firefox = {
         enable = true;
         package = firefoxPackage;
-        policies.Certificates.Install = [
-          "${config.home.homeDirectory}/.local/share/mkcert/rootCA.pem"
-        ];
+        policies.Certificates.Install = lib.optional (
+          host.firefoxCertificatePath != null
+        ) host.firefoxCertificatePath;
         profiles.default = {
           id = 0;
           isDefault = true;
-          path = "td4m60gg.default";
           settings = {
             "media.webrtc.pipewire.enabled" = true;
             "widget.gtk.libadwaita-colors.enabled" = false;

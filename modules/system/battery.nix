@@ -2,7 +2,12 @@
 
 {
   flake.nixosModules.battery =
-    { pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
 
     let
       setPowerProfile = pkgs.writeShellScript "set-power-profile" ''
@@ -35,13 +40,12 @@
       '';
     in
     {
-      boot.kernelParams = [ "mem_sleep_default=deep" ];
+      boot.kernelParams = lib.optional config.nos.hardware.deepSleep "mem_sleep_default=deep";
 
       services.power-profiles-daemon.enable = true;
       services.upower.enable = true;
 
-      # Laptop-specific power management.
-      services.thermald.enable = true;
+      services.thermald.enable = config.nos.hardware.thermald;
 
       services.logind.settings.Login = {
         HandlePowerKey = "ignore";

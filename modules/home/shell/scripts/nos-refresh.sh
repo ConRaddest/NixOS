@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Formats all Nix files, stages them, then runs home-manager switch.
+# Formats all Nix files, then runs Home Manager from the working tree.
 # Pass --offline to build from the local Nix store only (no downloads).
 #
 # set -uo rather than -euo: run_refresh uses && chaining to catch failures,
@@ -21,12 +21,9 @@ run_refresh() {
   host_name=$(nos_host_name)
   profile="$USER@$host_name"
 
-  # Format and stage first so the applied configuration matches the source tree
-  # and the git index is clean for inspection after a successful switch.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
-    && git -C "$NOS_DIR" add . \
     && nos_stage "switching home manager" \
-    && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$profile" \
+    && nos_run home-manager switch "${nix_opts[@]}" --flake "path:$NOS_DIR#$profile" \
     && nos_done
 }
 

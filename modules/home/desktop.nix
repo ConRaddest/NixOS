@@ -2,7 +2,12 @@
 
 {
   flake.lib.homeModules.desktop =
-    { pkgs, ... }:
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
 
     let
       slackX11 = pkgs.writeShellApplication {
@@ -28,10 +33,7 @@
       };
     in
     {
-      home.packages = [
-        slackX11
-        steamLauncher
-      ];
+      home.packages = [ slackX11 ] ++ lib.optional host.gaming steamLauncher;
 
       # Hide upstream entries that have NoDisplay=true but still surface in launchers.
       xdg.desktopEntries.uuctl = {
@@ -41,7 +43,7 @@
         type = "Application";
       };
 
-      xdg.desktopEntries.steam = {
+      xdg.desktopEntries.steam = lib.mkIf host.gaming {
         name = "Steam";
         comment = "Application for managing and playing games on Steam";
         exec = "steam-launcher %U";

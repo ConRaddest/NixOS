@@ -4,6 +4,7 @@
   flake.lib.homeModules.hyprland =
     {
       config,
+      host,
       lib,
       pkgs,
       inputs,
@@ -11,6 +12,16 @@
     }:
 
     let
+      monitorLua = monitor: ''
+        {
+          output = ${builtins.toJSON monitor.output},
+          mode = ${builtins.toJSON monitor.mode},
+          position = ${builtins.toJSON monitor.position},
+          scale = ${toString monitor.scale},
+          workspaces = { ${lib.concatMapStringsSep ", " toString monitor.workspaces} },
+        }
+      '';
+
       scrollOverview = pkgs.hyprlandPlugins.mkHyprlandPlugin {
         hyprland = pkgs.hyprland;
         pluginName = "scrolloverview";
@@ -67,6 +78,12 @@
         hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
       '';
 
+      xdg.configFile."hypr/nix/monitors.lua".text = ''
+        return {
+          ${lib.concatMapStringsSep ",\n" monitorLua host.monitors}
+        }
+      '';
+
       xdg.configFile."hypr/nix/input.lua".text =
         lib.optionalString config.nos.trackpad ''
           hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
@@ -83,13 +100,7 @@
       # NixOS system configuration owns portal backends.
       xdg.portal.enable = lib.mkForce false;
 
-      # Keep Lua config linked to working tree when flake checkout is known.
-      # Fall back to store copy for reusable modules without a checkout path.
-      xdg.configFile."hypr/hyprland.lua".source =
-        if config.nos.flakeDirectory != null then
-          config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua"
-        else
-          ./hyprland.lua;
+      xdg.configFile."hypr/hyprland.lua".source = ./hyprland.lua;
 
       home.activation.removeLegacyHyprpolkitagent = config.lib.dag.entryBefore [ "writeBoundary" ] ''
         rm -f "$HOME/.config/systemd/user/hyprpolkitagent.service"

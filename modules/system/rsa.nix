@@ -2,11 +2,11 @@
 
 {
   flake.nixosModules.rsa =
-    { ... }:
+    { host, ... }:
 
     {
-      time.timeZone = "Africa/Johannesburg";
-      i18n.defaultLocale = "en_ZA.UTF-8";
-      services.xserver.xkb.layout = "za";
+      time.timeZone = host.region.timeZone;
+      i18n.defaultLocale = host.region.locale;
+      services.xserver.xkb.layout = host.region.keyboardLayout;
     };
 }

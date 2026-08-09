@@ -42,10 +42,18 @@
           (inputs.import-tree ./hosts)
         ];
 
-        options.flake.lib.homeModules = lib.mkOption {
-          type = lib.types.lazyAttrsOf lib.types.raw;
-          default = { };
-          description = "Home Manager modules exported by this flake.";
+        options.flake = {
+          lib.homeModules = lib.mkOption {
+            type = lib.types.lazyAttrsOf lib.types.raw;
+            default = { };
+            description = "Home Manager modules exported by this flake.";
+          };
+
+          homeConfigurations = lib.mkOption {
+            type = lib.types.lazyAttrsOf lib.types.raw;
+            default = { };
+            description = "Standalone Home Manager configurations exported by each host.";
+          };
         };
 
         config = {

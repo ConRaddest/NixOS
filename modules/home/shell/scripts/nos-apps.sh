@@ -1,53 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-apps_file="${NOS_DIR:-$HOME/NixOS}/modules/home/apps.nix"
+nos_dir="${NOS_DIR:-$HOME/NixOS}"
+NOS_DIR="$nos_dir"
+# shellcheck source=modules/home/shell/scripts/nos-ui.sh
+source "$nos_dir/modules/home/shell/scripts/nos-ui.sh"
+host_name=$(nos_host_name)
+apps_file="$nos_dir/hosts/$host_name/apps.txt"
 
 write_apps_file() {
-  local tmp packages
+  local tmp
   tmp=$(mktemp)
-  packages=$(mktemp)
   cat > "$tmp"
-
-  sort -u "$tmp" > "$packages"
-
-  cat > "$apps_file" <<'EOF'
-# !!---------------------------------------------------!!
-# !!---------- AUTO-GENERATED: Do not edit! -----------!!
-# !!---------------------------------------------------!!
-
-{ ... }:
-
-{
-  flake.lib.homeModules.apps =
-    { pkgs, ... }:
-
-    {
-      home.packages = with pkgs; [
-EOF
-
-  sed '/^[[:space:]]*$/d; s/^/        /' "$packages" >> "$apps_file"
-
-  cat >> "$apps_file" <<'EOF'
-      ];
-    };
-}
-EOF
-
-  rm -f "$tmp" "$packages"
+  sed '/^[[:space:]]*$/d' "$tmp" | sort -u > "$apps_file"
+  rm -f "$tmp"
 }
 
 current_apps() {
-  awk '
-    /home\.packages = with pkgs; \[/ { in_list = 1; next }
-    in_list && /\];/ { in_list = 0 }
-    in_list {
-      line = $0
-      sub(/#.*/, "", line)
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
-      if (line != "") print line
-    }
-  ' "$apps_file"
+  sed '/^[[:space:]]*$/d; /^[[:space:]]*#/d' "$apps_file"
 }
 
 package_preview() {
