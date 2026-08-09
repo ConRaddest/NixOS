@@ -84,6 +84,7 @@ in
         self.nixosModules.networking
         self.nixosModules.nix
         self.nixosModules.security
+        self.nixosModules.vscode
 
         self.nixosModules.fonts
         self.nixosModules.hyprland

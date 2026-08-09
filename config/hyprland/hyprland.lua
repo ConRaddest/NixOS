@@ -99,7 +99,7 @@ hl.config({
 	},
 
 	-- misc
-	dwindle = { preserve_split = true },
+	dwindle = { preserve_split = true, smart_split = true },
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,
@@ -156,8 +156,8 @@ end
 -- ============================================================
 
 -- dms
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
-hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call processlist toggle"))
+hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
+-- hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call processlist toggle"))
 
 -- suspend on power button press
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
@@ -223,9 +223,80 @@ hl.bind("SUPER + mouse_down", function()
 end)
 
 -- move monitors to and from workspaces
-for _, dir in ipairs({ "left", "right", "up", "down" }) do
+local directions = { "left", "right", "up", "down" }
+local oppositeDirection = { left = "right", right = "left", up = "down", down = "up" }
+
+local function rangesOverlap(aStart, aEnd, bStart, bEnd)
+	return math.min(aEnd, bEnd) > math.max(aStart, bStart)
+end
+
+local function hasTiledWindowInDirection(window, direction)
+	local workspace = window.workspace
+	if not workspace then
+		return false
+	end
+
+	local position = window.at
+	local size = window.size
+	local centerX = position.x + size.x / 2
+	local centerY = position.y + size.y / 2
+
+	for _, other in ipairs(hl.get_workspace_windows(workspace)) do
+		if other ~= window and not other.floating and not other.hidden then
+			local otherPosition = other.at
+			local otherSize = other.size
+			local otherCenterX = otherPosition.x + otherSize.x / 2
+			local otherCenterY = otherPosition.y + otherSize.y / 2
+			local overlapsHorizontally =
+				rangesOverlap(position.x, position.x + size.x, otherPosition.x, otherPosition.x + otherSize.x)
+			local overlapsVertically =
+				rangesOverlap(position.y, position.y + size.y, otherPosition.y, otherPosition.y + otherSize.y)
+
+			if
+				(direction == "left" and otherCenterX < centerX and overlapsVertically)
+				or (direction == "right" and otherCenterX > centerX and overlapsVertically)
+				or (direction == "up" and otherCenterY < centerY and overlapsHorizontally)
+				or (direction == "down" and otherCenterY > centerY and overlapsHorizontally)
+			then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+local function smartMoveWindow(direction)
+	local window = hl.get_active_window()
+	local layout = window and window.layout
+	if not window or window.floating or window.fullscreen ~= 0 or not layout or layout.name ~= "dwindle" then
+		hl.dispatch(hl.dsp.window.move({ direction = direction }))
+		return
+	end
+
+	-- Keep an existing row/column intact. At its outer edge, the window in the
+	-- opposite direction still identifies the current split axis.
+	if
+		hasTiledWindowInDirection(window, direction)
+		or hasTiledWindowInDirection(window, oppositeDirection[direction])
+	then
+		hl.dispatch(hl.dsp.window.move({ direction = direction }))
+		return
+	end
+
+	-- Movement perpendicular to the current split rotates that split. The
+	-- focused leaf may then be on the opposite side, so swap its two siblings.
+	hl.dispatch(hl.dsp.layout("togglesplit"))
+	if hasTiledWindowInDirection(window, direction) then
+		hl.dispatch(hl.dsp.layout("swapsplit"))
+	end
+end
+
+for _, dir in ipairs(directions) do
 	hl.bind("SUPER + " .. dir, hl.dsp.focus({ direction = dir }))
-	hl.bind("SUPER + SHIFT + " .. dir, hl.dsp.window.move({ direction = dir }))
+	hl.bind("SUPER + SHIFT + " .. dir, function()
+		smartMoveWindow(dir)
+	end)
 end
 
 -- change workspaces

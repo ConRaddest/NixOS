@@ -7,7 +7,6 @@
       lib,
       pkgs,
       inputs,
-      self,
       ...
     }:
 
@@ -58,8 +57,9 @@
       # per-user Hyprland portal setup.
       xdg.portal.enable = lib.mkIf config.nos.isNixOS (lib.mkForce false);
 
-      # Store-backed source works regardless of checkout location.
-      xdg.configFile."hypr/hyprland.lua".source = "${self}/config/hyprland/hyprland.lua";
+      # Keep Lua config linked to working tree so `hyprctl reload` sees edits.
+      xdg.configFile."hypr/hyprland.lua".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/config/hyprland/hyprland.lua";
 
       home.activation.removeLegacyHyprpolkitagent = config.lib.dag.entryBefore [ "writeBoundary" ] ''
         rm -f "$HOME/.config/systemd/user/hyprpolkitagent.service"
