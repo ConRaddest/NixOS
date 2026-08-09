@@ -25,7 +25,7 @@ run_refresh() {
   # and the git index is clean for inspection after a successful switch.
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
     && git -C "$NOS_DIR" add . \
-    && nos_stage "refreshing home manager configuration" \
+    && nos_stage "switching home manager" \
     && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$profile" \
     && nos_done
 }

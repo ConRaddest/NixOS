@@ -53,20 +53,20 @@ let
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
       self.lib.homeModules.apps
-      self.lib.homeModules.audio
-      self.lib.homeModules.battery
-      self.lib.homeModules.bluetooth
+      # AUDIO_HOME_MODULE
+      # BATTERY_HOME_MODULE
+      # BLUETOOTH_HOME_MODULE
       self.lib.homeModules.directories
       self.lib.homeModules.dev
       self.lib.homeModules.fastfetch
       self.lib.homeModules.fzf
       self.lib.homeModules.gdu
       self.lib.homeModules.git
-      self.lib.homeModules.lazydocker
+      # DOCKER_HOME_MODULE
       self.lib.homeModules.npm
       self.lib.homeModules.nvim
       self.lib.homeModules.pi
-      self.lib.homeModules.ssh
+      # ONEPASSWORD_HOME_MODULE
       self.lib.homeModules.starship
       self.lib.homeModules.yazi
 
@@ -77,20 +77,36 @@ let
       self.lib.homeModules.hyprland
       self.lib.homeModules.kitty
       self.lib.homeModules.screenSharePicker
-      self.lib.homeModules.windows
+      # WINDOWS_HOME_MODULE
       self.lib.homeModules.zapzap
     ];
 
-    options.nos.flakeDirectory = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      description = "Mutable checkout path used by repository helper commands.";
+    options.nos = {
+      flakeDirectory = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Mutable checkout path used by repository helper commands.";
+      };
+      trackpad = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Whether host has a trackpad.";
+      };
+      trackpadName = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Hyprland input device name for host trackpad.";
+      };
     };
 
     config = {
       _module.args = { inherit font; };
 
-      nos.flakeDirectory = host.flakeDirectory;
+      nos = {
+        flakeDirectory = host.flakeDirectory;
+        trackpad = false;
+        trackpadName = null;
+      };
 
       home.username = host.username;
       home.homeDirectory = host.homeDirectory;
@@ -117,15 +133,13 @@ in
         self.nixosModules.hyprland
         self.nixosModules.portals
 
-        self.nixosModules.bluetooth
-        self.nixosModules.nvidia
-
-        self.nixosModules.audio
-        self.nixosModules.battery
-        self.nixosModules.printing
-
-        self.nixosModules.docker
-        self.nixosModules.onepassword
+        # GPU_MODULE
+        # BLUETOOTH_SYSTEM_MODULE
+        # AUDIO_SYSTEM_MODULE
+        # BATTERY_SYSTEM_MODULE
+        # PRINTING_SYSTEM_MODULE
+        # DOCKER_SYSTEM_MODULE
+        # ONEPASSWORD_SYSTEM_MODULE
       ];
 
       networking.hostName = hostName;

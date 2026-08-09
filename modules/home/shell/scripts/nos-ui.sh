@@ -30,15 +30,37 @@ nos_fail() {
 }
 
 nos_retry_prompt() {
-  printf '\n%s[?] retry? [Y/n]%s ' "$NOS_ERROR" "$NOS_RESET"
+  printf '\n%sretry? [Y/n]%s ' "$NOS_ERROR" "$NOS_RESET"
 }
 
 nos_repeat_prompt() {
-  printf '\n%s[?] go again? [y/N]%s ' "$NOS_ACCENT" "$NOS_RESET"
+  printf '\n%sgo again? [y/N]%s ' "$NOS_ACCENT" "$NOS_RESET"
+}
+
+nos_load_local_env() {
+  [[ -n "${NOS_DIR:-}" ]] || return 0
+  local env_file="$NOS_DIR/.env"
+
+  if [[ -f "$env_file" ]]; then
+    # shellcheck disable=SC1090
+    source "$env_file"
+  fi
 }
 
 nos_host_name() {
-  hostname -s
+  nos_load_local_env
+
+  if [[ -z "${HOST_NAME:-}" ]]; then
+    nos_fail "HOST_NAME missing; set export HOST_NAME=<host> in $NOS_DIR/.env"
+    return 1
+  fi
+
+  if [[ ! "$HOST_NAME" =~ ^[a-zA-Z0-9][a-zA-Z0-9-]*$ ]]; then
+    nos_fail "invalid HOST_NAME: $HOST_NAME"
+    return 1
+  fi
+
+  printf '%s\n' "$HOST_NAME"
 }
 
 nos_run() {

@@ -67,6 +67,19 @@
         hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
       '';
 
+      xdg.configFile."hypr/nix/input.lua".text =
+        lib.optionalString config.nos.trackpad ''
+          hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
+        ''
+        + lib.optionalString (config.nos.trackpadName != null) ''
+          hl.device({
+            name = ${builtins.toJSON config.nos.trackpadName},
+            accel_profile = "adaptive",
+            natural_scroll = true,
+            sensitivity = 0.0,
+          })
+        '';
+
       # NixOS system configuration owns portal backends.
       xdg.portal.enable = lib.mkForce false;
 

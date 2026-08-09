@@ -23,7 +23,7 @@ in
         "usb_storage"
       ];
       boot.initrd.kernelModules = [ ];
-      boot.kernelModules = [ "tun" ];
+      boot.kernelModules = [ ];
       boot.extraModulePackages = [ ];
 
       fileSystems."/" = {

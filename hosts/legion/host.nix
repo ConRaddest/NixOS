@@ -90,16 +90,32 @@ let
       self.lib.homeModules.zapzap
     ];
 
-    options.nos.flakeDirectory = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      description = "Mutable checkout path used by repository helper commands.";
+    options.nos = {
+      flakeDirectory = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Mutable checkout path used by repository helper commands.";
+      };
+      trackpad = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Whether host has a trackpad.";
+      };
+      trackpadName = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Hyprland input device name for host trackpad.";
+      };
     };
 
     config = {
       _module.args = { inherit font; };
 
-      nos.flakeDirectory = host.flakeDirectory;
+      nos = {
+        flakeDirectory = host.flakeDirectory;
+        trackpad = true;
+        trackpadName = "msft0001:01-06cb:cd5f-touchpad";
+      };
 
       home.username = host.username;
       home.homeDirectory = host.homeDirectory;
