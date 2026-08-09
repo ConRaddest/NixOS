@@ -10,8 +10,6 @@
     }:
 
     {
-      programs.fish.enable = true;
-
       users.users.${username} = {
         isNormalUser = true;
         description = fullName;

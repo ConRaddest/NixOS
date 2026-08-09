@@ -2,12 +2,12 @@
 # Fuzzy Home Manager package remover. Updates home/apps.nix, then refreshes Home Manager.
 set -euo pipefail
 
-# shellcheck source=scripts/nos-apps-lib.sh
-source "${NOS_DIR:-$HOME/NixOS}/scripts/nos-apps-lib.sh"
+# shellcheck source=scripts/nos-apps.sh
+source "${NOS_DIR:-$HOME/NixOS}/scripts/nos-apps.sh"
 
 fzf_args=(
   --multi
-  --preview 'bash -lc '\''source "$NOS_DIR/scripts/nos-apps-lib.sh"; package_preview {1}'\'''
+  --preview 'bash -lc '\''source "$NOS_DIR/scripts/nos-apps.sh"; package_preview {1}'\'''
   --preview-label='alt-p: toggle description, alt-j/k: scroll, tab: multi-select'
   --preview-label-pos='bottom'
   --preview-window 'down:35%:wrap'

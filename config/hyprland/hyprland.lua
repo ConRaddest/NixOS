@@ -156,8 +156,8 @@ end
 -- ============================================================
 
 -- dms
-hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
--- hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call processlist toggle"))
+hl.bind("SUPER + Space", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
+hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call processlist toggle"))
 
 -- suspend on power button press
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })

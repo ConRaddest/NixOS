@@ -1,0 +1,32 @@
+{
+  "name": "pi-vscode-context",
+  "displayName": "Pi VS Code Context",
+  "description": "Publishes currently open VS Code files for pi.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": ">=1.85.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "pi-vscode-context.refresh",
+        "title": "Pi: Refresh VS Code Context"
+      }
+    ],
+    "configuration": {
+      "title": "Pi VS Code Context",
+      "properties": {
+        "piVscodeContext.directory": {
+          "type": "string",
+          "description": "Directory used to share VS Code context with pi. Defaults to $XDG_CACHE_HOME/pi-vscode-context or ~/.cache/pi-vscode-context."
+        }
+      }
+    }
+  }
+}
