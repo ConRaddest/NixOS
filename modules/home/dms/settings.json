@@ -64,7 +64,7 @@
   "firstDayOfWeek": -1,
   "showWeekNumber": false,
   "calendarBackend": "auto",
-  "clockFormat": "auto",
+  "clockFormat": "12h",
   "showSeconds": false,
   "padHours12Hour": false,
   "useFahrenheit": false,
@@ -292,8 +292,12 @@
   "greeterFontFamily": "",
   "greeterWallpaperFillMode": "",
   "greeterPamExternallyManaged": false,
-  "greeterSyncPending": false,
-  "greeterSyncBaseline": {},
+  "greeterSyncPending": true,
+  "greeterSyncBaseline": {
+    "showSeconds": false,
+    "clockFormat": "auto",
+    "padHours12Hour": false
+  },
   "mediaSize": 1,
   "appLauncherViewMode": "list",
   "spotlightModalViewMode": "list",
