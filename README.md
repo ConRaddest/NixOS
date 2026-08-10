@@ -33,7 +33,7 @@ hosts/
 └── <hostname>/
     ├── host.nix        machine and user settings
     ├── hardware.nix    generated hardware configuration
-    └── apps.txt        applications installed for this host
+    └── apps.nix        applications installed for this host
 
 modules/
 ├── home/               Home Manager modules
@@ -90,7 +90,7 @@ It creates:
 ```text
 hosts/<hostname>/host.nix
 hosts/<hostname>/hardware.nix
-hosts/<hostname>/apps.txt
+hosts/<hostname>/apps.nix
 ```
 
 For normal installation, use `/home/<username>/NixOS` as target repository path.
@@ -353,15 +353,21 @@ When enabling modules manually, add both sides where applicable.
 Applications are stored in:
 
 ```text
-hosts/<hostname>/apps.txt
+hosts/<hostname>/apps.nix
 ```
 
-Use one Nixpkgs package attribute per line:
+Set `nos.apps` to a list of Nixpkgs package attribute strings:
 
-```text
-firefox
-libreoffice
-kdePackages.kcalc
+```nix
+{ ... }:
+
+{
+  nos.apps = [
+    "firefox"
+    "libreoffice"
+    "kdePackages.kcalc"
+  ];
+}
 ```
 
 Manage interactively:
@@ -417,6 +423,8 @@ nos-build
 ```bash
 nos-refresh
 ```
+
+`nos-refresh` formats Nix files, stages all repository changes, and creates a commit before activation. `nos-install` uses the same flow after updating the host package list.
 
 ### Update flake inputs and rebuild
 

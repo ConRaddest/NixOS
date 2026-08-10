@@ -57,6 +57,8 @@
 
     in
     {
+      news.display = "silent";
+
       home.sessionVariables = lib.optionalAttrs (flakeDirectory != null) {
         NOS_DIR = flakeDirectory;
       };

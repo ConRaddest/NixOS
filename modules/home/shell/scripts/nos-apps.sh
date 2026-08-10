@@ -11,22 +11,39 @@ NOS_DIR="$nos_dir"
 # shellcheck source=modules/home/shell/scripts/nos-ui.sh
 source "$nos_dir/modules/home/shell/scripts/nos-ui.sh"
 host_name=$(nos_host_name)
-apps_file="$nos_dir/hosts/$host_name/apps.txt"
+apps_file="$nos_dir/hosts/$host_name/apps.nix"
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Application List                                         │
 # ╰──────────────────────────────────────────────────────────╯
 
 write_apps_file() {
-  local tmp
-  tmp=$(mktemp)
-  cat > "$tmp"
-  sed '/^[[:space:]]*$/d' "$tmp" | sort -u > "$apps_file"
-  rm -f "$tmp"
+  local names tmp
+  names=$(mktemp)
+  tmp=$(mktemp --suffix=.nix)
+  cat > "$names"
+
+  if grep -Ev '^[a-zA-Z0-9][a-zA-Z0-9+._-]*(\.[a-zA-Z0-9][a-zA-Z0-9+._-]*)*$|^[[:space:]]*$' "$names" >&2; then
+    printf 'Invalid Nixpkgs package attribute.\n' >&2
+    rm -f "$names" "$tmp"
+    return 1
+  fi
+
+  {
+    printf '{ ... }:\n\n{\n  nos.apps = [\n'
+    sed '/^[[:space:]]*$/d' "$names" | sort -u | while IFS= read -r attr; do
+      printf '    "%s"\n' "$attr"
+    done
+    printf '  ];\n}\n'
+  } > "$tmp"
+
+  nixfmt "$tmp"
+  mv "$tmp" "$apps_file"
+  rm -f "$names"
 }
 
 current_apps() {
-  sed '/^[[:space:]]*$/d; /^[[:space:]]*#/d' "$apps_file"
+  sed -nE 's/^[[:space:]]*"([a-zA-Z0-9][a-zA-Z0-9+._-]*(\.[a-zA-Z0-9][a-zA-Z0-9+._-]*)*)"[[:space:]]*$/\1/p' "$apps_file"
 }
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -83,14 +100,9 @@ search_apps() {
   local query="${1:-}"
   [[ -n "$query" ]] || return 0
 
-  nix-search "$query" 2>/dev/null | awk -v installed="$(installed_apps | paste -sd ' ' -)" '
-    BEGIN {
-      split(installed, apps, " ")
-      for (i in apps) installed_app[apps[i]] = 1
-    }
+  nix-search "$query" 2>/dev/null | awk '
     NF {
       name = $1
-      if (installed_app[name]) next
       desc = $0
       sub(/^[^[:space:]]+[[:space:]]*/, "", desc)
       sub(/^@[[:space:]]*/, "", desc)

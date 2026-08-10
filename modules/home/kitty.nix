@@ -2,10 +2,23 @@
 
 {
   flake.lib.homeModules.kitty =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
 
     let
       stylix = config.lib.stylix.colors.withHashtag;
+      kittyWithoutSystemdScopes = pkgs.kitty.overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace kitty/child.py \
+            --replace-fail \
+              "fast_data_types.systemd_move_pid_into_new_scope(pid, f'kitty-{ppid}-{self.id}.scope', f'kitty child process: {pid} launched by: {ppid}')" \
+              "raise NotImplementedError"
+        '';
+      });
     in
     {
       xdg.configFile."kitty/open-url.sh" = {
@@ -23,6 +36,7 @@
 
       programs.kitty = {
         enable = true;
+        package = kittyWithoutSystemdScopes;
 
         keybindings = {
           "shift+delete" = "copy_to_clipboard";

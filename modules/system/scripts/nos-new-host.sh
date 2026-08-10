@@ -585,7 +585,7 @@ inject_module() {
   inject_module INTEGRATED_GPU_MODULE "self.nixosModules.$integrated_gpu"
 [[ "$gaming" == true ]] &&
   inject_module GAMING_SYSTEM_MODULE "self.nixosModules.gaming"
-[[ "$gaming" != true ]] && sed -i '/^steam$/d' "$host_dir/apps.txt"
+[[ "$gaming" != true ]] && sed -i '/^[[:space:]]*"steam"[[:space:]]*$/d' "$host_dir/apps.nix"
 [[ "$battery" == true ]] && {
   inject_module BATTERY_SYSTEM_MODULE "self.nixosModules.battery"
   inject_module BATTERY_HOME_MODULE "self.lib.homeModules.battery"

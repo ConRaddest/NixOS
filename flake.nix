@@ -45,7 +45,7 @@
         imports = [
           (inputs.import-tree ./modules/system)
           (inputs.import-tree ./modules/home)
-          (inputs.import-tree ./hosts)
+          ((inputs.import-tree.filterNot (lib.hasSuffix "/apps.nix")) ./hosts)
         ];
 
         options.flake = {

@@ -15,7 +15,7 @@ selected_file=$(mktemp)
 trap 'rm -f "$selected_file"' EXIT
 selected_file_q=$(printf '%q' "$selected_file")
 
-reload_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; search_apps_with_selected_file "$1" "$2"'\'' _ {q} '"$selected_file_q"
+reload_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; search_apps_with_selected_file "${1// /-}" "$2"'\'' _ {q} '"$selected_file_q"
 toggle_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; toggle_selected_app "$1" "$2"'\'' _ '"$selected_file_q"' {1}'
 toggle_action_cmd='bash -lc '\''[[ "$1" == "[Selected]" ]] && echo exclude || echo toggle'\'' _ {2}'
 
@@ -67,7 +67,7 @@ while true; do
   [[ -n "${pkg_names:-}" ]] || continue
   { current_apps; printf '\n%s\n' "$pkg_names"; } | write_apps_file
 
-  if ! nos-refresh; then
+  if ! NOS_COMMIT_MESSAGE="apps: update $host_name packages" nos-refresh; then
     printf '\nInstall refresh failed. Press Enter to close.\n'
     read -r
     exit 1

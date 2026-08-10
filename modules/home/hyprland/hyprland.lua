@@ -433,25 +433,6 @@ hl.layer_rule({
 	ignore_alpha = 0.01,
 })
 
--- FreeRDP RAIL repeatedly forwards Windows maximize/fullscreen requests.
--- Keep RemoteApp surfaces under compositor control.
-hl.window_rule({
-	match = { class = "^windows-vm$" },
-	suppress_event = "maximize fullscreen",
-})
-
--- FreeRDP maps its full desktop fallback while Windows starts or shuts down.
--- Real RemoteApp surfaces use their application title instead.
-hl.window_rule({
-	match = {
-		class = "^windows-vm$",
-		title = "^FreeRDP: 127\\.0\\.0\\.1$",
-	},
-	workspace = "special:windows-hidden silent",
-	no_focus = true,
-	suppress_event = "activate activatefocus maximize fullscreen",
-})
-
 hl.window_rule({ match = { float = true }, opacity = "0.935 override 0.935 override 1.0 override" })
 
 -- Electron renders transparent rounded corners on native VS Code dialogs.

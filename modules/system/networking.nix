@@ -12,6 +12,12 @@
         dns = "systemd-resolved";
       };
 
+      # LocalSend discovery and file transfers.
+      networking.firewall = {
+        allowedTCPPorts = [ 53317 ];
+        allowedUDPPorts = [ 53317 ];
+      };
+
       services.resolved = {
         enable = true;
         settings.Resolve.FallbackDNS = [
@@ -20,6 +26,7 @@
         ];
       };
 
+      # Custom local hosts for development (defined per host)
       networking.hosts = {
         "127.0.0.1" = host.localHosts;
         "::1" = host.localHosts;
