@@ -75,7 +75,11 @@ nos_operation_terminal() {
   local title="$2"
   shift 2
 
-  [[ "${NOS_OPERATION_TERMINAL:-}" != "$operation" ]] || return 0
+  # Reuse an existing Kitty terminal for nested operations such as
+  # nos-install -> nos-refresh, then return to the calling interface.
+  if [[ -n "${NOS_OPERATION_TERMINAL:-}" || -n "${KITTY_WINDOW_ID:-}" ]]; then
+    return 0
+  fi
 
   NOS_OPERATION_TERMINAL="$operation" exec uwsm app -- kitty \
     --hold \
