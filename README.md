@@ -9,6 +9,7 @@ Multi-host NixOS configuration for x86_64 workstations. It manages both system s
 - Kitty with Fish and Starship
 - Firefox, Neovim, Yazi, btop, LazyDocker, GIMP, and LibreOffice
 - XDG portals, screen sharing, clipboard, screenshots, and Polkit support
+- Host-agnostic formatting, static-analysis, shell, NixOS, and Home Manager checks
 - Optional graphics, audio, Bluetooth, Docker, Windows VM, 1Password, printing, gaming, and laptop modules
 
 ## Before using it
@@ -274,6 +275,35 @@ hardware = {
 - set `nvidiaOpen` according to GPU generation
 - use `nvidiaPrime` only for hybrid NVIDIA systems
 
+On hosts importing the battery module, Hyprland owns power-key and lid-switch handling while logind ignores those events. Pressing the power key or closing the lid suspends the machine, including on external power and while docked. This behavior requires the Hyprland session to be running.
+
+### Additional mounts
+
+Declare host-specific filesystems without editing generated `hardware.nix`:
+
+```nix
+mounts = [
+  {
+    mountPoint = "/home/alice/SSD";
+    device = "/dev/disk/by-uuid/<uuid>";
+    fsType = "ext4";
+    options = [ "nofail" ];
+  }
+];
+```
+
+Mount points must be absolute. Use stable filesystem UUIDs rather than `/dev/sdX` names.
+
+### Desktop shell
+
+Select one supported shell in the host definition:
+
+```nix
+desktopShell = "noctalia"; # or "dms"
+```
+
+Hyprland keybinds, launcher commands, process view, media controls, and shell setup adapt to this value.
+
 ### Monitors
 
 Empty list uses Hyprland automatic output handling:
@@ -410,6 +440,28 @@ Change `stylix.base16Scheme`, `stylix.override`, or `stylix.image` in `modules/h
 nos-build
 ```
 
+## Validation and CI
+
+Run every local check:
+
+```bash
+nix flake check
+```
+
+Show complete logs when a check fails:
+
+```bash
+nix flake check -L
+```
+
+Evaluate without building:
+
+```bash
+nix flake check --no-build
+```
+
+Checks cover Nix formatting, Deadnix, Statix, ShellCheck, every exported NixOS configuration, and every exported Home Manager configuration. Host checks are generated from flake outputs, so newly exported hosts are included automatically. `.github/workflows/check.yml` runs the same suite for pushes to `main` and pull requests.
+
 ## Common commands
 
 ### Build and apply system plus Home Manager
@@ -424,7 +476,7 @@ nos-build
 nos-refresh
 ```
 
-Management commands format only changed Nix files, build before activation, and never stage repository changes. Failed refreshes, package edits, and input updates restore files to their pre-command state. System activation requires sudo authentication.
+Management commands reject untracked Nix files, format only changed Nix files, build before activation, and never stage repository changes. Failed refreshes, package edits, and input updates restore files to their pre-command state. System builds create a persistent NixOS generation before activation and require sudo authentication.
 
 ### Update flake inputs and rebuild
 
@@ -460,6 +512,12 @@ Start:
 
 ```bash
 windows-vm-start
+```
+
+Stop:
+
+```bash
+windows-vm-stop
 ```
 
 VM files are kept together under:
