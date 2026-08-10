@@ -317,7 +317,7 @@ end
 hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("uwsm app -- nos-build"), { desc = "Build NixOS configuration" })
 hl.bind("SUPER + SHIFT + U", hl.dsp.exec_cmd("uwsm app -- nos-update"), { desc = "Update NixOS configuration" })
 hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", true), { desc = "Install Nix package" })
-hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", false), { desc = "Remove Nix package" })
+hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", true), { desc = "Remove Nix package" })
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc = "Refresh Home Manager" })
 
 -- universal copy / paste

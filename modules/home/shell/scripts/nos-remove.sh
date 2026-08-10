@@ -36,8 +36,9 @@ while true; do
   { grep -Fvx -f <(printf '%s\n' "$pkg_names") <(current_apps) || true; } | write_apps_file
 
   if ! nos-refresh; then
-    printf '\nRemove refresh failed. Press Enter to close.\n'
-    read -r
+    printf '\nRemove refresh failed.\n'
     exit 1
   fi
+
+  break
 done
