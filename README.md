@@ -424,7 +424,7 @@ nos-build
 nos-refresh
 ```
 
-`nos-refresh` formats Nix files, stages all repository changes, and creates a commit before activation. `nos-install` uses the same flow after updating the host package list.
+`nos-refresh` formats Nix files and stages all repository changes before activation. `nos-install` uses the same flow after updating the host package list.
 
 ### Update flake inputs and rebuild
 

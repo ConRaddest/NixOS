@@ -5,6 +5,8 @@
     "audacity"
     "cmatrix"
     "drawio"
+    "gimp"
+    "gnome-disk-utility"
     "libreoffice"
     "localsend"
     "nautilus"
