@@ -10,10 +10,14 @@ nos_wordmark() {
   local accent=''
   local reset=''
   local color="${NOS_ACCENT_COLOR:-bb9af7}"
+  local subtitle="${1:-Declarative by Design}"
+  local spaced_subtitle=''
   local columns
   local max_width=0
   local padding=0
+  local subtitle_padding=0
   local line
+  local i
   local -a lines
 
   [[ "${NOS_WORDMARK_SHOWN:-}" != 1 ]] || return 0
@@ -37,8 +41,15 @@ nos_wordmark() {
     (( ${#line} > max_width )) && max_width=${#line}
   done
 
+  subtitle=${subtitle^^}
+  for (( i = 0; i < ${#subtitle}; i++ )); do
+    [[ -n "$spaced_subtitle" ]] && spaced_subtitle+=' '
+    spaced_subtitle+="${subtitle:i:1}"
+  done
+
   columns=$(tput cols 2>/dev/null || printf '%s' "${COLUMNS:-80}")
   (( columns > max_width )) && padding=$(( (columns - max_width) / 2 ))
+  (( columns > ${#spaced_subtitle} )) && subtitle_padding=$(( (columns - ${#spaced_subtitle}) / 2 ))
 
   printf '%s' "$accent"
   for line in "${lines[@]}"; do
@@ -48,6 +59,7 @@ nos_wordmark() {
       printf '\n'
     fi
   done
+  printf '\n%*s%s\n' "$subtitle_padding" '' "$spaced_subtitle"
   printf '%s\n' "$reset"
   export NOS_WORDMARK_SHOWN=1
 }

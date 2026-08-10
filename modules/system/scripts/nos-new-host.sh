@@ -10,7 +10,7 @@ repo_dir=$(git rev-parse --show-toplevel 2>/dev/null) || {
 NOS_DIR="$repo_dir"
 # shellcheck source=modules/home/shell/scripts/nos-ui.sh
 source "$NOS_DIR/modules/home/shell/scripts/nos-ui.sh"
-nos_wordmark
+nos_wordmark "Adding New Host"
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Presentation                                             │

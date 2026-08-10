@@ -14,7 +14,7 @@ fi
 run_build() {
   local host_name
 
-  nos_wordmark || return
+  nos_wordmark "Rebuilding System Configuration" || return
   host_name=$(nos_host_name) || return
 
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \

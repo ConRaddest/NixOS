@@ -5,7 +5,7 @@ set -euo pipefail
 # shellcheck source=modules/home/shell/scripts/nos-apps.sh
 source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-apps.sh"
 
-nos_wordmark
+nos_wordmark "Installing Applications"
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Selection State                                          │
