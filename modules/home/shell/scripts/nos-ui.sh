@@ -10,6 +10,11 @@ nos_wordmark() {
   local accent=''
   local reset=''
   local color="${NOS_ACCENT_COLOR:-bb9af7}"
+  local columns
+  local max_width=0
+  local padding=0
+  local line
+  local -a lines
 
   [[ "${NOS_WORDMARK_SHOWN:-}" != 1 ]] || return 0
 
@@ -27,9 +32,23 @@ nos_wordmark() {
     reset=$'\033[0m'
   fi
 
+  mapfile -t lines < "$wordmark"
+  for line in "${lines[@]}"; do
+    (( ${#line} > max_width )) && max_width=${#line}
+  done
+
+  columns=$(tput cols 2>/dev/null || printf '%s' "${COLUMNS:-80}")
+  (( columns > max_width )) && padding=$(( (columns - max_width) / 2 ))
+
   printf '%s' "$accent"
-  cat "$wordmark"
-  printf '%s\n\n' "$reset"
+  for line in "${lines[@]}"; do
+    if [[ -n "$line" ]]; then
+      printf '%*s%s\n' "$padding" '' "$line"
+    else
+      printf '\n'
+    fi
+  done
+  printf '%s\n' "$reset"
   export NOS_WORDMARK_SHOWN=1
 }
 
