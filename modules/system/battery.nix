@@ -47,10 +47,11 @@
 
       services.thermald.enable = config.nos.hardware.thermald;
 
+      # Hyprland owns power-key and lid-switch handling.
       services.logind.settings.Login = {
-        HandlePowerKey = "suspend";
-        HandleLidSwitch = "suspend";
-        HandleLidSwitchExternalPower = "suspend";
+        HandlePowerKey = "ignore";
+        HandleLidSwitch = "ignore";
+        HandleLidSwitchExternalPower = "ignore";
         HandleLidSwitchDocked = "ignore";
       };
 

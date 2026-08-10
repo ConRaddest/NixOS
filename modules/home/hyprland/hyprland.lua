@@ -51,9 +51,9 @@ hl.config({
 		repeat_rate = 35,
 		repeat_delay = 200,
 	},
-	-- cursor = {
-	-- 	no_hardware_cursors = true,
-	-- },
+	cursor = {
+		no_hardware_cursors = true,
+	},
 
 	-- cosmetics
 	general = {
@@ -71,8 +71,8 @@ hl.config({
 		blur = {
 			enabled = true,
 			special = true,
-			size = 2,
-			passes = 1,
+			size = 3,
+			passes = 3,
 			xray = true,
 		},
 		shadow = {
@@ -140,6 +140,10 @@ hl.bind("SUPER + P", hl.dsp.exec_cmd(shell.process_list))
 if shell.bar_toggle then
 	hl.bind("SUPER + I", hl.dsp.exec_cmd(shell.bar_toggle))
 end
+
+-- Hyprland owns power events so behavior remains consistent across AC and dock states.
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 
 -- apps
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("terminal"))
