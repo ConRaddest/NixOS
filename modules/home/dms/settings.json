@@ -1,7 +1,7 @@
 {
   "currentThemeName": "custom",
   "currentThemeCategory": "generic",
-  "customThemeFile": "/nix/store/z300szn9iqlgqbqmz4ssh13rcq1bqczh-dankMaterialShell-stylix-color-theme.json",
+  "customThemeFile": "/nix/store/wdpy11fn8wn4zqlq0z98l3kbjv5chnvn-dankMaterialShell-stylix-color-theme.json",
   "registryThemeVariants": {},
   "matugenScheme": "scheme-tonal-spot",
   "matugenContrast": 0,
@@ -64,7 +64,7 @@
   "firstDayOfWeek": -1,
   "showWeekNumber": false,
   "calendarBackend": "auto",
-  "clockFormat": "12h",
+  "clockFormat": "auto",
   "showSeconds": false,
   "padHours12Hour": false,
   "useFahrenheit": false,
@@ -149,33 +149,33 @@
   "privacyShowScreenShareIcon": false,
   "controlCenterWidgets": [
     {
+      "enabled": true,
       "id": "volumeSlider",
-      "enabled": true,
       "width": 50
     },
     {
+      "enabled": true,
       "id": "brightnessSlider",
-      "enabled": true,
       "width": 50
     },
     {
+      "enabled": true,
       "id": "wifi",
-      "enabled": true,
       "width": 50
     },
     {
+      "enabled": true,
       "id": "bluetooth",
-      "enabled": true,
       "width": 50
     },
     {
+      "enabled": true,
       "id": "audioOutput",
-      "enabled": true,
       "width": 50
     },
     {
-      "id": "audioInput",
       "enabled": true,
+      "id": "audioInput",
       "width": 50
     }
   ],
@@ -294,9 +294,9 @@
   "greeterPamExternallyManaged": false,
   "greeterSyncPending": true,
   "greeterSyncBaseline": {
-    "showSeconds": false,
     "clockFormat": "auto",
-    "padHours12Hour": false
+    "padHours12Hour": false,
+    "showSeconds": false
   },
   "mediaSize": 1,
   "appLauncherViewMode": "list",
@@ -331,24 +331,24 @@
   "weatherEnabled": true,
   "dashTabs": [
     {
-      "id": "overview",
-      "enabled": true
+      "enabled": true,
+      "id": "overview"
     },
     {
-      "id": "media",
-      "enabled": true
+      "enabled": true,
+      "id": "media"
     },
     {
-      "id": "wallpaper",
-      "enabled": true
+      "enabled": true,
+      "id": "wallpaper"
     },
     {
-      "id": "weather",
-      "enabled": true
+      "enabled": true,
+      "id": "weather"
     },
     {
-      "id": "settings",
-      "enabled": true
+      "enabled": true,
+      "id": "settings"
     }
   ],
   "networkPreference": "auto",
@@ -357,23 +357,23 @@
   "iconThemePerMode": false,
   "lastAppliedIconTheme": "",
   "cursorSettings": {
-    "theme": "System Default",
-    "size": 24,
-    "niri": {
-      "hideWhenTyping": false,
-      "hideAfterInactiveMs": 0
+    "dwl": {
+      "cursorHideTimeout": 0
     },
     "hyprland": {
       "hideOnKeyPress": false,
       "hideOnTouch": false,
       "inactiveTimeout": 0
     },
-    "dwl": {
-      "cursorHideTimeout": 0
-    },
     "mango": {
       "cursorHideTimeout": 0
-    }
+    },
+    "niri": {
+      "hideAfterInactiveMs": 0,
+      "hideWhenTyping": false
+    },
+    "size": 24,
+    "theme": "System Default"
   },
   "launcherLogoMode": "apps",
   "launcherLogoCustomPath": "",
@@ -616,57 +616,57 @@
   "connectedFrameBarStyleBackups": {},
   "barConfigs": [
     {
-      "id": "default",
-      "name": "Main Bar",
+      "autoHide": false,
+      "autoHideDelay": 250,
+      "barInsetPadding": 4,
+      "borderColor": "surfaceText",
+      "borderEnabled": false,
+      "borderOpacity": 1,
+      "borderThickness": 1,
+      "bottomGap": 0,
+      "centerWidgets": [],
       "enabled": true,
-      "position": 3,
-      "screenPreferences": [
-        "all"
-      ],
-      "showOnLastDisplay": true,
+      "fontScale": 1.2,
+      "gothCornerRadiusOverride": false,
+      "gothCornerRadiusValue": 12,
+      "gothCornersEnabled": false,
+      "iconScale": 1.1,
+      "id": "default",
+      "innerPadding": 0,
       "leftWidgets": [
         "notificationButton",
         "workspaceSwitcher"
       ],
-      "centerWidgets": [],
+      "name": "Main Bar",
+      "noBackground": false,
+      "openOnOverview": false,
+      "popupGapsAuto": true,
+      "popupGapsManual": 4,
+      "position": 3,
       "rightWidgets": [
         "systemTray",
         {
-          "id": "battery",
           "enabled": true,
+          "id": "battery",
           "showBatteryPercent": false
         },
         "controlCenterButton",
         {
-          "id": "clock",
+          "clockCompactMode": true,
           "enabled": true,
-          "clockCompactMode": true
+          "id": "clock"
         }
       ],
+      "screenPreferences": [
+        "all"
+      ],
+      "showOnLastDisplay": true,
       "spacing": 4,
-      "innerPadding": 0,
-      "bottomGap": 0,
-      "transparency": 0,
-      "widgetTransparency": 0,
       "squareCorners": false,
-      "noBackground": false,
-      "gothCornersEnabled": false,
-      "gothCornerRadiusOverride": false,
-      "gothCornerRadiusValue": 12,
-      "borderEnabled": false,
-      "borderColor": "surfaceText",
-      "borderOpacity": 1,
-      "borderThickness": 1,
-      "fontScale": 1.2,
-      "autoHide": false,
-      "autoHideDelay": 250,
-      "openOnOverview": false,
+      "transparency": 0,
       "visible": true,
-      "popupGapsAuto": true,
-      "popupGapsManual": 4,
       "widgetPadding": 8,
-      "barInsetPadding": 4,
-      "iconScale": 1.1
+      "widgetTransparency": 0
     }
   ],
   "desktopClockEnabled": false,
@@ -741,14 +741,14 @@
   "desktopWidgetInstances": [],
   "desktopWidgetGroups": [],
   "builtInPluginSettings": {
-    "dms_settings_search": {
-      "trigger": "?"
-    },
     "dms_clipboard_search": {
       "trigger": "cb"
     },
     "dms_qr_generator": {
       "trigger": "qrg"
+    },
+    "dms_settings_search": {
+      "trigger": "?"
     }
   },
   "clipboardClickToPaste": false,

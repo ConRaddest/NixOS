@@ -46,20 +46,29 @@ fzf_args=(
 # │ Main                                                     │
 # ╰──────────────────────────────────────────────────────────╯
 
-nos_heading "Install Applications"
 initial_query="$*"
-if ! selection=$(fzf --query "$initial_query" "${fzf_args[@]}"); then
-  exit 0
-fi
-selected_count=$(sed '/^[[:space:]]*$/d' "$selected_file" | wc -l)
+while true; do
+  : > "$selected_file"
+  nos_heading "Install Applications"
 
-if (( selected_count > 0 )); then
-  pkg_names=$(sed '/^[[:space:]]*$/d' "$selected_file")
-else
-  pkg_names=$(printf '%s\n' "${selection:-}" | cut -f1 | sed '/^[[:space:]]*$/d')
-fi
+  if ! selection=$(fzf --query "$initial_query" "${fzf_args[@]}"); then
+    exit 0
+  fi
+  initial_query=""
 
-if [[ -n "${pkg_names:-}" ]]; then
-  { current_apps; printf '%s\n' "$pkg_names"; } | write_apps_file
-  exec nos-refresh
-fi
+  selected_count=$(sed '/^[[:space:]]*$/d' "$selected_file" | wc -l)
+  if (( selected_count > 0 )); then
+    pkg_names=$(sed '/^[[:space:]]*$/d' "$selected_file")
+  else
+    pkg_names=$(printf '%s\n' "${selection:-}" | cut -f1 | sed '/^[[:space:]]*$/d')
+  fi
+
+  [[ -n "${pkg_names:-}" ]] || continue
+  { current_apps; printf '\n%s\n' "$pkg_names"; } | write_apps_file
+
+  if ! nos-refresh; then
+    printf '\nInstall refresh failed. Log remains above. Press Enter to close.\n'
+    read -r
+    exit 1
+  fi
+done

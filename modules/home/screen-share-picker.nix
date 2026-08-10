@@ -71,7 +71,7 @@
         @define-color muted ${colors.base04};
         @define-color card_bg ${colors.base01};
         @define-color text_dark ${colors.base00};
-        @define-color accent_hover ${colors.base0E};
+        @define-color accent_hover ${colors.base0D};
         @define-color accent_hover_text ${colors.base00};
         @define-color selected_tab ${colors.base0D};
         @define-color text ${colors.base05};

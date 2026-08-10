@@ -2,7 +2,12 @@
 
 {
   flake.lib.homeModules.nvim =
-    { pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
 
     {
       xdg.desktopEntries.nvim = {
@@ -32,6 +37,26 @@
           "application/x-shellscript"
         ];
       };
+
+      xdg.dataFile."mime/packages/code-workspace.xml".text = ''
+        <?xml version="1.0" encoding="UTF-8"?>
+        <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+          <mime-type type="application/x-code-workspace">
+            <comment>Visual Studio Code Workspace</comment>
+            <glob pattern="*.code-workspace"/>
+          </mime-type>
+        </mime-info>
+      '';
+
+      xdg.mimeApps = {
+        enable = true;
+        associations.added."application/x-code-workspace" = "code.desktop";
+        defaultApplications."application/x-code-workspace" = "code.desktop";
+      };
+
+      home.activation.updateCodeWorkspaceMimeDatabase = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        run ${pkgs.shared-mime-info}/bin/update-mime-database ${lib.escapeShellArg "${config.xdg.dataHome}/mime"}
+      '';
 
       programs.neovim = {
         enable = true;
@@ -117,7 +142,7 @@
                 syntax case ignore
                 syntax match NoteNumber /^\s*\d\+\(\.\d\+\)*\.\?\ze\s/
                 syntax match NoteLetter /^\s*[a-z])\ze\s/
-                syntax match NoteArrow /\v(->|=>)/
+                syntax match NoteArrow /->\|=>/
                 syntax match NoteBullet /^\s*-\ze\s/
                 syntax match NoteBracket /\[[^]]*\]/
                 syntax match NoteParen /([^)]*)/

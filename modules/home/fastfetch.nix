@@ -2,22 +2,24 @@
 
 {
   flake.lib.homeModules.fastfetch =
-    { config, pkgs, ... }:
+    {
+      config,
+      hostName,
+      pkgs,
+      self,
+      ...
+    }:
 
     let
       colors = config.lib.stylix.colors.withHashtag;
+      hostLogo = "${self}/hosts/${hostName}/logo.txt";
+      defaultLogo = "${self}/assets/logo.txt";
+      logo = if builtins.pathExists hostLogo then hostLogo else defaultLogo;
     in
     {
       home.packages = [ pkgs.fastfetch ];
 
-      xdg.configFile."fastfetch/logo.txt".text = ''
-        ███╗   ██╗ ██████╗ ███████╗
-        ████╗  ██║██╔═══██╗██╔════╝
-        ██╔██╗ ██║██║   ██║███████╗
-        ██║╚██╗██║██║   ██║╚════██║
-        ██║ ╚████║╚██████╔╝███████║
-        ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
-      '';
+      xdg.configFile."fastfetch/logo.txt".source = logo;
 
       xdg.configFile."fastfetch/config.jsonc".text = builtins.toJSON {
         "$schema" = "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json";

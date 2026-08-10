@@ -21,12 +21,12 @@
             text-color: "${colors.base00}"
             background-color: "${colors.base0D}"
           result-row:
-            number-color: "${colors.base0E}"
+            number-color: "${colors.base0D}"
             directory-color: "${colors.base0D}"
           footer:
             text-color: "${colors.base05}"
             background-color: "${colors.base00}"
-            number-color: "${colors.base0E}"
+            number-color: "${colors.base0D}"
           header:
             text-color: "${colors.base05}"
             background-color: "${colors.base00}"

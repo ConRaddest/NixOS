@@ -314,11 +314,11 @@ local function openTerminal(klass, cmd, pause)
 	)
 end
 
-hl.bind("SUPER + SHIFT + B", openTerminal("nos-build", "nos-build", false), { desc = "Build NixOS configuration" })
-hl.bind("SUPER + SHIFT + U", openTerminal("nos-update", "nos-update", true), { desc = "Update NixOS configuration" })
+hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("uwsm app -- nos-build"), { desc = "Build NixOS configuration" })
+hl.bind("SUPER + SHIFT + U", hl.dsp.exec_cmd("uwsm app -- nos-update"), { desc = "Update NixOS configuration" })
 hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", false), { desc = "Install Nix package" })
 hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", false), { desc = "Remove Nix package" })
-hl.bind("SUPER + SHIFT + R", openTerminal("nos-refresh", "nos-refresh", false), { desc = "Refresh Home Manager" })
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc = "Refresh Home Manager" })
 
 -- universal copy / paste
 local universal_shortcut_pressed = {}
@@ -381,8 +381,8 @@ local media = {
 	{ "XF86AudioLowerVolume",  "dms ipc call audio decrement 5" },
 	{ "XF86AudioMute",         "dms ipc call audio mute" },
 	{ "XF86AudioMicMute",      "dms ipc call audio micmute" },
-	{ "XF86MonBrightnessUp",   'dms ipc call brightness increment 5 ""' },
-	{ "XF86MonBrightnessDown", 'dms ipc call brightness decrement 5 ""' },
+	{ "XF86MonBrightnessUp",   "brightnessctl --quiet --class=backlight set +5%" },
+	{ "XF86MonBrightnessDown", "brightnessctl --quiet --class=backlight set 5%-"  },
 }
 for _, b in ipairs(media) do
 	hl.bind(b[1], hl.dsp.exec_cmd(b[2]), { locked = true, repeating = true })
@@ -398,11 +398,9 @@ local popup_windows = {
 	{ title = "windows-credentials" },
 	{ title = "windows-vm-start" },
 
-	{ title = "nos-build",             size = popupSize },
-	{ title = "nos-refresh",           size = popupSize },
-	{ title = "nos-update",            size = popupSize },
 	{ title = "nos-install",           size = popupSize },
 	{ title = "nos-remove",            size = popupSize },
+	{ class = "nos-progress",           size = popupSize },
 
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },

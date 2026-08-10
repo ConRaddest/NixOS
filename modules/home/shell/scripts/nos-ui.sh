@@ -30,24 +30,72 @@ nos_heading() {
   printf '%s%s%s\n\n' "$NOS_BOLD" "$underline" "$NOS_RESET"
 }
 
-nos_stage() {
-  nos_heading "$1"
+# ╭──────────────────────────────────────────────────────────╮
+# │ Desktop notifications and logs                           │
+# ╰──────────────────────────────────────────────────────────╯
+
+nos_begin() {
+  local operation="$1"
+  local operation_pid="$$"
+  local title="NixOS ${operation^}"
+
+  NOS_LOG_FILE=$(mktemp "${TMPDIR:-/tmp}/nos-${operation}-XXXXXX.log")
+  export NOS_LOG_FILE
+
+  (
+    local action
+    action=$(notify-send \
+      --app-name="NixOS" \
+      --icon="$NOS_ICON" \
+      --expire-time=15000 \
+      --action="progress=Open in terminal" \
+      "$title Started" \
+      "Operation running in background.")
+
+    if [[ "$action" == "progress" ]]; then
+      uwsm app -- kitty \
+        --hold \
+        --class nos-progress \
+        --title "$title Progress" \
+        -e tail --pid="$operation_pid" -n +1 -f "$NOS_LOG_FILE" \
+        >/dev/null 2>&1
+    fi
+  ) >/dev/null 2>&1 &
 }
 
-nos_done() {
-  printf '%s%s%s\n' "$NOS_OK" "${1:-Operation completed successfully.}" "$NOS_RESET"
+nos_capture() {
+  "$@" 2>&1 | tee "$NOS_LOG_FILE"
+  return "${PIPESTATUS[0]}"
 }
 
-nos_fail() {
-  printf '\n%sError: %s%s\n' "$NOS_ERROR" "${1:-Operation failed.}" "$NOS_RESET" >&2
-}
+nos_finish() {
+  local status="$1"
+  local title="$2"
+  local message="$3"
+  local urgency="normal"
 
-nos_retry_prompt() {
-  printf '\n%sRetry operation? [Y/n]: %s' "$NOS_ERROR" "$NOS_RESET"
-}
+  if [[ "$status" == "success" ]]; then
+    wl-copy --type text/plain < "$NOS_LOG_FILE"
+    message+=" Output copied to clipboard."
+  else
+    urgency="critical"
+  fi
 
-nos_repeat_prompt() {
-  printf '\n%sRun again? [y/N]: %s' "$NOS_ACCENT" "$NOS_RESET"
+  (
+    local action
+    action=$(notify-send \
+      --app-name="NixOS" \
+      --icon="$NOS_ICON" \
+      --urgency="$urgency" \
+      --expire-time=15000 \
+      --action="open=Open log" \
+      "$title" \
+      "$message Log: $NOS_LOG_FILE")
+
+    if [[ "$action" == "open" ]]; then
+      xdg-open "$NOS_LOG_FILE" >/dev/null 2>&1
+    fi
+  ) >/dev/null 2>&1 &
 }
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -72,12 +120,12 @@ nos_host_name() {
   nos_load_host_name
 
   if [[ -z "${HOST_NAME:-}" ]]; then
-    nos_fail "HOST_NAME is missing. Add export HOST_NAME=<host> to $NOS_DIR/.env."
+    printf 'HOST_NAME is missing. Add export HOST_NAME=<host> to %s/.env.\n' "$NOS_DIR" >&2
     return 1
   fi
 
   if [[ ! "$HOST_NAME" =~ ^[a-zA-Z0-9][a-zA-Z0-9-]*$ ]]; then
-    nos_fail "Invalid HOST_NAME: $HOST_NAME"
+    printf 'Invalid HOST_NAME: %s\n' "$HOST_NAME" >&2
     return 1
   fi
 

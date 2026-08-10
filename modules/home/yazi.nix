@@ -6,18 +6,6 @@
 
     let
       stylix = config.lib.stylix.colors.withHashtag;
-      colors = {
-        accent = stylix.base0D;
-        text = stylix.base05;
-        subtext = stylix.base04;
-        muted = stylix.base03;
-        overlay = stylix.base02;
-        red = stylix.base08;
-        yellow = stylix.base0A;
-        green = stylix.base0B;
-        teal = stylix.base0C;
-      };
-
       yaziWrapper = pkgs.writeShellScriptBin "yazi-wrapper.sh" ''
         multiple="$1"
         directory="$2"
@@ -73,9 +61,9 @@
           opener = {
             edit = [
               {
-                run = "uwsm app -- code --reuse-window %*";
-                block = false;
-                desc = "VS Code";
+                run = "nvim %*";
+                block = true;
+                desc = "Neovim";
               }
             ];
             view = [
@@ -144,114 +132,114 @@
 
       xdg.configFile."yazi/theme.toml".text = ''
         [mgr]
-        cwd             = { fg = "${colors.accent}" }
-        find_keyword    = { fg = "${colors.yellow}", bold = true, underline = true }
-        find_position   = { fg = "${colors.text}", bg = "reset", bold = true }
-        marker_copied   = { fg = "${colors.green}",  bg = "${colors.green}" }
-        marker_cut      = { fg = "${colors.red}",    bg = "${colors.red}" }
-        marker_marked   = { fg = "${colors.teal}",   bg = "${colors.teal}" }
-        marker_selected = { fg = "${colors.yellow}", bg = "${colors.yellow}" }
-        count_copied    = { bg = "${colors.green}" }
-        count_cut       = { bg = "${colors.red}" }
-        count_selected  = { bg = "${colors.yellow}" }
+        cwd             = { fg = "${stylix.base0D}" }
+        find_keyword    = { fg = "${stylix.base0A}", bold = true, underline = true }
+        find_position   = { fg = "${stylix.base05}", bg = "reset", bold = true }
+        marker_copied   = { fg = "${stylix.base0B}",  bg = "${stylix.base0B}" }
+        marker_cut      = { fg = "${stylix.base08}",    bg = "${stylix.base08}" }
+        marker_marked   = { fg = "${stylix.base0C}",   bg = "${stylix.base0C}" }
+        marker_selected = { fg = "${stylix.base0A}", bg = "${stylix.base0A}" }
+        count_copied    = { bg = "${stylix.base0B}" }
+        count_cut       = { bg = "${stylix.base08}" }
+        count_selected  = { bg = "${stylix.base0A}" }
         border_symbol   = "│"
-        border_style    = { fg = "${colors.muted}" }
+        border_style    = { fg = "${stylix.base03}" }
 
         [indicator]
-        parent  = { fg = "${colors.text}", bg = "${colors.overlay}" }
-        current = { fg = "${colors.text}", bg = "${colors.overlay}" }
-        preview = { fg = "${colors.text}", bg = "${colors.overlay}" }
+        parent  = { fg = "${stylix.base06}", bg = "${stylix.base02}" }
+        current = { fg = "${stylix.base06}", bg = "${stylix.base02}", bold = true }
+        preview = { fg = "${stylix.base06}", bg = "${stylix.base02}" }
         padding = { open = "▐", close = "▌" }
 
         [tabs]
-        active    = { bg = "${colors.accent}", bold = true }
-        inactive  = { fg = "${colors.accent}", bg = "${colors.overlay}" }
+        active    = { fg = "${stylix.base02}", bg = "${stylix.base0D}", bold = true }
+        inactive  = { fg = "${stylix.base0D}", bg = "${stylix.base02}" }
         sep_inner = { open = " ", close = " " }
         sep_outer = { open = " ", close = " " }
 
         [mode]
-        normal_main = { bg = "${colors.accent}", bold = true }
-        normal_alt  = { fg = "${colors.accent}", bg = "${colors.overlay}" }
-        select_main = { bg = "${colors.teal}",   bold = true }
-        select_alt  = { fg = "${colors.teal}",   bg = "${colors.overlay}" }
-        unset_main  = { bg = "${colors.subtext}", bold = true }
-        unset_alt   = { fg = "${colors.subtext}", bg = "${colors.overlay}" }
+        normal_main = { fg = "${stylix.base02}", bg = "${stylix.base0D}", bold = true }
+        normal_alt  = { fg = "${stylix.base0D}", bg = "${stylix.base02}" }
+        select_main = { bg = "${stylix.base0C}",   bold = true }
+        select_alt  = { fg = "${stylix.base0C}",   bg = "${stylix.base02}" }
+        unset_main  = { bg = "${stylix.base05}", bold = true }
+        unset_alt   = { fg = "${stylix.base05}", bg = "${stylix.base02}" }
 
         [status]
         sep_left  = { open = " ", close = " " }
         sep_right = { open = " ", close = " " }
-        perm_sep        = { fg = "${colors.muted}" }
-        perm_type       = { fg = "${colors.accent}" }
-        perm_read       = { fg = "${colors.yellow}" }
-        perm_write      = { fg = "${colors.red}" }
-        perm_exec       = { fg = "${colors.green}" }
-        progress_label  = { fg = "${colors.text}", bold = true }
-        progress_normal = { fg = "${colors.green}", bg = "${colors.overlay}" }
-        progress_error  = { fg = "${colors.yellow}", bg = "${colors.red}" }
+        perm_sep        = { fg = "${stylix.base03}" }
+        perm_type       = { fg = "${stylix.base0D}" }
+        perm_read       = { fg = "${stylix.base0A}" }
+        perm_write      = { fg = "${stylix.base08}" }
+        perm_exec       = { fg = "${stylix.base0B}" }
+        progress_label  = { fg = "${stylix.base05}", bold = true }
+        progress_normal = { fg = "${stylix.base0B}", bg = "${stylix.base02}" }
+        progress_error  = { fg = "${stylix.base0A}", bg = "${stylix.base08}" }
 
         [confirm]
-        border  = { fg = "${colors.accent}" }
-        title   = { fg = "${colors.accent}", bold = true }
-        body    = { fg = "${colors.text}" }
-        list    = { fg = "${colors.subtext}" }
-        btn_yes = { bg = "${colors.accent}", bold = true }
-        btn_no  = { fg = "${colors.text}", bg = "${colors.overlay}" }
+        border  = { fg = "${stylix.base0D}" }
+        title   = { fg = "${stylix.base0D}", bold = true }
+        body    = { fg = "${stylix.base05}" }
+        list    = { fg = "${stylix.base05}" }
+        btn_yes = { fg = "${stylix.base02}", bg = "${stylix.base0D}", bold = true }
+        btn_no  = { fg = "${stylix.base05}", bg = "${stylix.base02}" }
 
         [pick]
-        border   = { fg = "${colors.accent}" }
-        active   = { fg = "${colors.text}", bold = true }
-        inactive = { fg = "${colors.subtext}" }
+        border   = { fg = "${stylix.base0D}" }
+        active   = { fg = "${stylix.base05}", bold = true }
+        inactive = { fg = "${stylix.base05}" }
 
         [input]
-        border   = { fg = "${colors.accent}" }
-        title    = { fg = "${colors.accent}" }
-        value    = { fg = "${colors.text}" }
+        border   = { fg = "${stylix.base0D}" }
+        title    = { fg = "${stylix.base0D}" }
+        value    = { fg = "${stylix.base05}" }
         selected = { reversed = true }
 
         [cmp]
-        border   = { fg = "${colors.accent}" }
-        active   = { bg = "${colors.accent}" }
-        inactive = { fg = "${colors.subtext}" }
+        border   = { fg = "${stylix.base0D}" }
+        active   = { fg = "${stylix.base02}", bg = "${stylix.base0D}" }
+        inactive = { fg = "${stylix.base05}" }
 
         [tasks]
-        border  = { fg = "${colors.accent}" }
-        title   = { fg = "${colors.accent}" }
-        hovered = { fg = "${colors.text}", bold = true }
+        border  = { fg = "${stylix.base0D}" }
+        title   = { fg = "${stylix.base0D}" }
+        hovered = { fg = "${stylix.base05}", bold = true }
 
         [which]
-        mask            = { bg = "${colors.overlay}" }
-        rest            = { fg = "${colors.muted}" }
-        desc            = { fg = "${colors.text}" }
+        mask            = { bg = "${stylix.base02}" }
+        rest            = { fg = "${stylix.base03}" }
+        desc            = { fg = "${stylix.base05}" }
         separator       = "  "
-        separator_style = { fg = "${colors.muted}" }
+        separator_style = { fg = "${stylix.base03}" }
 
         [help]
-        on      = { fg = "${colors.teal}" }
-        run     = { fg = "${colors.text}" }
+        on      = { fg = "${stylix.base0C}" }
+        run     = { fg = "${stylix.base05}" }
         hovered = { reversed = true, bold = true }
-        footer  = { bg = "${colors.subtext}" }
+        footer  = { bg = "${stylix.base05}" }
 
         [spot]
-        border   = { fg = "${colors.accent}" }
-        title    = { fg = "${colors.accent}" }
-        tbl_cell = { fg = "${colors.text}", bg = "${colors.overlay}" }
+        border   = { fg = "${stylix.base0D}" }
+        title    = { fg = "${stylix.base0D}" }
+        tbl_cell = { fg = "${stylix.base05}", bg = "${stylix.base02}" }
 
         [icon]
         dirs = []
         prepend_conds = [
-          { if = "dir & hovered", text = "󰝰", fg = "${colors.accent}" },
-          { if = "dir",           text = "󰉋", fg = "${colors.accent}" },
+          { if = "dir & hovered", text = "󰝰", fg = "${stylix.base0D}" },
+          { if = "dir",           text = "󰉋", fg = "${stylix.base0D}" },
         ]
 
         [filetype]
         rules = [
-          { mime = "image/*", fg = "${colors.text}" },
-          { mime = "{audio,video}/*", fg = "${colors.text}" },
-          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${colors.text}" },
-          { mime = "application/{pdf,doc,rtf}", fg = "${colors.text}" },
-          { mime = "vfs/{absent,stale}", fg = "${colors.muted}" },
-          { url = "*/", fg = "${colors.subtext}" },
-          { url = "*", fg = "${colors.text}" },
+          { mime = "image/*", fg = "${stylix.base05}" },
+          { mime = "{audio,video}/*", fg = "${stylix.base05}" },
+          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${stylix.base05}" },
+          { mime = "application/{pdf,doc,rtf}", fg = "${stylix.base05}" },
+          { mime = "vfs/{absent,stale}", fg = "${stylix.base05}" },
+          { url = "*/", fg = "${stylix.base05}" },
+          { url = "*", fg = "${stylix.base05}" },
         ]
       '';
 

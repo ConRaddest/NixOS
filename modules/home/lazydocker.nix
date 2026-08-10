@@ -27,7 +27,7 @@
             activeBorderColor: ["${colors.base0D}", "bold"]
             inactiveBorderColor: ["${colors.base03}"]
             selectedLineBgColor: ["${colors.base02}"]
-            optionsTextColor: ["${colors.base0E}"]
+            optionsTextColor: ["${colors.base0D}"]
             defaultFgColor: ["${colors.base05}"]
       '';
 

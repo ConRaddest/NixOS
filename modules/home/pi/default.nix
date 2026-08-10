@@ -27,8 +27,6 @@
       home.packages = [ pi ];
 
       home.file = {
-        ".pi/agent/extensions/vscode-context.ts".source = ./vscode-context.ts;
-        ".vscode/extensions/local.pi-vscode-context-0.1.0".source = ./pi-context;
         ".pi/agent/SYSTEM.md".text = ''
           You are an expert coding assistant operating inside pi, a coding agent harness.
           You help users by reading files, executing commands, editing code, and writing new files.

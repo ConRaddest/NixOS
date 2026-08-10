@@ -4,28 +4,20 @@
   flake.lib.homeModules.starship =
     { config, ... }:
 
+    let
+      stylix = config.lib.stylix.colors.withHashtag;
+    in
     {
       programs.starship = {
         enable = true;
         enableFishIntegration = true;
 
         settings = {
-          # Stylix 26.05 exposes Base16 A-F keys with uppercase suffixes,
-          # while Starship palette references ignore uppercase names.
-          palettes.base16 = with config.lib.stylix.colors.withHashtag; {
-            base0a = base0A;
-            base0b = base0B;
-            base0c = base0C;
-            base0d = base0D;
-            base0e = base0E;
-            base0f = base0F;
-          };
-
           add_newline = true;
-          format = "[░▒▓](fg:base0d)$os[](bg:base0e fg:base0d)$directory[](fg:base0e bg:base02)$git_branch$git_status[](fg:base02 bg:base01)$nodejs$bun$rust$golang$php[](fg:base01 bg:base00)$time[ ](fg:base00)$line_break$character";
+          format = "[░▒▓](fg:${stylix.base0F})$os[](fg:${stylix.base0F} bg:${stylix.base0D})$directory[](fg:${stylix.base0D} bg:${stylix.base02})$git_branch$git_status[](fg:${stylix.base02} bg:${stylix.base00})$nodejs$bun$rust$golang$php[](fg:${stylix.base00} bg:${stylix.base01})$time[ ](fg:${stylix.base01})$line_break$character";
 
           directory = {
-            style = "fg:base00 bg:base0e";
+            style = "fg:${stylix.base00} bg:${stylix.base0D}";
             format = "[ $path ]($style)";
             truncation_length = 3;
             truncation_symbol = "…/";
@@ -39,55 +31,55 @@
 
           git_branch = {
             symbol = "";
-            style = "bg:base02";
-            format = "[[ $symbol $branch ](fg:base0e bg:base02)]($style)";
+            style = "bg:${stylix.base02}";
+            format = "[[ $symbol $branch ](fg:${stylix.base0D} bg:${stylix.base02})]($style)";
           };
 
           git_status = {
-            style = "bg:base02";
-            format = "[[($all_status$ahead_behind )](fg:base0e bg:base02)]($style)";
+            style = "bg:${stylix.base02}";
+            format = "[[($all_status$ahead_behind )](fg:${stylix.base0D} bg:${stylix.base02})]($style)";
           };
 
           nodejs = {
             symbol = "";
-            style = "bg:base01";
-            format = "[[ $symbol ($version) ](fg:base0e bg:base01)]($style)";
+            style = "bg:${stylix.base00}";
+            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
           };
 
           bun = {
             symbol = "";
-            style = "bg:base01";
-            format = "[[ $symbol ($version) ](fg:base0e bg:base01)]($style)";
+            style = "bg:${stylix.base00}";
+            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
           };
 
           rust = {
             symbol = "";
-            style = "bg:base01";
-            format = "[[ $symbol ($version) ](fg:base0e bg:base01)]($style)";
+            style = "bg:${stylix.base00}";
+            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
           };
 
           golang = {
             symbol = "";
-            style = "bg:base01";
-            format = "[[ $symbol ($version) ](fg:base0e bg:base01)]($style)";
+            style = "bg:${stylix.base00}";
+            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
           };
 
           php = {
             symbol = "";
-            style = "bg:base01";
-            format = "[[ $symbol ($version) ](fg:base0e bg:base01)]($style)";
+            style = "bg:${stylix.base00}";
+            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
           };
 
           time = {
             disabled = false;
             time_format = "%R";
-            style = "bg:base00";
-            format = "[[  $time ](fg:base04 bg:base00)]($style)";
+            style = "bg:${stylix.base01}";
+            format = "[[  $time ](fg:${stylix.base05} bg:${stylix.base01})]($style)";
           };
 
           os = {
             disabled = false;
-            style = "bg:base0d fg:base00";
+            style = "bg:${stylix.base0F} fg:${stylix.base00}";
             format = "[ $symbol ]($style)";
             symbols = {
               Windows = "󰍲";
@@ -117,8 +109,8 @@
           };
 
           character = {
-            success_symbol = "[❯](bold base0d)";
-            error_symbol = "[❯](bold base0d)";
+            success_symbol = "[❯](bold ${stylix.base0D})";
+            error_symbol = "[❯](bold ${stylix.base0D})";
           };
         };
       };

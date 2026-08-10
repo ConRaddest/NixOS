@@ -46,6 +46,7 @@ repo_dir=$(git rev-parse --show-toplevel 2>/dev/null) || {
 
 template_dir="$repo_dir/hosts/_template"
 hosts_dir="$repo_dir/hosts"
+logo_generator="$repo_dir/scripts/generate-logo.py"
 [[ -f "$template_dir/host.nix" ]] || {
   echo "Error: Host template is missing: $template_dir/host.nix" >&2
   exit 1
@@ -54,6 +55,15 @@ hosts_dir="$repo_dir/hosts"
   echo "Error: Hardware template is missing: $template_dir/hardware.nix" >&2
   exit 1
 }
+[[ -f "$logo_generator" ]] || {
+  echo "Error: Logo generator is missing: $logo_generator" >&2
+  exit 1
+}
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: python3 is required to generate host logos." >&2
+  exit 1
+fi
 
 if ! command -v nixos-generate-config >/dev/null 2>&1; then
   echo "Error: nixos-generate-config is unavailable." >&2
@@ -519,6 +529,7 @@ printf 'Creating host configuration...\n'
 cp -R "$template_dir" "$host_dir"
 host_file="$host_dir/host.nix"
 hardware_file="$host_dir/hardware.nix"
+logo_file="$host_dir/logo.txt"
 
 escaped_user=$(nix_string_replacement "$username")
 escaped_full_name=$(nix_string_replacement "$full_name")
@@ -660,6 +671,9 @@ EOF
 EOF
 } > "$hardware_file"
 
+printf 'Generating host logo...\n'
+python3 "$logo_generator" --seed "$host_name" --output "$logo_file"
+
 # Make generated host visible to Git-backed flake evaluation without staging
 # file contents. Ignored .env remains outside the flake source.
 git -C "$repo_dir" add -N -- "hosts/$host_name"
@@ -682,6 +696,7 @@ fi
 print_heading "Host Configuration Created"
 printf 'Host configuration:     %s\n' "$host_file"
 printf 'Hardware configuration: %s\n' "$hardware_file"
+printf 'Host logo:              %s\n' "$logo_file"
 if [[ "$env_created" == true ]]; then
   printf 'Local environment:      %s\n' "$env_file"
 else

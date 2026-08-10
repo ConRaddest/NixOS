@@ -25,12 +25,19 @@ fzf_args=(
 # │ Main                                                     │
 # ╰──────────────────────────────────────────────────────────╯
 
-nos_heading "Remove Applications"
-if ! pkg_names=$(current_apps | fzf "${fzf_args[@]}"); then
-  exit 0
-fi
+while true; do
+  nos_heading "Remove Applications"
 
-if [[ -n "${pkg_names:-}" ]]; then
-  grep -Fvx -f <(printf '%s\n' "$pkg_names") <(current_apps) | write_apps_file
-  exec nos-refresh
-fi
+  if ! pkg_names=$(current_apps | fzf "${fzf_args[@]}"); then
+    exit 0
+  fi
+
+  [[ -n "${pkg_names:-}" ]] || continue
+  { grep -Fvx -f <(printf '%s\n' "$pkg_names") <(current_apps) || true; } | write_apps_file
+
+  if ! nos-refresh; then
+    printf '\nRemove refresh failed. Log remains above. Press Enter to close.\n'
+    read -r
+    exit 1
+  fi
+done
