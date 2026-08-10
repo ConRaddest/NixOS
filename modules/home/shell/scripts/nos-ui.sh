@@ -11,13 +11,15 @@ nos_wordmark() {
   local reset=''
   local color="${NOS_ACCENT_COLOR:-bb9af7}"
   local subtitle="${1:-Declarative by Design}"
-  local spaced_subtitle=''
   local columns
   local max_width=0
   local padding=0
-  local subtitle_padding=0
+  local box_inner_width
+  local box_padding=0
+  local text_left
+  local text_right
+  local border
   local line
-  local i
   local -a lines
 
   [[ "${NOS_WORDMARK_SHOWN:-}" != 1 ]] || return 0
@@ -42,14 +44,16 @@ nos_wordmark() {
   done
 
   subtitle=${subtitle^^}
-  for (( i = 0; i < ${#subtitle}; i++ )); do
-    [[ -n "$spaced_subtitle" ]] && spaced_subtitle+=' '
-    spaced_subtitle+="${subtitle:i:1}"
-  done
 
   columns=$(tput cols 2>/dev/null || printf '%s' "${COLUMNS:-80}")
   (( columns > max_width )) && padding=$(( (columns - max_width) / 2 ))
-  (( columns > ${#spaced_subtitle} )) && subtitle_padding=$(( (columns - ${#spaced_subtitle}) / 2 ))
+
+  box_inner_width=$(( ${#subtitle} + 4 ))
+  (( columns > box_inner_width + 2 )) && box_padding=$(( (columns - box_inner_width - 2) / 2 ))
+  text_left=$(( (box_inner_width - ${#subtitle}) / 2 ))
+  text_right=$(( box_inner_width - ${#subtitle} - text_left ))
+  printf -v border '%*s' "$box_inner_width" ''
+  border=${border// /─}
 
   printf '%s' "$accent"
   for line in "${lines[@]}"; do
@@ -59,7 +63,9 @@ nos_wordmark() {
       printf '\n'
     fi
   done
-  printf '\n%*s%s\n' "$subtitle_padding" '' "$spaced_subtitle"
+  printf '\n%*s╭%s╮\n' "$box_padding" '' "$border"
+  printf '%*s│%*s%s%*s│\n' "$box_padding" '' "$text_left" '' "$subtitle" "$text_right" ''
+  printf '%*s╰%s╯\n' "$box_padding" '' "$border"
   printf '%s\n' "$reset"
   export NOS_WORDMARK_SHOWN=1
 }

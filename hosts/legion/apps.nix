@@ -5,7 +5,6 @@
     "audacity"
     "cmatrix"
     "drawio"
-    "gimp"
     "libreoffice"
     "localsend"
     "nautilus"
