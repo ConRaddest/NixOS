@@ -392,19 +392,9 @@
 
         windows-vm-rdp
         windows-vm-start
+        windows-vm-stop
         windows-install
         windows-uninstall
       ];
-
-      home.activation.removeLegacyWinApps = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-        for directory in "$HOME/.local/share/applications" "$HOME/.local/bin"; do
-          if [[ -d "$directory" ]]; then
-            while IFS= read -r file; do
-              rm -f "$file"
-            done < <(find "$directory" -maxdepth 1 -type f -exec grep -Il winapps {} \; 2>/dev/null)
-          fi
-        done
-        rm -rf "$HOME/.local/share/winapps" "$HOME/.config/winapps"
-      '';
     };
 }

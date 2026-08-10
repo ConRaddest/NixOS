@@ -424,7 +424,7 @@ nos-build
 nos-refresh
 ```
 
-`nos-refresh` formats Nix files and stages all repository changes before activation. `nos-install` uses the same flow after updating the host package list.
+Management commands format only changed Nix files, build before activation, and never stage repository changes. Failed refreshes, package edits, and input updates restore files to their pre-command state. System activation requires sudo authentication.
 
 ### Update flake inputs and rebuild
 

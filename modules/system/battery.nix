@@ -48,22 +48,10 @@
       services.thermald.enable = config.nos.hardware.thermald;
 
       services.logind.settings.Login = {
-        HandlePowerKey = "ignore";
-        HandleLidSwitch = "ignore";
-        HandleLidSwitchExternalPower = "ignore";
+        HandlePowerKey = "suspend";
+        HandleLidSwitch = "suspend";
+        HandleLidSwitchExternalPower = "suspend";
         HandleLidSwitchDocked = "ignore";
-      };
-
-      # Set the initial profile once power-profiles-daemon is actually up. This
-      # avoids boot-time D-Bus activation cycles and empty-profile errors.
-      systemd.services.power-profile-auto = {
-        description = "Set power profile for current AC state";
-        after = [ "power-profiles-daemon.service" ];
-        wantedBy = [ "power-profiles-daemon.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = setCurrentPowerProfile;
-        };
       };
 
       powerManagement.resumeCommands = ''

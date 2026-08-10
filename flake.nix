@@ -3,9 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    firefox-nixpkgs.url = "github:nixos/nixpkgs/0ad6f47ea4fe188f4bc8f0380f93ae8523337c6c";
-
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
 
@@ -72,8 +69,71 @@
 
           perSystem =
             { pkgs, ... }:
+            let
+              source = inputs.self;
+              nixosChecks = lib.mapAttrs' (
+                name: configuration: lib.nameValuePair "nixos-${name}" configuration.config.system.build.toplevel
+              ) inputs.self.nixosConfigurations;
+              homeChecks = lib.mapAttrs' (
+                name: configuration:
+                lib.nameValuePair "home-${lib.replaceStrings [ "@" ] [ "-at-" ] name}" configuration.activationPackage
+              ) inputs.self.homeConfigurations;
+            in
             {
               formatter = pkgs.nixfmt;
+
+              checks = {
+                formatting =
+                  pkgs.runCommand "check-nix-formatting"
+                    {
+                      nativeBuildInputs = [
+                        pkgs.findutils
+                        pkgs.nixfmt
+                      ];
+                    }
+                    ''
+                      cd ${source}
+                      find . -name '*.nix' -print0 | xargs -0 -r nixfmt --check
+                      touch "$out"
+                    '';
+
+                dead-code =
+                  pkgs.runCommand "check-dead-code"
+                    {
+                      nativeBuildInputs = [ pkgs.deadnix ];
+                    }
+                    ''
+                      deadnix --fail ${source}
+                      touch "$out"
+                    '';
+
+                static-analysis =
+                  pkgs.runCommand "check-static-analysis"
+                    {
+                      nativeBuildInputs = [ pkgs.statix ];
+                    }
+                    ''
+                      statix check --config ${source}/statix.toml ${source}
+                      touch "$out"
+                    '';
+
+                shell-scripts =
+                  pkgs.runCommand "check-shell-scripts"
+                    {
+                      nativeBuildInputs = [
+                        pkgs.findutils
+                        pkgs.shellcheck
+                      ];
+                    }
+                    ''
+                      cd ${source}
+                      find . -name '*.sh' -print0 | xargs -0 -r shellcheck
+                      touch "$out"
+                    '';
+
+              }
+              // nixosChecks
+              // homeChecks;
             };
         };
       }

@@ -2,7 +2,7 @@
 
 {
   flake.nixosModules.nix =
-    { pkgs, ... }:
+    { ... }:
 
     {
       nix.settings = {
@@ -11,8 +11,8 @@
           "flakes"
         ];
         auto-optimise-store = true;
-        keep-derivations = true;
-        keep-outputs = true;
+        keep-derivations = false;
+        keep-outputs = false;
         trusted-users = [
           "root"
           "@wheel"

@@ -3,17 +3,12 @@
 {
   flake.lib.homeModules.firefox =
     {
-      config,
       host,
-      inputs,
       lib,
       pkgs,
       ...
     }:
 
-    let
-      firefoxPackage = inputs.firefox-nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.firefox;
-    in
     {
       home.packages = [ pkgs.mkcert ];
 
@@ -31,7 +26,7 @@
 
       programs.firefox = {
         enable = true;
-        package = firefoxPackage;
+        package = pkgs.firefox;
         policies.Certificates.Install = lib.optional (
           host.firefoxCertificatePath != null
         ) host.firefoxCertificatePath;

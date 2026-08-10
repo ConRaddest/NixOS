@@ -122,22 +122,6 @@
         "type": "github"
       }
     },
-    "firefox-nixpkgs": {
-      "locked": {
-        "lastModified": 1783389287,
-        "narHash": "sha256-0xIy4dVLqq47rA+mRy0hXDfjhQd4E5PoIns/RmB7nR4=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "0ad6f47ea4fe188f4bc8f0380f93ae8523337c6c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "0ad6f47ea4fe188f4bc8f0380f93ae8523337c6c",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -332,22 +316,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-unstable": {
-      "locked": {
-        "lastModified": 1786106723,
-        "narHash": "sha256-zDSUbpoeo/9ZmD2+wXnzxoo1+uhL8vxc0b8yuYMKYq0=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "f13ff45afd1bb73e640eaa08a7066dbed07e3238",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "noctalia": {
       "inputs": {
         "nixpkgs": [
@@ -396,14 +364,12 @@
     "root": {
       "inputs": {
         "dms": "dms",
-        "firefox-nixpkgs": "firefox-nixpkgs",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-unstable": "nixpkgs-unstable",
         "noctalia": "noctalia",
         "stylix": "stylix"
       }

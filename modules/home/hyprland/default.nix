@@ -174,11 +174,6 @@
       xdg.configFile."hypr/hyprland.lua".source =
         config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
 
-      home.activation.removeLegacyHyprpolkitagent = config.lib.dag.entryBefore [ "writeBoundary" ] ''
-        rm -f "$HOME/.config/systemd/user/hyprpolkitagent.service"
-        rm -f "$HOME/.config/systemd/user/graphical-session.target.wants/hyprpolkitagent.service"
-      '';
-
       systemd.user.services.nos-hyprpolkitagent = {
         Unit = {
           Description = "Hyprland Polkit Agent";

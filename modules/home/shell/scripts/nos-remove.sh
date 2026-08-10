@@ -7,10 +7,23 @@ source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-apps.sh"
 
 nos_wordmark "Removing Applications"
 
+apps_backup=$(mktemp)
+cp -- "$apps_file" "$apps_backup"
+cleanup() {
+  local status=$?
+  if ((status != 0)); then
+    cp -- "$apps_backup" "$apps_file"
+  fi
+  rm -f -- "$apps_backup"
+  return "$status"
+}
+trap cleanup EXIT
+
 # ╭──────────────────────────────────────────────────────────╮
 # │ Interface                                                │
 # ╰──────────────────────────────────────────────────────────╯
 
+# shellcheck disable=SC2016 # Inner shell expands preview parameters.
 fzf_args=(
   --multi
   --preview 'bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; package_preview {1}'\'''

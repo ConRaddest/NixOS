@@ -64,20 +64,6 @@ nos_wordmark() {
   export NOS_WORDMARK_SHOWN=1
 }
 
-if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
-  readonly NOS_ACCENT=$'\033[95m'
-  readonly NOS_OK=$'\033[92m'
-  readonly NOS_ERROR=$'\033[91m'
-  readonly NOS_BOLD=$'\033[1m'
-  readonly NOS_RESET=$'\033[0m'
-else
-  readonly NOS_ACCENT=''
-  readonly NOS_OK=''
-  readonly NOS_ERROR=''
-  readonly NOS_BOLD=''
-  readonly NOS_RESET=''
-fi
-
 # ╭──────────────────────────────────────────────────────────╮
 # │ Operation terminals                                      │
 # ╰──────────────────────────────────────────────────────────╯
@@ -147,4 +133,62 @@ nos_run() {
   nix_config+='warn-dirty = false'
 
   NIX_CONFIG="$nix_config" "$@"
+}
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Transaction helpers                                      │
+# ╰──────────────────────────────────────────────────────────╯
+
+nos_changed_nix_files() {
+  git -C "$NOS_DIR" diff --name-only --diff-filter=ACMR -z HEAD -- '*.nix'
+}
+
+nos_require_tracked_nix_files() {
+  local -a files=()
+
+  mapfile -d '' -t files < <(
+    git -C "$NOS_DIR" ls-files --others --exclude-standard -z -- '*.nix'
+  )
+  ((${#files[@]} == 0)) && return 0
+
+  printf 'Untracked Nix files are excluded from flake evaluation:\n' >&2
+  printf '  %s\n' "${files[@]}" >&2
+  printf 'Track them first with: git add -N -- <file>\n' >&2
+  return 1
+}
+
+nos_transaction_begin() {
+  local file
+
+  NOS_TRANSACTION_DIR=$(mktemp -d)
+  NOS_TRANSACTION_FILES=()
+  for file in "$@"; do
+    [[ -f "$NOS_DIR/$file" ]] || continue
+    NOS_TRANSACTION_FILES+=("$file")
+    (cd "$NOS_DIR" && cp --parents -- "$file" "$NOS_TRANSACTION_DIR")
+  done
+  export NOS_TRANSACTION_DIR
+}
+
+nos_transaction_restore() {
+  local file
+
+  [[ -n "${NOS_TRANSACTION_DIR:-}" && -d "$NOS_TRANSACTION_DIR" ]] || return 0
+  for file in "${NOS_TRANSACTION_FILES[@]:-}"; do
+    [[ -f "$NOS_TRANSACTION_DIR/$file" ]] && cp -- "$NOS_TRANSACTION_DIR/$file" "$NOS_DIR/$file"
+  done
+  rm -rf -- "$NOS_TRANSACTION_DIR"
+  NOS_TRANSACTION_DIR=''
+}
+
+nos_transaction_finish() {
+  [[ -z "${NOS_TRANSACTION_DIR:-}" ]] || rm -rf -- "$NOS_TRANSACTION_DIR"
+  NOS_TRANSACTION_DIR=''
+}
+
+nos_format_changed_nix() {
+  local -a files=()
+
+  mapfile -d '' -t files < <(nos_changed_nix_files)
+  ((${#files[@]} == 0)) || (cd "$NOS_DIR" && nixfmt "${files[@]}")
 }

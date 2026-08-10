@@ -11,19 +11,25 @@ if [[ "${1:-}" == "--offline" ]]; then
   nix_opts+=(--option substitute false)
 fi
 
-stage_changes() {
-  git -C "$NOS_DIR" add -A
-}
-
 run_refresh() {
-  local host_name
+  local host_name result
+  local -a changed_files=()
 
   nos_wordmark "Switching Home Manager" || return
   host_name=$(nos_host_name) || return
+  nos_require_tracked_nix_files || return
+  mapfile -d '' -t changed_files < <(nos_changed_nix_files)
+  nos_transaction_begin "${changed_files[@]}"
+  trap nos_transaction_restore EXIT
 
-  find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \
-    && stage_changes \
-    && nos_run home-manager switch "${nix_opts[@]}" --flake "$NOS_DIR#$USER@$host_name"
+  nos_format_changed_nix || return
+  result="$NOS_TRANSACTION_DIR/home-manager"
+  nos_run nix build "${nix_opts[@]}" --out-link "$result" \
+    "$NOS_DIR#homeConfigurations.\"$USER@$host_name\".activationPackage" || return
+  "$result/activate" || return
+
+  nos_transaction_finish
+  trap - EXIT
 }
 
 run_refresh

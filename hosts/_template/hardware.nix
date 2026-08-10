@@ -6,7 +6,6 @@ in
 {
   flake.nixosModules."${hostName}Hardware" =
     {
-      config,
       lib,
       modulesPath,
       ...

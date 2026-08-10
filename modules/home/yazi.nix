@@ -43,7 +43,6 @@
         imv
         mpv
         yaziWrapper
-        xdg-desktop-portal-termfilechooser
       ];
 
       programs.yazi = {

@@ -12,17 +12,31 @@ nos_wordmark "Installing Applications"
 # ╰──────────────────────────────────────────────────────────╯
 
 selected_file=$(mktemp)
-trap 'rm -f "$selected_file"' EXIT
+apps_backup=$(mktemp)
+cp -- "$apps_file" "$apps_backup"
+cleanup() {
+  local status=$?
+  if ((status != 0)); then
+    cp -- "$apps_backup" "$apps_file"
+  fi
+  rm -f -- "$selected_file" "$apps_backup"
+  return "$status"
+}
+trap cleanup EXIT
 selected_file_q=$(printf '%q' "$selected_file")
 
+# shellcheck disable=SC2016 # Inner shell expands positional parameters.
 reload_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; search_apps_with_selected_file "${1// /-}" "$2"'\'' _ {q} '"$selected_file_q"
+# shellcheck disable=SC2016 # Inner shell expands positional parameters.
 toggle_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; toggle_selected_app "$1" "$2"'\'' _ '"$selected_file_q"' {1}'
+# shellcheck disable=SC2016 # Inner shell expands positional parameters.
 toggle_action_cmd='bash -lc '\''[[ "$1" == "[Selected]" ]] && echo exclude || echo toggle'\'' _ {2}'
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Interface                                                │
 # ╰──────────────────────────────────────────────────────────╯
 
+# shellcheck disable=SC2016 # Inner shell expands preview parameters.
 fzf_args=(
   --multi
   --disabled

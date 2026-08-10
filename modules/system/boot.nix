@@ -10,7 +10,10 @@
     {
       config = lib.mkMerge [
         (lib.mkIf (cfg.mode == "uefi") {
-          boot.loader.systemd-boot.enable = true;
+          boot.loader.systemd-boot = {
+            enable = true;
+            configurationLimit = 15;
+          };
           boot.loader.efi.canTouchEfiVariables = true;
         })
 

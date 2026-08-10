@@ -51,6 +51,15 @@ let
       "learner-local.pmis.servicesseta.org.za"
     ];
 
+    mounts = [
+      {
+        mountPoint = "/home/cdt/SSD";
+        device = "/dev/disk/by-uuid/703e86da-1c1b-4ae8-afd6-99312da4a1be";
+        fsType = "ext4";
+        options = [ "nofail" ];
+      }
+    ];
+
     monitors = [
       {
         output = "eDP-1";

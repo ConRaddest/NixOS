@@ -45,6 +45,7 @@ let
     };
 
     localHosts = [ ];
+    mounts = [ ];
     monitors = [ ];
 
     gduMaxCores = 4;

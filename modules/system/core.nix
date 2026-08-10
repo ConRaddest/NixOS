@@ -2,7 +2,12 @@
 
 {
   flake.nixosModules.core =
-    { pkgs, ... }:
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
 
     {
       # Hide noisy early kernel/firmware warnings from the TTY while still
@@ -15,6 +20,24 @@
         "udev.log_level=3"
         "systemd.show_status=true"
       ];
+
+      fileSystems = builtins.listToAttrs (
+        map (mount: {
+          name = mount.mountPoint;
+          value = {
+            inherit (mount) device fsType;
+            options = mount.options or [ ];
+          };
+        }) (host.mounts or [ ])
+      );
+
+      assertions = map (mount: {
+        assertion = lib.hasPrefix "/" mount.mountPoint;
+        message = "Host mount point must be an absolute path: ${mount.mountPoint}";
+      }) (host.mounts or [ ]);
+
+      services.fstrim.enable = true;
+      services.fwupd.enable = true;
 
       environment.systemPackages = with pkgs; [
         pciutils

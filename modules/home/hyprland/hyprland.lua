@@ -51,9 +51,9 @@ hl.config({
 		repeat_rate = 35,
 		repeat_delay = 200,
 	},
-	cursor = {
-		no_hardware_cursors = true,
-	},
+	-- cursor = {
+	-- 	no_hardware_cursors = true,
+	-- },
 
 	-- cosmetics
 	general = {
@@ -72,13 +72,13 @@ hl.config({
 			enabled = true,
 			special = true,
 			size = 2,
-			passes = 3,
+			passes = 1,
 			xray = true,
 		},
 		shadow = {
 			enabled = true,
-			range = 50,
-			render_power = 100,
+			range = 12,
+			render_power = 3,
 			color = 0x33000000,
 			color_inactive = 0x22000000,
 			offset = { 0, 4 },
@@ -140,11 +140,6 @@ hl.bind("SUPER + P", hl.dsp.exec_cmd(shell.process_list))
 if shell.bar_toggle then
 	hl.bind("SUPER + I", hl.dsp.exec_cmd(shell.bar_toggle))
 end
-
--- suspend on power button press
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
--- laptop lid suspends the computer
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 
 -- apps
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("terminal"))

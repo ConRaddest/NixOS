@@ -620,6 +620,7 @@ trap 'rm -f "$hardware_tmp"' EXIT
 # ╰──────────────────────────────────────────────────────────╯
 
 printf 'Generating hardware configuration...\n'
+# shellcheck disable=SC2024 # Redirect targets user-owned temporary file.
 sudo nixos-generate-config "${root_args[@]}" --show-hardware-config > "$hardware_tmp"
 
 if ! grep -qE '^\{[[:space:]]*$' "$hardware_tmp" || ! tail -n 1 "$hardware_tmp" | grep -qE '^\}[[:space:]]*$'; then

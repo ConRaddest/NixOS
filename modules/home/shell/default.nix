@@ -23,7 +23,6 @@
           export NOS_ZONE_TAB_FILE="${pkgs.tzdata}/share/zoneinfo/zone1970.tab"
           export NOS_ACCENT_COLOR=${lib.escapeShellArg stylix.base0D}
           export FZF_DEFAULT_OPTS=${lib.escapeShellArg config.home.sessionVariables.FZF_DEFAULT_OPTS}
-          export SUDO_ASKPASS="${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass"
           export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:${pkgs.python3}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';

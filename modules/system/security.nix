@@ -34,17 +34,6 @@
 
       security.sudo.wheelNeedsPassword = true;
       security.sudo.extraConfig = "Defaults pwfeedback";
-      security.sudo.extraRules = [
-        {
-          users = [ username ];
-          commands = [
-            {
-              command = "/run/current-system/sw/bin/nixos-rebuild";
-              options = [ "NOPASSWD" ];
-            }
-          ];
-        }
-      ];
       security.polkit.enable = true;
     };
 }
