@@ -5,6 +5,7 @@
     {
       config,
       hostName,
+      lib,
       pkgs,
       self,
       ...
@@ -12,9 +13,13 @@
 
     let
       colors = config.lib.stylix.colors.withHashtag;
-      hostLogo = "${self}/hosts/${hostName}/logo.txt";
-      defaultLogo = "${self}/assets/logo.txt";
-      logo = if builtins.pathExists hostLogo then hostLogo else defaultLogo;
+      logo = pkgs.runCommand "fastfetch-logo-${hostName}" { nativeBuildInputs = [ pkgs.python3 ]; } ''
+        python3 ${self}/scripts/generate-logo.py \
+          --seed ${lib.escapeShellArg hostName} \
+          --output "$out"
+      '';
+      dim = colors.base02;
+      accent = colors.base0E;
     in
     {
       home.packages = [ pkgs.fastfetch ];
@@ -26,44 +31,115 @@
         logo = {
           type = "file";
           source = "~/.config/fastfetch/logo.txt";
-          color."1" = colors.base0D;
+          color."1" = accent;
           padding = {
             top = 0;
             right = 3;
           };
         };
         display = {
+          disableLinewrap = true;
           separator = "  ";
-          color = {
-            keys = colors.base0D;
-            title = colors.base0D;
-            separator = colors.base0D;
-          };
         };
         modules = [
           {
-            type = "os";
-            key = "system";
+            keyColor = dim;
+            type = "custom";
+            format = "┌──────────────────────Hardware──────────────────────┐";
           }
           {
-            type = "kernel";
-            key = "kernel";
-          }
-          {
-            type = "uptime";
-            key = "uptime";
+            type = "host";
+            key = " PC";
+            keyColor = accent;
           }
           {
             type = "cpu";
-            key = "cpu";
+            key = "│ ├";
+            showPeCoreCount = true;
+            keyColor = accent;
+          }
+          {
+            type = "gpu";
+            key = "│ ├";
+            detectionMethod = "pci";
+            format = "{name}";
+            keyColor = accent;
+          }
+          {
+            type = "display";
+            key = "│ ├󱄄";
+            keyColor = accent;
           }
           {
             type = "memory";
-            key = "memory";
+            key = "│ ├";
+            keyColor = accent;
           }
           {
-            type = "disk";
-            key = "disk";
+            type = "battery";
+            key = "└ └󰁹";
+            keyColor = accent;
+          }
+          {
+            keyColor = dim;
+            type = "custom";
+            format = "└────────────────────────────────────────────────────┘";
+          }
+          "break"
+          {
+            keyColor = dim;
+            type = "custom";
+            format = "┌──────────────────────Software──────────────────────┐";
+          }
+          {
+            type = "os";
+            key = " OS";
+            keyColor = accent;
+          }
+          {
+            type = "kernel";
+            key = "│ ├";
+            keyColor = accent;
+          }
+          {
+            type = "uptime";
+            key = "│ ├󱫐";
+            keyColor = accent;
+          }
+          {
+            type = "packages";
+            key = "│ ├󰏖";
+            keyColor = accent;
+          }
+          {
+            type = "shell";
+            key = "│ ├";
+            keyColor = accent;
+          }
+          {
+            type = "wm";
+            key = "│ ├";
+            keyColor = accent;
+          }
+          {
+            type = "theme";
+            key = "│ ├󰉼";
+            keyColor = accent;
+          }
+          {
+            type = "terminal";
+            key = "│ ├";
+            keyColor = accent;
+          }
+          {
+            type = "terminalfont";
+            key = "└ └";
+            keyColor = accent;
+          }
+          {
+            keyColor = dim;
+            type = "custom";
+            format = "└────────────────────────────────────────────────────┘";
           }
         ];
       };

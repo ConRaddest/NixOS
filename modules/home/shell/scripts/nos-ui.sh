@@ -5,6 +5,34 @@
 # │ Presentation                                             │
 # ╰──────────────────────────────────────────────────────────╯
 
+nos_wordmark() {
+  local wordmark="${NOS_DIR:-$HOME/NixOS}/assets/wordmark.txt"
+  local accent=''
+  local reset=''
+  local color="${NOS_ACCENT_COLOR:-bb9af7}"
+
+  [[ "${NOS_WORDMARK_SHOWN:-}" != 1 ]] || return 0
+
+  if [[ ! -r "$wordmark" ]]; then
+    printf 'Wordmark is missing: %s\n' "$wordmark" >&2
+    return 1
+  fi
+
+  color="${color#\#}"
+  if [[ -z "${NO_COLOR:-}" && "$color" =~ ^[[:xdigit:]]{6}$ ]]; then
+    printf -v accent '\033[38;2;%d;%d;%dm' \
+      "$((16#${color:0:2}))" \
+      "$((16#${color:2:2}))" \
+      "$((16#${color:4:2}))"
+    reset=$'\033[0m'
+  fi
+
+  printf '%s' "$accent"
+  cat "$wordmark"
+  printf '%s\n\n' "$reset"
+  export NOS_WORDMARK_SHOWN=1
+}
+
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   readonly NOS_ACCENT=$'\033[95m'
   readonly NOS_OK=$'\033[92m'
@@ -18,17 +46,6 @@ else
   readonly NOS_BOLD=''
   readonly NOS_RESET=''
 fi
-
-nos_heading() {
-  local heading="$1"
-  local underline
-
-  printf -v underline '%*s' "${#heading}" ''
-  underline=${underline// /─}
-
-  printf '%s%s%s%s\n' "$NOS_BOLD" "$NOS_ACCENT" "$heading" "$NOS_RESET"
-  printf '%s%s%s\n\n' "$NOS_BOLD" "$underline" "$NOS_RESET"
-}
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Desktop notifications and logs                           │

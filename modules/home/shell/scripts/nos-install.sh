@@ -5,6 +5,8 @@ set -euo pipefail
 # shellcheck source=modules/home/shell/scripts/nos-apps.sh
 source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-apps.sh"
 
+nos_wordmark
+
 # ╭──────────────────────────────────────────────────────────╮
 # │ Selection State                                          │
 # ╰──────────────────────────────────────────────────────────╯
@@ -49,7 +51,6 @@ fzf_args=(
 initial_query="$*"
 while true; do
   : > "$selected_file"
-  nos_heading "Install Applications"
 
   if ! selection=$(fzf --query "$initial_query" "${fzf_args[@]}"); then
     exit 0
@@ -67,7 +68,7 @@ while true; do
   { current_apps; printf '\n%s\n' "$pkg_names"; } | write_apps_file
 
   if ! nos-refresh; then
-    printf '\nInstall refresh failed. Log remains above. Press Enter to close.\n'
+    printf '\nInstall refresh failed. Press Enter to close.\n'
     read -r
     exit 1
   fi

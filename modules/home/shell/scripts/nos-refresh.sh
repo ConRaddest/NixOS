@@ -11,6 +11,8 @@ fi
 
 run_refresh() {
   local host_name
+
+  nos_wordmark || return
   host_name=$(nos_host_name) || return
 
   find "$NOS_DIR" -name "*.nix" -not -path "*/.git/*" -exec nixfmt {} + \

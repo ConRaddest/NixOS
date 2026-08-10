@@ -52,13 +52,12 @@ def parse_args():
     parser.add_argument(
         "--entrance-row",
         type=int,
-        default=0,
-        help="left-side entrance cell row",
+        help="left-side entrance cell row; omitted for a closed maze",
     )
     parser.add_argument(
         "--exit-row",
         type=int,
-        help="right-side exit cell row; defaults to last row",
+        help="right-side exit cell row; omitted for a closed maze",
     )
     parser.add_argument(
         "--output",
@@ -81,7 +80,7 @@ def validate_args(args):
         raise ValueError("start row is outside maze")
     if not 0 <= args.start_column < args.cell_columns:
         raise ValueError("start column is outside maze")
-    if not 0 <= args.entrance_row < args.cell_rows:
+    if args.entrance_row is not None and not 0 <= args.entrance_row < args.cell_rows:
         raise ValueError("entrance row is outside maze")
     if args.exit_row is not None and not 0 <= args.exit_row < args.cell_rows:
         raise ValueError("exit row is outside maze")
@@ -124,8 +123,10 @@ def carve_maze(rows, columns, seed, start):
 def build_edges(walls, entrance_row, exit_row):
     rows = len(walls)
     columns = len(walls[0])
-    walls[entrance_row][0][3] = False
-    walls[exit_row][columns - 1][1] = False
+    if entrance_row is not None:
+        walls[entrance_row][0][3] = False
+    if exit_row is not None:
+        walls[exit_row][columns - 1][1] = False
 
     horizontal = [[False] * columns for _ in range(rows + 1)]
     vertical = [[False] * (columns + 1) for _ in range(rows)]
@@ -184,7 +185,6 @@ def main():
     except ValueError as error:
         raise SystemExit(str(error)) from error
 
-    exit_row = args.exit_row if args.exit_row is not None else args.cell_rows - 1
     seed = int(args.seed) if args.seed.isdigit() else args.seed
     walls = carve_maze(
         args.cell_rows,
@@ -192,7 +192,7 @@ def main():
         seed,
         (args.start_row, args.start_column),
     )
-    horizontal, vertical = build_edges(walls, args.entrance_row, exit_row)
+    horizontal, vertical = build_edges(walls, args.entrance_row, args.exit_row)
     maze = render_maze(
         horizontal,
         vertical,

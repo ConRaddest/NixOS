@@ -2,7 +2,12 @@
 
 {
   flake.lib.homeModules.starship =
-    { config, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
 
     let
       stylix = config.lib.stylix.colors.withHashtag;
@@ -10,7 +15,7 @@
     {
       programs.starship = {
         enable = true;
-        enableFishIntegration = true;
+        enableFishIntegration = false;
 
         settings = {
           add_newline = true;
@@ -114,5 +119,13 @@
           };
         };
       };
+
+      programs.fish.interactiveShellInit = lib.mkAfter ''
+        if test "$TERM" != dumb
+          ${pkgs.coreutils}/bin/env \
+            PATH=${config.programs.starship.package}/bin \
+            ${config.programs.starship.package}/bin/starship init fish --print-full-init | source
+        end
+      '';
     };
 }

@@ -5,6 +5,8 @@ set -euo pipefail
 # shellcheck source=modules/home/shell/scripts/nos-apps.sh
 source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-apps.sh"
 
+nos_wordmark
+
 # ╭──────────────────────────────────────────────────────────╮
 # │ Interface                                                │
 # ╰──────────────────────────────────────────────────────────╯
@@ -26,8 +28,6 @@ fzf_args=(
 # ╰──────────────────────────────────────────────────────────╯
 
 while true; do
-  nos_heading "Remove Applications"
-
   if ! pkg_names=$(current_apps | fzf "${fzf_args[@]}"); then
     exit 0
   fi
@@ -36,7 +36,7 @@ while true; do
   { grep -Fvx -f <(printf '%s\n' "$pkg_names") <(current_apps) || true; } | write_apps_file
 
   if ! nos-refresh; then
-    printf '\nRemove refresh failed. Log remains above. Press Enter to close.\n'
+    printf '\nRemove refresh failed. Press Enter to close.\n'
     read -r
     exit 1
   fi

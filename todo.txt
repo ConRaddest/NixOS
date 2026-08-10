@@ -1,3 +1,0 @@
-1. Yazi ..
-2. Fzf
-3. Starship
