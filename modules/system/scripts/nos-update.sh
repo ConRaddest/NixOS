@@ -4,6 +4,8 @@ set -uo pipefail
 # shellcheck source=modules/home/shell/scripts/nos-ui.sh
 source "$NOS_DIR/modules/home/shell/scripts/nos-ui.sh"
 
+nos_operation_terminal "update" "NixOS Update" "$@"
+
 run_update() {
   local host_name
 
@@ -15,10 +17,4 @@ run_update() {
     && nos_run sudo --askpass nixos-rebuild switch --flake "$NOS_DIR#$host_name"
 }
 
-nos_begin "update"
-if nos_capture run_update; then
-  nos_finish "success" "NixOS Update Finished" "Inputs updated and configuration applied successfully."
-else
-  nos_finish "failure" "NixOS Update Failed" "Update or rebuild failed."
-  exit 1
-fi
+run_update

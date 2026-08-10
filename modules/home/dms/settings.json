@@ -309,7 +309,7 @@
   "appLauncherGridColumns": 4,
   "spotlightCloseNiriOverview": true,
   "rememberLastQuery": false,
-  "rememberLastMode": true,
+  "rememberLastMode": false,
   "spotlightSectionViewModes": {},
   "appDrawerSectionViewModes": {},
   "niriOverviewOverlayEnabled": true,
@@ -514,7 +514,7 @@
   "notificationPopupShadowEnabled": true,
   "notificationPopupPrivacyMode": false,
   "notificationForegroundLayers": true,
-  "modalDarkenBackground": true,
+  "modalDarkenBackground": false,
   "lockScreenShowPowerActions": true,
   "lockScreenShowSystemIcons": true,
   "lockScreenShowTime": true,
@@ -742,13 +742,28 @@
   "desktopWidgetGroups": [],
   "builtInPluginSettings": {
     "dms_clipboard_search": {
-      "trigger": "cb"
+      "trigger": "cb",
+      "enabled": false
     },
     "dms_qr_generator": {
-      "trigger": "qrg"
+      "trigger": "qrg",
+      "enabled": false
     },
     "dms_settings_search": {
-      "trigger": "?"
+      "trigger": "?",
+      "enabled": false
+    },
+    "dms_settings": {
+      "enabled": false
+    },
+    "dms_notepad": {
+      "enabled": false
+    },
+    "dms_sysmon": {
+      "enabled": false
+    },
+    "dms_colorpicker": {
+      "enabled": false
     }
   },
   "clipboardClickToPaste": false,

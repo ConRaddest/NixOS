@@ -48,71 +48,21 @@ else
 fi
 
 # ╭──────────────────────────────────────────────────────────╮
-# │ Desktop notifications and logs                           │
+# │ Operation terminals                                      │
 # ╰──────────────────────────────────────────────────────────╯
 
-nos_begin() {
+nos_operation_terminal() {
   local operation="$1"
-  local operation_pid="$$"
-  local title="NixOS ${operation^}"
-
-  NOS_LOG_FILE=$(mktemp "${TMPDIR:-/tmp}/nos-${operation}-XXXXXX.log")
-  export NOS_LOG_FILE
-
-  (
-    local action
-    action=$(notify-send \
-      --app-name="NixOS" \
-      --icon="$NOS_ICON" \
-      --expire-time=15000 \
-      --action="progress=Open in terminal" \
-      "$title Started" \
-      "Operation running in background.")
-
-    if [[ "$action" == "progress" ]]; then
-      uwsm app -- kitty \
-        --hold \
-        --class nos-progress \
-        --title "$title Progress" \
-        -e tail --pid="$operation_pid" -n +1 -f "$NOS_LOG_FILE" \
-        >/dev/null 2>&1
-    fi
-  ) >/dev/null 2>&1 &
-}
-
-nos_capture() {
-  "$@" 2>&1 | tee "$NOS_LOG_FILE"
-  return "${PIPESTATUS[0]}"
-}
-
-nos_finish() {
-  local status="$1"
   local title="$2"
-  local message="$3"
-  local urgency="normal"
+  shift 2
 
-  if [[ "$status" == "success" ]]; then
-    wl-copy --type text/plain < "$NOS_LOG_FILE"
-    message+=" Output copied to clipboard."
-  else
-    urgency="critical"
-  fi
+  [[ "${NOS_OPERATION_TERMINAL:-}" != "$operation" ]] || return 0
 
-  (
-    local action
-    action=$(notify-send \
-      --app-name="NixOS" \
-      --icon="$NOS_ICON" \
-      --urgency="$urgency" \
-      --expire-time=15000 \
-      --action="open=Open log" \
-      "$title" \
-      "$message Log: $NOS_LOG_FILE")
-
-    if [[ "$action" == "open" ]]; then
-      xdg-open "$NOS_LOG_FILE" >/dev/null 2>&1
-    fi
-  ) >/dev/null 2>&1 &
+  NOS_OPERATION_TERMINAL="$operation" exec uwsm app -- kitty \
+    --hold \
+    --class "nos-$operation" \
+    --title "$title" \
+    -e "$0" "$@"
 }
 
 # ╭──────────────────────────────────────────────────────────╮

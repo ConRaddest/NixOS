@@ -5,6 +5,8 @@
     {
       config,
       font,
+      host,
+      lib,
       pkgs,
       ...
     }:
@@ -61,15 +63,6 @@
           # adapter instead of Stylix's generated Hyprland config.
           hyprland.enable = false;
 
-          # Keep DMS accent surfaces in the purple family.
-          dank-material-shell.colors.override =
-            let
-              normal = config.lib.stylix.colors.withHashtag;
-            in
-            {
-              withHashtag.base0C = normal.base0F;
-            };
-
           # Match FZF's selection and search colors to Yazi's palette roles.
           fzf.colors.override =
             let
@@ -95,6 +88,16 @@
 
           gtk.enable = true;
           qt.enable = true;
+        }
+        // lib.optionalAttrs (host.desktopShell == "dms") {
+          # Keep DMS accent surfaces in the purple family.
+          dank-material-shell.colors.override =
+            let
+              normal = config.lib.stylix.colors.withHashtag;
+            in
+            {
+              withHashtag.base0C = normal.base0F;
+            };
         };
       };
 

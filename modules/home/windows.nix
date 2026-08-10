@@ -339,17 +339,6 @@
           type = "Application";
           categories = [ "System" ];
         };
-
-        windows-vm-stop = {
-          name = "Stop Windows";
-          comment = "Gracefully stop Windows virtual machine";
-          exec = "windows-vm-stop";
-          icon = "windows";
-          terminal = false;
-          type = "Application";
-          categories = [ "System" ];
-        };
-
       };
 
       home.file = {
@@ -403,7 +392,6 @@
 
         windows-vm-rdp
         windows-vm-start
-        windows-vm-stop
         windows-install
         windows-uninstall
       ];

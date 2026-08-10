@@ -20,6 +20,7 @@ let
     stateVersion = "26.05";
     initialHashedPassword = null;
     gaming = true;
+    desktopShell = "noctalia"; # "dms" || "noctalia"
 
     boot = {
       mode = "uefi";
@@ -154,7 +155,7 @@ let
 
       # Desktop environment
       self.lib.homeModules.desktop
-      self.lib.homeModules.dms
+      self.lib.homeModules.${host.desktopShell}
       self.lib.homeModules.firefox
       self.lib.homeModules.hyprland
       self.lib.homeModules.kitty

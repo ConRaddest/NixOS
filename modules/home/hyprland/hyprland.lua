@@ -59,12 +59,8 @@ hl.config({
 	general = {
 		gaps_in = 4,
 		gaps_out = 8,
-		border_size = 2,
+		border_size = 1,
 		layout = "dwindle",
-		col = {
-			active_border = "rgba(1a1b26ff)",
-			inactive_border = "rgba(1a1b26ff)",
-		},
 	},
 
 	decoration = {
@@ -103,7 +99,7 @@ hl.config({
 })
 
 -- Stylix colors generated from the shared Base16 palette.
--- require("nix.colors")
+require("nix.colors")
 
 -- ============================================================
 -- animations
@@ -138,9 +134,12 @@ end
 -- keybinds
 -- ============================================================
 
--- dms
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
-hl.bind("SUPER + P", hl.dsp.exec_cmd("dms ipc call processlist toggle"))
+local shell = require("nix.shell")
+hl.bind("SUPER + Space", hl.dsp.exec_cmd(shell.launcher))
+hl.bind("SUPER + P", hl.dsp.exec_cmd(shell.process_list))
+if shell.bar_toggle then
+	hl.bind("SUPER + I", hl.dsp.exec_cmd(shell.bar_toggle))
+end
 
 -- suspend on power button press
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
@@ -377,10 +376,10 @@ end, { desc = "Toggle single-window max width" })
 
 -- media / brightness
 local media = {
-	{ "XF86AudioRaiseVolume",  "dms ipc call audio increment 5" },
-	{ "XF86AudioLowerVolume",  "dms ipc call audio decrement 5" },
-	{ "XF86AudioMute",         "dms ipc call audio mute" },
-	{ "XF86AudioMicMute",      "dms ipc call audio micmute" },
+	{ "XF86AudioRaiseVolume",  shell.volume_up },
+	{ "XF86AudioLowerVolume",  shell.volume_down },
+	{ "XF86AudioMute",         shell.volume_mute },
+	{ "XF86AudioMicMute",      shell.mic_mute },
 	{ "XF86MonBrightnessUp",   "brightnessctl --quiet --class=backlight set +5%" },
 	{ "XF86MonBrightnessDown", "brightnessctl --quiet --class=backlight set 5%-"  },
 }
@@ -400,7 +399,9 @@ local popup_windows = {
 
 	{ title = "nos-install",           size = popupSize },
 	{ title = "nos-remove",            size = popupSize },
-	{ class = "nos-progress",           size = popupSize },
+	{ class = "nos-build",              size = popupSize },
+	{ class = "nos-refresh",            size = popupSize },
+	{ class = "nos-update",             size = popupSize },
 
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },
@@ -443,9 +444,4 @@ hl.window_rule({
 	opacity = "1.0 override 1.0 override 1.0 override",
 })
 
-require("dms.binds")
-require("dms.binds-user")
-require("dms.outputs")
-require("dms.windowrules")
--- require("dms.layout")
-require("dms.cursor")
+shell.setup()

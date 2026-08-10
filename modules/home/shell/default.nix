@@ -21,11 +21,10 @@
           export NOS_LOCALES_FILE="${pkgs.glibcLocales}/share/i18n/SUPPORTED"
           export NOS_XKB_RULES_FILE="${pkgs.xkeyboard_config}/share/xkeyboard-config-2/rules/base.lst"
           export NOS_ZONE_TAB_FILE="${pkgs.tzdata}/share/zoneinfo/zone1970.tab"
-          export NOS_ICON="${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg"
           export NOS_ACCENT_COLOR=${lib.escapeShellArg stylix.base0D}
           export FZF_DEFAULT_OPTS=${lib.escapeShellArg config.home.sessionVariables.FZF_DEFAULT_OPTS}
           export SUDO_ASKPASS="${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass"
-          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:${pkgs.python3}/bin:${pkgs.libnotify}/bin:${pkgs.wl-clipboard}/bin:${pkgs.xdg-utils}/bin:$PATH"
+          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:${pkgs.python3}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
