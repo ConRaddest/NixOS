@@ -68,8 +68,9 @@ while true; do
   { current_apps; printf '\n%s\n' "$pkg_names"; } | write_apps_file
 
   if ! NOS_COMMIT_MESSAGE="apps: update $host_name packages" nos-refresh; then
-    printf '\nInstall refresh failed. Press Enter to close.\n'
-    read -r
+    printf '\nInstall refresh failed.\n'
     exit 1
   fi
+
+  break
 done

@@ -307,15 +307,16 @@ local screenshot_cmd = "mkdir -p ~/Screenshots && "
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
 -- NOS helpers
-local function openTerminal(klass, cmd, pause)
+local function openTerminal(klass, cmd, keepOpen)
+	local suffix = keepOpen and "; exec fish" or ""
 	return hl.dsp.exec_cmd(
-		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. "'"
+		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. suffix .. "'"
 	)
 end
 
 hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("uwsm app -- nos-build"), { desc = "Build NixOS configuration" })
 hl.bind("SUPER + SHIFT + U", hl.dsp.exec_cmd("uwsm app -- nos-update"), { desc = "Update NixOS configuration" })
-hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", false), { desc = "Install Nix package" })
+hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", true), { desc = "Install Nix package" })
 hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", false), { desc = "Remove Nix package" })
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc = "Refresh Home Manager" })
 
