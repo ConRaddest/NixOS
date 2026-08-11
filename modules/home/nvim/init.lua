@@ -226,7 +226,7 @@ vim.keymap.set({ "n", "i" }, "<C-/>", focus_snacks_explorer_input, {
 	desc = "Focus explorer search",
 })
 
-vim.keymap.set("n", "<C-c>", function()
+local function close_current_buffer()
 	local buffer = vim.api.nvim_get_current_buf()
 
 	if vim.bo[buffer].modified then
@@ -242,9 +242,28 @@ vim.keymap.set("n", "<C-c>", function()
 		end
 	end
 
-	vim.cmd("BufferLineCycleNext")
+	local buffers = require("bufferline.commands").get_elements().elements
+	local next_buffer
+
+	for index, item in ipairs(buffers) do
+		if item.id == buffer then
+			next_buffer = buffers[index + 1] or buffers[index - 1]
+			break
+		end
+	end
+
+	if next_buffer and vim.api.nvim_buf_is_valid(next_buffer.id) then
+		vim.api.nvim_win_set_buf(0, next_buffer.id)
+	end
+
 	Snacks.bufdelete({ buf = buffer, force = true })
-end, {
+end
+
+vim.keymap.set("n", "<C-c>", close_current_buffer, {
+	desc = "Close buffer",
+	nowait = true,
+})
+vim.keymap.set("n", "<C-w>", close_current_buffer, {
 	desc = "Close buffer",
 	nowait = true,
 })
