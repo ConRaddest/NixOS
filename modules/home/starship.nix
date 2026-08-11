@@ -11,6 +11,33 @@
 
     let
       stylix = config.lib.stylix.colors.withHashtag;
+      ttyConfig = (pkgs.formats.toml { }).generate "starship-tty.toml" {
+        add_newline = false;
+        format = "$directory$git_branch$git_status$line_break$character";
+
+        directory = {
+          format = "[$path]($style) ";
+          style = "bold white";
+          truncation_length = 3;
+          truncation_symbol = ".../";
+        };
+
+        git_branch = {
+          format = "[$symbol$branch]($style) ";
+          style = "dimmed white";
+          symbol = "git:";
+        };
+
+        git_status = {
+          format = "[$all_status$ahead_behind]($style) ";
+          style = "dimmed white";
+        };
+
+        character = {
+          success_symbol = "[>](bold white)";
+          error_symbol = "[>](bold white)";
+        };
+      };
     in
     {
       programs.starship = {
@@ -122,6 +149,10 @@
 
       programs.fish.interactiveShellInit = lib.mkAfter ''
         if test "$TERM" != dumb
+          if test "$TERM" = linux
+            set -gx STARSHIP_CONFIG ${ttyConfig}
+          end
+
           ${pkgs.coreutils}/bin/env \
             PATH=${config.programs.starship.package}/bin \
             ${config.programs.starship.package}/bin/starship init fish --print-full-init | source

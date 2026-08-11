@@ -79,6 +79,10 @@
               };
             };
 
+          # base16-fish rewrites terminal palettes, including Linux virtual consoles.
+          # Kitty has its own target, and shell colors are configured separately.
+          fish.enable = false;
+
           # Existing GDU behavior and colors share one YAML file.
           gdu.enable = false;
 

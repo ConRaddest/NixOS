@@ -8,6 +8,7 @@
     "gimp"
     "gnome-disk-utility"
     "libreoffice"
+    "librewolf"
     "localsend"
     "nautilus"
     "slack"

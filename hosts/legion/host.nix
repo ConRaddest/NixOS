@@ -22,6 +22,7 @@ let
     gaming = true;
     desktopShell = "noctalia"; # "dms" || "noctalia"
 
+
     boot = {
       mode = "uefi";
       device = null;

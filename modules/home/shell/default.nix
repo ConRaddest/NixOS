@@ -78,8 +78,11 @@
         ];
         interactiveShellInit = ''
           set -g fish_greeting
-          set -g fish_color_command ${stylix.base0D}
-          set -g fish_color_param ${stylix.base05}
+
+          if test "$TERM" != linux
+            set -g fish_color_command ${stylix.base0D}
+            set -g fish_color_param ${stylix.base05}
+          end
         ''
         + lib.optionalString (flakeDirectory != null) ''
 
