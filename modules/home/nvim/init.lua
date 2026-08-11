@@ -24,6 +24,7 @@ vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter" }, {
 
 vim.opt.fillchars:append({
   vert = " ",
+  diff = " ",
 })
 
 local which_key = require("which-key")
