@@ -59,7 +59,7 @@ hl.config({
 	general = {
 		gaps_in = 4,
 		gaps_out = 8,
-		border_size = 1,
+		border_size = 0,
 		layout = "dwindle",
 	},
 
@@ -119,11 +119,11 @@ hl.curve("fast", {
 })
 
 local animations = {
-	{ enabled = true, leaf = "windows",          speed = 2, spring = "spring" },
-	{ enabled = true, leaf = "windowsOut",       speed = 2, spring = "spring" },
-	{ enabled = true, leaf = "workspaces",       speed = 2, bezier = "fast",  style = "slidevert" },
-	{ enabled = true, leaf = "specialWorkspace", speed = 2, bezier = "fast",  style = "slidevert" },
-	{ enabled = true, leaf = "fade",             speed = 1, bezier = "fast" },
+	{ enabled = true, leaf = "windows", speed = 2, spring = "spring" },
+	{ enabled = true, leaf = "windowsOut", speed = 2, spring = "spring" },
+	{ enabled = true, leaf = "workspaces", speed = 2, bezier = "fast", style = "slidevert" },
+	{ enabled = true, leaf = "specialWorkspace", speed = 2, bezier = "fast", style = "slidevert" },
+	{ enabled = true, leaf = "fade", speed = 1, bezier = "fast" },
 }
 
 for _, animation in ipairs(animations) do
@@ -229,15 +229,15 @@ local function hasTiledWindowInDirection(window, direction)
 			local otherCenterX = otherPosition.x + otherSize.x / 2
 			local otherCenterY = otherPosition.y + otherSize.y / 2
 			local overlapsHorizontally =
-					rangesOverlap(position.x, position.x + size.x, otherPosition.x, otherPosition.x + otherSize.x)
+				rangesOverlap(position.x, position.x + size.x, otherPosition.x, otherPosition.x + otherSize.x)
 			local overlapsVertically =
-					rangesOverlap(position.y, position.y + size.y, otherPosition.y, otherPosition.y + otherSize.y)
+				rangesOverlap(position.y, position.y + size.y, otherPosition.y, otherPosition.y + otherSize.y)
 
 			if
-					(direction == "left" and otherCenterX < centerX and overlapsVertically)
-					or (direction == "right" and otherCenterX > centerX and overlapsVertically)
-					or (direction == "up" and otherCenterY < centerY and overlapsHorizontally)
-					or (direction == "down" and otherCenterY > centerY and overlapsHorizontally)
+				(direction == "left" and otherCenterX < centerX and overlapsVertically)
+				or (direction == "right" and otherCenterX > centerX and overlapsVertically)
+				or (direction == "up" and otherCenterY < centerY and overlapsHorizontally)
+				or (direction == "down" and otherCenterY > centerY and overlapsHorizontally)
 			then
 				return true
 			end
@@ -258,8 +258,8 @@ local function smartMoveWindow(direction)
 	-- Keep an existing row/column intact. At its outer edge, the window in the
 	-- opposite direction still identifies the current split axis.
 	if
-			hasTiledWindowInDirection(window, direction)
-			or hasTiledWindowInDirection(window, oppositeDirection[direction])
+		hasTiledWindowInDirection(window, direction)
+		or hasTiledWindowInDirection(window, oppositeDirection[direction])
 	then
 		hl.dispatch(hl.dsp.window.move({ direction = direction }))
 		return
@@ -301,8 +301,8 @@ hl.bind("SUPER + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
 
 -- screenshot
 local screenshot_cmd = "mkdir -p ~/Screenshots && "
-		.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
-		.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
+	.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
+	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
 -- NOS helpers
@@ -376,12 +376,12 @@ end, { desc = "Toggle single-window max width" })
 
 -- media / brightness
 local media = {
-	{ "XF86AudioRaiseVolume",  shell.volume_up },
-	{ "XF86AudioLowerVolume",  shell.volume_down },
-	{ "XF86AudioMute",         shell.volume_mute },
-	{ "XF86AudioMicMute",      shell.mic_mute },
-	{ "XF86MonBrightnessUp",   "brightnessctl --quiet --class=backlight set +5%" },
-	{ "XF86MonBrightnessDown", "brightnessctl --quiet --class=backlight set 5%-"  },
+	{ "XF86AudioRaiseVolume", shell.volume_up },
+	{ "XF86AudioLowerVolume", shell.volume_down },
+	{ "XF86AudioMute", shell.volume_mute },
+	{ "XF86AudioMicMute", shell.mic_mute },
+	{ "XF86MonBrightnessUp", "brightnessctl --quiet --class=backlight set +5%" },
+	{ "XF86MonBrightnessDown", "brightnessctl --quiet --class=backlight set 5%-" },
 }
 for _, b in ipairs(media) do
 	hl.bind(b[1], hl.dsp.exec_cmd(b[2]), { locked = true, repeating = true })
@@ -397,11 +397,11 @@ local popup_windows = {
 	{ title = "windows-credentials" },
 	{ title = "windows-vm-start" },
 
-	{ title = "nos-install",           size = popupSize },
-	{ title = "nos-remove",            size = popupSize },
-	{ class = "nos-build",              size = popupSize },
-	{ class = "nos-refresh",            size = popupSize },
-	{ class = "nos-update",             size = popupSize },
+	{ title = "nos-install", size = popupSize },
+	{ title = "nos-remove", size = popupSize },
+	{ class = "nos-build", size = popupSize },
+	{ class = "nos-refresh", size = popupSize },
+	{ class = "nos-update", size = popupSize },
 
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "termfilechooser" },

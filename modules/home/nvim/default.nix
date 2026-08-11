@@ -14,7 +14,7 @@
         name = "Neovim";
         genericName = "Text Editor";
         comment = "Edit text files in Neovim";
-        exec = "kitty --class neovim --title neovim -e nvim %F";
+        exec = "kitty -o window_padding_width=0 --class neovim --title neovim -e nvim %F";
         icon = "nvim";
         terminal = false;
         type = "Application";
@@ -36,6 +36,7 @@
           "text/x-python"
           "application/x-shellscript"
         ];
+
       };
 
       xdg.dataFile."mime/packages/code-workspace.xml".text = ''
@@ -61,8 +62,8 @@
       xdg.configFile."nvim/lua/config.lua".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
 
-      # Match Neovim to system Base16 palette.
-      stylix.targets.neovim.enable = true;
+      # Use Neovim's Tokyo Night theme instead of Stylix's reduced Base16 syntax palette.
+      stylix.targets.neovim.enable = false;
 
       programs.neovim = {
         enable = true;
@@ -84,6 +85,51 @@
           grug-far-nvim
           nvim-web-devicons
           bufferline-nvim
+
+          # Language intelligence
+          nvim-lspconfig
+          blink-cmp
+          friendly-snippets
+          nvim-autopairs
+          (nvim-treesitter.withPlugins (
+            parsers: with parsers; [
+              bash
+              c
+              c_sharp
+              css
+              html
+              javascript
+              jsdoc
+              json
+              lua
+              markdown
+              markdown_inline
+              nix
+              python
+              qmljs
+              regex
+              tsx
+              typescript
+              vim
+              vimdoc
+              yaml
+            ]
+          ))
+          nvim-treesitter-context
+          nvim-ts-autotag
+
+          # Formatting and diagnostics
+          conform-nvim
+          nvim-lint
+          trouble-nvim
+
+          # Testing, tasks, and sessions
+          nvim-nio
+          neotest
+          neotest-python
+          neotest-dotnet
+          overseer-nvim
+          persistence-nvim
         ];
 
         initLua = ''
