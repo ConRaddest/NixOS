@@ -7,6 +7,7 @@
     "drawio"
     "gimp"
     "gnome-disk-utility"
+    "lazygit"
     "libreoffice"
     "librewolf"
     "localsend"
