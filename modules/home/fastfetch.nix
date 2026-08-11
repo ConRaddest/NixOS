@@ -18,7 +18,6 @@
           --seed ${lib.escapeShellArg hostName} \
           --output "$out"
       '';
-      dim = colors.selection;
       accent = colors.secondary;
     in
     {

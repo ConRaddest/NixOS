@@ -94,6 +94,20 @@ local function toggle_snacks_explorer()
 	Snacks.explorer({ focus = true })
 end
 
+local function focus_snacks_explorer_input()
+	local explorer = Snacks.picker.get({ source = "explorer" })[1]
+
+	if not explorer then
+		snacks_editor_window = vim.api.nvim_get_current_win()
+		Snacks.explorer({ focus = true })
+		explorer = Snacks.picker.get({ source = "explorer" })[1]
+	end
+
+	if explorer then
+		explorer:focus("input", { show = true })
+	end
+end
+
 local function save_current_buffer()
 	if vim.api.nvim_buf_get_name(0) ~= "" then
 		vim.cmd("write")
@@ -130,6 +144,30 @@ which_key.add({
 	{ "<leader>e", "<cmd>Yazi<cr>", desc = "File explorer" },
 	{ "<leader>g", group = "Git" },
 	{ "<leader>gg", "<cmd>Neogit<cr>", desc = "Git status" },
+	{
+		"<leader>gc",
+		function()
+			local trouble = require("trouble")
+
+			if trouble.is_open("git_hunks") then
+				trouble.close("git_hunks")
+				return
+			end
+
+			require("gitsigns").setqflist("all", { open = false }, function(error)
+				if error then
+					vim.notify(error, vim.log.levels.ERROR)
+					return
+				end
+
+				vim.schedule(function()
+					focus_snacks_editor()
+					trouble.open("git_hunks")
+				end)
+			end)
+		end,
+		desc = "Toggle changed hunks",
+	},
 	{ "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Review changes" },
 	{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
 	{ "<leader>s", group = "Search" },
@@ -184,23 +222,30 @@ which_key.add({
 	{ "<C-s>", save_current_buffer, desc = "Save" },
 })
 
-vim.keymap.set("n", "<C-c>", function()
-	local split_count = 0
+vim.keymap.set({ "n", "i" }, "<C-/>", focus_snacks_explorer_input, {
+	desc = "Focus explorer search",
+})
 
-	for _, window in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-		if vim.api.nvim_win_get_config(window).relative == "" then
-			split_count = split_count + 1
+vim.keymap.set("n", "<C-c>", function()
+	local buffer = vim.api.nvim_get_current_buf()
+
+	if vim.bo[buffer].modified then
+		local choice =
+			vim.fn.confirm(("Save changes to %q?"):format(vim.api.nvim_buf_get_name(buffer)), "&Yes\n&No\n&Cancel")
+
+		if choice == 0 or choice == 3 then
+			return
+		end
+
+		if choice == 1 then
+			vim.api.nvim_buf_call(buffer, vim.cmd.write)
 		end
 	end
 
-	if split_count > 1 then
-		vim.api.nvim_win_close(vim.api.nvim_get_current_win(), false)
-		return
-	end
-
-	Snacks.bufdelete()
+	vim.cmd("BufferLineCycleNext")
+	Snacks.bufdelete({ buf = buffer, force = true })
 end, {
-	desc = "Close split or buffer",
+	desc = "Close buffer",
 	nowait = true,
 })
 
@@ -412,12 +457,14 @@ require("snacks").setup({
 				win = {
 					input = {
 						keys = {
+							["<Esc>"] = { "focus_list", mode = { "n", "i" } },
 							["<C-b>"] = { toggle_snacks_explorer, mode = { "n", "i" } },
 							["<C-Right>"] = { focus_snacks_editor, mode = { "n", "i" } },
 						},
 					},
 					list = {
 						keys = {
+							["<Esc>"] = focus_snacks_editor,
 							["<C-b>"] = toggle_snacks_explorer,
 							["<C-Right>"] = focus_snacks_editor,
 						},
@@ -451,6 +498,9 @@ require("bufferline").setup({
 	options = {
 		show_tab_indicators = false,
 		show_close_icon = false,
+		custom_filter = function(buffer)
+			return vim.api.nvim_buf_get_name(buffer) ~= ""
+		end,
 	},
 })
 
@@ -692,7 +742,19 @@ end, { desc = "Format buffer" })
 vim.keymap.set("n", "<leader>dx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
 vim.keymap.set("n", "<leader>dX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer diagnostics" })
 
-require("trouble").setup({})
+require("trouble").setup({
+	modes = {
+		git_hunks = {
+			mode = "qflist",
+			win = {
+				type = "split",
+				relative = "win",
+				position = "bottom",
+				size = 12,
+			},
+		},
+	},
+})
 
 -- Tests and project tasks
 local neotest = require("neotest")
