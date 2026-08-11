@@ -132,6 +132,12 @@ require("neogit").setup({
   },
 })
 
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    require("neogit.lib.hl").setup(require("neogit.config").values)
+  end,
+})
+
 require("snacks").setup({
   explorer = { enabled = true },
   picker = { enabled = true },
