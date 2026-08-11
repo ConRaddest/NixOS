@@ -12,7 +12,7 @@
 
     let
       flakeDirectory = config.nos.flakeDirectory;
-      stylix = config.lib.stylix.colors;
+      colors = lib.mapAttrs (_: lib.removePrefix "#") config.nos.theme.colors;
 
       mkNosScript =
         name: script:
@@ -21,7 +21,7 @@
           export NOS_LOCALES_FILE="${pkgs.glibcLocales}/share/i18n/SUPPORTED"
           export NOS_XKB_RULES_FILE="${pkgs.xkeyboard_config}/share/xkeyboard-config-2/rules/base.lst"
           export NOS_ZONE_TAB_FILE="${pkgs.tzdata}/share/zoneinfo/zone1970.tab"
-          export NOS_ACCENT_COLOR=${lib.escapeShellArg stylix.base0D}
+          export NOS_ACCENT_COLOR=${lib.escapeShellArg colors.primary}
           export FZF_DEFAULT_OPTS=${lib.escapeShellArg config.home.sessionVariables.FZF_DEFAULT_OPTS}
           export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:${pkgs.python3}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
@@ -57,6 +57,9 @@
     {
       news.display = "silent";
 
+      # Keep Linux virtual consoles on kernel colors.
+      stylix.targets.fish.enable = false;
+
       home.sessionVariables = lib.optionalAttrs (flakeDirectory != null) {
         NOS_DIR = flakeDirectory;
       };
@@ -80,8 +83,8 @@
           set -g fish_greeting
 
           if test "$TERM" != linux
-            set -g fish_color_command ${stylix.base0D}
-            set -g fish_color_param ${stylix.base05}
+            set -g fish_color_command ${colors.primary}
+            set -g fish_color_param ${colors.foreground}
           end
         ''
         + lib.optionalString (flakeDirectory != null) ''

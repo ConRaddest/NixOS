@@ -13,6 +13,11 @@
       fonts.fontconfig.enable = true;
       dconf.enable = true;
 
+      stylix.targets = {
+        gtk.enable = true;
+        qt.enable = true;
+      };
+
       # Stylix owns cursor package, name, and size. Keep Hyprcursor integration.
       home.pointerCursor.hyprcursor.enable = true;
 

@@ -5,7 +5,7 @@
     { config, pkgs, ... }:
 
     let
-      colors = config.lib.stylix.colors.withHashtag;
+      colors = config.nos.theme.colors;
     in
     {
       xdg.desktopEntries.lazydocker = {
@@ -24,11 +24,11 @@
       xdg.configFile."lazydocker/config.yml".text = ''
         gui:
           theme:
-            activeBorderColor: ["${colors.base0D}", "bold"]
-            inactiveBorderColor: ["${colors.base03}"]
-            selectedLineBgColor: ["${colors.base02}"]
-            optionsTextColor: ["${colors.base0D}"]
-            defaultFgColor: ["${colors.base05}"]
+            activeBorderColor: ["${colors.primary}", "bold"]
+            inactiveBorderColor: ["${colors.border}"]
+            selectedLineBgColor: ["${colors.selection}"]
+            optionsTextColor: ["${colors.primary}"]
+            defaultFgColor: ["${colors.foreground}"]
       '';
 
       home.file = {

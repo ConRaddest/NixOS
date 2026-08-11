@@ -16,7 +16,7 @@
       backgroundOpacity = "0.95";
       pickerPackage =
         inputs.hyprland-preview-share-picker.packages.${pkgs.stdenv.hostPlatform.system}.default;
-      colors = config.lib.stylix.colors.withHashtag;
+      colors = config.nos.theme.colors;
     in
     {
       home.packages = [ pickerPackage ];
@@ -65,16 +65,16 @@
       '';
 
       xdg.configFile."hyprland-preview-share-picker/hyprland-preview-share-picker.css".text = ''
-        @define-color foreground ${colors.base05};
-        @define-color background ${colors.base00};
-        @define-color accent ${colors.base0D};
-        @define-color muted ${colors.base04};
-        @define-color card_bg ${colors.base01};
-        @define-color text_dark ${colors.base00};
-        @define-color accent_hover ${colors.base0D};
-        @define-color accent_hover_text ${colors.base00};
-        @define-color selected_tab ${colors.base0D};
-        @define-color text ${colors.base05};
+        @define-color foreground ${colors.foreground};
+        @define-color background ${colors.background};
+        @define-color accent ${colors.primary};
+        @define-color muted ${colors.muted};
+        @define-color card_bg ${colors.surface};
+        @define-color text_dark ${colors.background};
+        @define-color accent_hover ${colors.primary};
+        @define-color accent_hover_text ${colors.background};
+        @define-color selected_tab ${colors.primary};
+        @define-color text ${colors.foreground};
         @define-color shadow #000000;
 
         * {

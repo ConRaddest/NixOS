@@ -12,7 +12,7 @@
     }:
 
     let
-      colors = config.lib.stylix.colors;
+      colors = lib.mapAttrs (_: lib.removePrefix "#") config.nos.theme.colors;
       desktopShell =
         if host.desktopShell == "dms" then
           {
@@ -88,6 +88,9 @@
       };
     in
     {
+      # Lua config and generated adapter below render semantic colors directly.
+      stylix.targets.hyprland.enable = false;
+
       home.packages = with pkgs; [
         cliphist
         grim
@@ -106,6 +109,9 @@
         enable = true;
         systemd.enable = false;
       };
+
+      # Wallpaper runs independently from desktop shell. Stylix supplies image.
+      services.hyprpaper.enable = true;
 
       xdg.configFile."hypr/nix/plugins.lua".text = ''
         hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
@@ -152,16 +158,16 @@
           general = {
             col = {
               -- Match background to hide Hyprland xray border artifacts.
-              active_border = "rgba(${colors.base00}ff)",
-              inactive_border = "rgba(${colors.base00}ff)",
+              active_border = "rgb(${colors.background})",
+              inactive_border = "rgb(${colors.background})",
             },
           },
           group = {
             col = {
-              border_active = "rgb(${colors.base0D})",
-              border_inactive = "rgb(${colors.base03})",
-              border_locked_active = "rgb(${colors.base0C})",
-              border_locked_inactive = "rgb(${colors.base03})",
+              border_active = "rgb(${colors.primary})",
+              border_inactive = "rgb(${colors.border})",
+              border_locked_active = "rgb(${colors.info})",
+              border_locked_inactive = "rgb(${colors.border})",
             },
           },
         })

@@ -2,10 +2,13 @@
 
 {
   flake.lib.homeModules.dms =
-    { ... }:
+    { config, ... }:
 
     {
       imports = [ inputs.dms.homeModules.dank-material-shell ];
+
+      stylix.targets.dank-material-shell.colors.override.withHashtag.base0C =
+        config.nos.theme.colors.accentDark;
 
       programs.dank-material-shell = {
         enable = true;

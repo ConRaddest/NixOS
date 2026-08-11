@@ -10,7 +10,7 @@ Multi-host NixOS configuration for x86_64 workstations. It manages both system s
 - Firefox, Neovim, Yazi, btop, LazyDocker, GIMP, and LibreOffice
 - XDG portals, screen sharing, clipboard, screenshots, and Polkit support
 - Host-agnostic formatting, static-analysis, shell, NixOS, and Home Manager checks
-- Optional graphics, audio, Bluetooth, Docker, Windows VM, 1Password, printing, gaming, and laptop modules
+- Optional graphics, audio, Bluetooth, Docker, Windows VM, 1Password, printing, Steam, and laptop modules
 
 ## Before using it
 
@@ -374,7 +374,7 @@ Wizard keeps related system and home modules aligned:
 | Windows VM | Docker/KVM/TUN         | VM launchers and FreeRDP |
 | 1Password  | application and policy | SSH agent config         |
 | Printing   | CUPS                   | none                     |
-| Gaming     | Steam support          | Steam launcher           |
+| Steam      | Steam support          | Steam launcher           |
 
 When enabling modules manually, add both sides where applicable.
 
@@ -430,11 +430,17 @@ Notes:
 
 ## Theming
 
-`homeModules.theme` imports Stylix and defines one shared Base16 palette, wallpaper, font set, cursor, and application targets. Theme changes are declarative and apply during the next Home Manager or NixOS rebuild.
+`homeModules.theme` imports Stylix and applies shared theme options, fonts, cursor, wallpaper, and application targets. Each theme is a dendritic Home Manager module under `modules/home/theme/themes/`; its folder contains the Nix palette definition and wallpaper.
 
-Current theme uses `modules/home/theme/tokyo-night-mauve.yaml`, with mauve `base0D` as the shared system accent. Stylix directly themes supported applications. Custom Fastfetch, GDU, Hyprland Lua, LazyDocker, and screen-share-picker adapters consume `config.lib.stylix.colors` from the same palette.
+Theme palettes use hashtagged `#RRGGBB` colors. The theme engine resolves semantic roles such as `primary`, `background`, `success`, and `error` through `config.nos.theme.colors`. Stylix themes supported applications while custom Fastfetch, GDU, Hyprland Lua, LazyDocker, Noctalia, shell, Starship, Yazi, and screen-share-picker adapters consume the same semantic colors.
 
-Change `stylix.base16Scheme`, `stylix.override`, or `stylix.image` in `modules/home/theme/default.nix`, then rebuild:
+Select a theme directly in each host definition:
+
+```nix
+theme = self.lib.homeModules.themeTokyoNight;
+```
+
+Add `host.theme` beside `self.lib.homeModules.theme` in the host's Home Manager imports. Change the module reference, then rebuild:
 
 ```bash
 nos-build

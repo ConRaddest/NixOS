@@ -10,34 +10,7 @@
     }:
 
     let
-      stylix = config.lib.stylix.colors.withHashtag;
-      ttyConfig = (pkgs.formats.toml { }).generate "starship-tty.toml" {
-        add_newline = false;
-        format = "$directory$git_branch$git_status$line_break$character";
-
-        directory = {
-          format = "[$path]($style) ";
-          style = "bold white";
-          truncation_length = 3;
-          truncation_symbol = ".../";
-        };
-
-        git_branch = {
-          format = "[$symbol$branch]($style) ";
-          style = "dimmed white";
-          symbol = "git:";
-        };
-
-        git_status = {
-          format = "[$all_status$ahead_behind]($style) ";
-          style = "dimmed white";
-        };
-
-        character = {
-          success_symbol = "[>](bold white)";
-          error_symbol = "[>](bold white)";
-        };
-      };
+      theme = config.nos.theme.colors;
     in
     {
       programs.starship = {
@@ -46,10 +19,10 @@
 
         settings = {
           add_newline = true;
-          format = "[░▒▓](fg:${stylix.base0F})$os[](fg:${stylix.base0F} bg:${stylix.base0D})$directory[](fg:${stylix.base0D} bg:${stylix.base02})$git_branch$git_status[](fg:${stylix.base02} bg:${stylix.base00})$nodejs$bun$rust$golang$php[](fg:${stylix.base00} bg:${stylix.base01})$time[ ](fg:${stylix.base01})$line_break$character";
+          format = "[░▒▓](fg:${theme.accentDark})$os[](fg:${theme.accentDark} bg:${theme.primary})$directory[](fg:${theme.primary} bg:${theme.selection})$git_branch$git_status[](fg:${theme.selection} bg:${theme.background})$nodejs$bun$rust$golang$php[](fg:${theme.background} bg:${theme.surface})$time[ ](fg:${theme.surface})$line_break$character";
 
           directory = {
-            style = "fg:${stylix.base00} bg:${stylix.base0D}";
+            style = "fg:${theme.background} bg:${theme.primary}";
             format = "[ $path ]($style)";
             truncation_length = 3;
             truncation_symbol = "…/";
@@ -63,55 +36,55 @@
 
           git_branch = {
             symbol = "";
-            style = "bg:${stylix.base02}";
-            format = "[[ $symbol $branch ](fg:${stylix.base0D} bg:${stylix.base02})]($style)";
+            style = "bg:${theme.selection}";
+            format = "[[ $symbol $branch ](fg:${theme.primary} bg:${theme.selection})]($style)";
           };
 
           git_status = {
-            style = "bg:${stylix.base02}";
-            format = "[[($all_status$ahead_behind )](fg:${stylix.base0D} bg:${stylix.base02})]($style)";
+            style = "bg:${theme.selection}";
+            format = "[[($all_status$ahead_behind )](fg:${theme.primary} bg:${theme.selection})]($style)";
           };
 
           nodejs = {
             symbol = "";
-            style = "bg:${stylix.base00}";
-            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
+            style = "bg:${theme.background}";
+            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
           };
 
           bun = {
             symbol = "";
-            style = "bg:${stylix.base00}";
-            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
+            style = "bg:${theme.background}";
+            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
           };
 
           rust = {
             symbol = "";
-            style = "bg:${stylix.base00}";
-            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
+            style = "bg:${theme.background}";
+            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
           };
 
           golang = {
             symbol = "";
-            style = "bg:${stylix.base00}";
-            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
+            style = "bg:${theme.background}";
+            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
           };
 
           php = {
             symbol = "";
-            style = "bg:${stylix.base00}";
-            format = "[[ $symbol ($version) ](fg:${stylix.base0D} bg:${stylix.base00})]($style)";
+            style = "bg:${theme.background}";
+            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
           };
 
           time = {
             disabled = false;
             time_format = "%R";
-            style = "bg:${stylix.base01}";
-            format = "[[  $time ](fg:${stylix.base05} bg:${stylix.base01})]($style)";
+            style = "bg:${theme.surface}";
+            format = "[[  $time ](fg:${theme.foreground} bg:${theme.surface})]($style)";
           };
 
           os = {
             disabled = false;
-            style = "bg:${stylix.base0F} fg:${stylix.base00}";
+            style = "bg:${theme.accentDark} fg:${theme.background}";
             format = "[ $symbol ]($style)";
             symbols = {
               Windows = "󰍲";
@@ -141,17 +114,15 @@
           };
 
           character = {
-            success_symbol = "[❯](bold ${stylix.base0D})";
-            error_symbol = "[❯](bold ${stylix.base0D})";
+            success_symbol = "[❯](bold ${theme.primary})";
+            error_symbol = "[❯](bold ${theme.primary})";
           };
         };
       };
 
       programs.fish.interactiveShellInit = lib.mkAfter ''
         if test "$TERM" != dumb
-          if test "$TERM" = linux
-            set -gx STARSHIP_CONFIG ${ttyConfig}
-          end
+          set -gx STARSHIP_CONFIG ${config.xdg.configHome}/starship.toml
 
           ${pkgs.coreutils}/bin/env \
             PATH=${config.programs.starship.package}/bin \

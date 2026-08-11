@@ -5,7 +5,7 @@
     { config, pkgs, ... }:
 
     let
-      stylix = config.lib.stylix.colors.withHashtag;
+      theme = config.nos.theme.colors;
       yaziWrapper = pkgs.writeShellScriptBin "yazi-wrapper.sh" ''
         multiple="$1"
         directory="$2"
@@ -39,6 +39,9 @@
       '';
     in
     {
+      # Custom config below renders semantic colors directly.
+      stylix.targets.yazi.enable = false;
+
       home.packages = with pkgs; [
         imv
         mpv
@@ -131,114 +134,114 @@
 
       xdg.configFile."yazi/theme.toml".text = ''
         [mgr]
-        cwd             = { fg = "${stylix.base0D}" }
-        find_keyword    = { fg = "${stylix.base0A}", bold = true, underline = true }
-        find_position   = { fg = "${stylix.base05}", bg = "reset", bold = true }
-        marker_copied   = { fg = "${stylix.base0B}",  bg = "${stylix.base0B}" }
-        marker_cut      = { fg = "${stylix.base08}",    bg = "${stylix.base08}" }
-        marker_marked   = { fg = "${stylix.base0C}",   bg = "${stylix.base0C}" }
-        marker_selected = { fg = "${stylix.base0A}", bg = "${stylix.base0A}" }
-        count_copied    = { bg = "${stylix.base0B}" }
-        count_cut       = { bg = "${stylix.base08}" }
-        count_selected  = { bg = "${stylix.base0A}" }
+        cwd             = { fg = "${theme.primary}" }
+        find_keyword    = { fg = "${theme.warning}", bold = true, underline = true }
+        find_position   = { fg = "${theme.foreground}", bg = "reset", bold = true }
+        marker_copied   = { fg = "${theme.success}",  bg = "${theme.success}" }
+        marker_cut      = { fg = "${theme.error}",    bg = "${theme.error}" }
+        marker_marked   = { fg = "${theme.info}",   bg = "${theme.info}" }
+        marker_selected = { fg = "${theme.warning}", bg = "${theme.warning}" }
+        count_copied    = { bg = "${theme.success}" }
+        count_cut       = { bg = "${theme.error}" }
+        count_selected  = { bg = "${theme.warning}" }
         border_symbol   = "│"
-        border_style    = { fg = "${stylix.base03}" }
+        border_style    = { fg = "${theme.border}" }
 
         [indicator]
-        parent  = { fg = "${stylix.base06}", bg = "${stylix.base02}" }
-        current = { fg = "${stylix.base06}", bg = "${stylix.base02}", bold = true }
-        preview = { fg = "${stylix.base06}", bg = "${stylix.base02}" }
+        parent  = { fg = "${theme.highlight}", bg = "${theme.selection}" }
+        current = { fg = "${theme.highlight}", bg = "${theme.selection}", bold = true }
+        preview = { fg = "${theme.highlight}", bg = "${theme.selection}" }
         padding = { open = "▐", close = "▌" }
 
         [tabs]
-        active    = { fg = "${stylix.base02}", bg = "${stylix.base0D}", bold = true }
-        inactive  = { fg = "${stylix.base0D}", bg = "${stylix.base02}" }
+        active    = { fg = "${theme.selection}", bg = "${theme.primary}", bold = true }
+        inactive  = { fg = "${theme.primary}", bg = "${theme.selection}" }
         sep_inner = { open = " ", close = " " }
         sep_outer = { open = " ", close = " " }
 
         [mode]
-        normal_main = { fg = "${stylix.base02}", bg = "${stylix.base0D}", bold = true }
-        normal_alt  = { fg = "${stylix.base0D}", bg = "${stylix.base02}" }
-        select_main = { bg = "${stylix.base0C}",   bold = true }
-        select_alt  = { fg = "${stylix.base0C}",   bg = "${stylix.base02}" }
-        unset_main  = { bg = "${stylix.base05}", bold = true }
-        unset_alt   = { fg = "${stylix.base05}", bg = "${stylix.base02}" }
+        normal_main = { fg = "${theme.selection}", bg = "${theme.primary}", bold = true }
+        normal_alt  = { fg = "${theme.primary}", bg = "${theme.selection}" }
+        select_main = { bg = "${theme.info}",   bold = true }
+        select_alt  = { fg = "${theme.info}",   bg = "${theme.selection}" }
+        unset_main  = { bg = "${theme.foreground}", bold = true }
+        unset_alt   = { fg = "${theme.foreground}", bg = "${theme.selection}" }
 
         [status]
         sep_left  = { open = " ", close = " " }
         sep_right = { open = " ", close = " " }
-        perm_sep        = { fg = "${stylix.base03}" }
-        perm_type       = { fg = "${stylix.base0D}" }
-        perm_read       = { fg = "${stylix.base0A}" }
-        perm_write      = { fg = "${stylix.base08}" }
-        perm_exec       = { fg = "${stylix.base0B}" }
-        progress_label  = { fg = "${stylix.base05}", bold = true }
-        progress_normal = { fg = "${stylix.base0B}", bg = "${stylix.base02}" }
-        progress_error  = { fg = "${stylix.base0A}", bg = "${stylix.base08}" }
+        perm_sep        = { fg = "${theme.border}" }
+        perm_type       = { fg = "${theme.primary}" }
+        perm_read       = { fg = "${theme.warning}" }
+        perm_write      = { fg = "${theme.error}" }
+        perm_exec       = { fg = "${theme.success}" }
+        progress_label  = { fg = "${theme.foreground}", bold = true }
+        progress_normal = { fg = "${theme.success}", bg = "${theme.selection}" }
+        progress_error  = { fg = "${theme.warning}", bg = "${theme.error}" }
 
         [confirm]
-        border  = { fg = "${stylix.base0D}" }
-        title   = { fg = "${stylix.base0D}", bold = true }
-        body    = { fg = "${stylix.base05}" }
-        list    = { fg = "${stylix.base05}" }
-        btn_yes = { fg = "${stylix.base02}", bg = "${stylix.base0D}", bold = true }
-        btn_no  = { fg = "${stylix.base05}", bg = "${stylix.base02}" }
+        border  = { fg = "${theme.primary}" }
+        title   = { fg = "${theme.primary}", bold = true }
+        body    = { fg = "${theme.foreground}" }
+        list    = { fg = "${theme.foreground}" }
+        btn_yes = { fg = "${theme.selection}", bg = "${theme.primary}", bold = true }
+        btn_no  = { fg = "${theme.foreground}", bg = "${theme.selection}" }
 
         [pick]
-        border   = { fg = "${stylix.base0D}" }
-        active   = { fg = "${stylix.base05}", bold = true }
-        inactive = { fg = "${stylix.base05}" }
+        border   = { fg = "${theme.primary}" }
+        active   = { fg = "${theme.foreground}", bold = true }
+        inactive = { fg = "${theme.foreground}" }
 
         [input]
-        border   = { fg = "${stylix.base0D}" }
-        title    = { fg = "${stylix.base0D}" }
-        value    = { fg = "${stylix.base05}" }
+        border   = { fg = "${theme.primary}" }
+        title    = { fg = "${theme.primary}" }
+        value    = { fg = "${theme.foreground}" }
         selected = { reversed = true }
 
         [cmp]
-        border   = { fg = "${stylix.base0D}" }
-        active   = { fg = "${stylix.base02}", bg = "${stylix.base0D}" }
-        inactive = { fg = "${stylix.base05}" }
+        border   = { fg = "${theme.primary}" }
+        active   = { fg = "${theme.selection}", bg = "${theme.primary}" }
+        inactive = { fg = "${theme.foreground}" }
 
         [tasks]
-        border  = { fg = "${stylix.base0D}" }
-        title   = { fg = "${stylix.base0D}" }
-        hovered = { fg = "${stylix.base05}", bold = true }
+        border  = { fg = "${theme.primary}" }
+        title   = { fg = "${theme.primary}" }
+        hovered = { fg = "${theme.foreground}", bold = true }
 
         [which]
-        mask            = { bg = "${stylix.base02}" }
-        rest            = { fg = "${stylix.base03}" }
-        desc            = { fg = "${stylix.base05}" }
+        mask            = { bg = "${theme.selection}" }
+        rest            = { fg = "${theme.border}" }
+        desc            = { fg = "${theme.foreground}" }
         separator       = "  "
-        separator_style = { fg = "${stylix.base03}" }
+        separator_style = { fg = "${theme.border}" }
 
         [help]
-        on      = { fg = "${stylix.base0C}" }
-        run     = { fg = "${stylix.base05}" }
+        on      = { fg = "${theme.info}" }
+        run     = { fg = "${theme.foreground}" }
         hovered = { reversed = true, bold = true }
-        footer  = { bg = "${stylix.base05}" }
+        footer  = { bg = "${theme.foreground}" }
 
         [spot]
-        border   = { fg = "${stylix.base0D}" }
-        title    = { fg = "${stylix.base0D}" }
-        tbl_cell = { fg = "${stylix.base05}", bg = "${stylix.base02}" }
+        border   = { fg = "${theme.primary}" }
+        title    = { fg = "${theme.primary}" }
+        tbl_cell = { fg = "${theme.foreground}", bg = "${theme.selection}" }
 
         [icon]
         dirs = []
         prepend_conds = [
-          { if = "dir & hovered", text = "󰝰", fg = "${stylix.base0D}" },
-          { if = "dir",           text = "󰉋", fg = "${stylix.base0D}" },
+          { if = "dir & hovered", text = "󰝰", fg = "${theme.primary}" },
+          { if = "dir",           text = "󰉋", fg = "${theme.primary}" },
         ]
 
         [filetype]
         rules = [
-          { mime = "image/*", fg = "${stylix.base05}" },
-          { mime = "{audio,video}/*", fg = "${stylix.base05}" },
-          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${stylix.base05}" },
-          { mime = "application/{pdf,doc,rtf}", fg = "${stylix.base05}" },
-          { mime = "vfs/{absent,stale}", fg = "${stylix.base05}" },
-          { url = "*/", fg = "${stylix.base05}" },
-          { url = "*", fg = "${stylix.base05}" },
+          { mime = "image/*", fg = "${theme.foreground}" },
+          { mime = "{audio,video}/*", fg = "${theme.foreground}" },
+          { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "${theme.foreground}" },
+          { mime = "application/{pdf,doc,rtf}", fg = "${theme.foreground}" },
+          { mime = "vfs/{absent,stale}", fg = "${theme.foreground}" },
+          { url = "*/", fg = "${theme.foreground}" },
+          { url = "*", fg = "${theme.foreground}" },
         ]
       '';
 

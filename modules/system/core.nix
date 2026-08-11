@@ -39,6 +39,14 @@
         message = "Host mount point must be an absolute path: ${mount.mountPoint}";
       }) (host.mounts or [ ]);
 
+      # Desktop processes such as Electron can expose multi-gigabyte virtual
+      # mappings. Processing their crashes as core dumps can saturate disk I/O
+      # and freeze graphical session for minutes.
+      systemd.coredump.settings.Coredump = {
+        Storage = "none";
+        ProcessSizeMax = 0;
+      };
+
       services.fstrim.enable = true;
       services.fwupd.enable = true;
 

@@ -1,0 +1,12 @@
+1. directory browsing
+  1.1 file explorer
+  1.2 file finding
+  1.3 file / folder creation
+2. git control
+  2.1 check git differences
+  2.2 be able to revert git changes
+  2.3 be able to stage git changes
+3. language server support (completions, intellisense)
+  3.1 nix
+  3.2 lua
+  3.3 react

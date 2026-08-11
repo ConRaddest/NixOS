@@ -31,6 +31,14 @@
       config = {
         home.packages = availablePackages;
 
+        # Hide upstream entry that has NoDisplay=true but still surfaces in launchers.
+        xdg.desktopEntries.uuctl = {
+          name = "uuctl";
+          exec = "uuctl";
+          noDisplay = true;
+          type = "Application";
+        };
+
         warnings = lib.optional (builtins.length requestedPackages != builtins.length availablePackages) (
           "Some packages in ${appsFile} are unavailable on ${pkgs.stdenv.hostPlatform.system} and were skipped."
         );

@@ -12,14 +12,14 @@
     }:
 
     let
-      colors = config.lib.stylix.colors.withHashtag;
+      colors = config.nos.theme.colors;
       logo = pkgs.runCommand "fastfetch-logo-${hostName}" { nativeBuildInputs = [ pkgs.python3 ]; } ''
         python3 ${self}/scripts/generate-logo.py \
           --seed ${lib.escapeShellArg hostName} \
           --output "$out"
       '';
-      dim = colors.base02;
-      accent = colors.base0E;
+      dim = colors.selection;
+      accent = colors.secondary;
     in
     {
       home.packages = [ pkgs.fastfetch ];
@@ -42,11 +42,6 @@
           separator = "  ";
         };
         modules = [
-          {
-            keyColor = dim;
-            type = "custom";
-            format = "┌──────────────────────Hardware──────────────────────┐";
-          }
           {
             type = "host";
             key = " PC";
@@ -80,17 +75,7 @@
             key = "└ └󰁹";
             keyColor = accent;
           }
-          {
-            keyColor = dim;
-            type = "custom";
-            format = "└────────────────────────────────────────────────────┘";
-          }
           "break"
-          {
-            keyColor = dim;
-            type = "custom";
-            format = "┌──────────────────────Software──────────────────────┐";
-          }
           {
             type = "os";
             key = " OS";
@@ -136,10 +121,9 @@
             key = "└ └";
             keyColor = accent;
           }
+          "break"
           {
-            keyColor = dim;
-            type = "custom";
-            format = "└────────────────────────────────────────────────────┘";
+            type = "colors";
           }
         ];
       };

@@ -18,8 +18,9 @@ let
     flakeDirectory = "/home/CHANGE_ME/NixOS";
     stateVersion = "26.05";
     initialHashedPassword = null;
-    gaming = true;
+    steam = true;
     desktopShell = "dms"; # "dms" or "noctalia"
+    theme = self.lib.homeModules.themeTokyoNight;
 
     boot = {
       mode = "uefi";
@@ -95,6 +96,7 @@ let
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
       self.lib.homeModules.theme
+      host.theme
       self.lib.homeModules.apps
       # AUDIO_HOME_MODULE
       # BATTERY_HOME_MODULE
@@ -115,12 +117,14 @@ let
       self.lib.homeModules.yazi
 
       # Desktop environment
-      self.lib.homeModules.desktop
       self.lib.homeModules.${host.desktopShell}
       self.lib.homeModules.firefox
       self.lib.homeModules.hyprland
       self.lib.homeModules.kitty
       self.lib.homeModules.screenSharePicker
+      self.lib.homeModules.slack
+      self.lib.homeModules.steam
+      self.lib.homeModules.teamsForLinux
       # WINDOWS_HOME_MODULE
       self.lib.homeModules.zapzap
     ];
@@ -189,7 +193,7 @@ in
         # BATTERY_SYSTEM_MODULE
         # PRINTING_SYSTEM_MODULE
         # DOCKER_SYSTEM_MODULE
-        # GAMING_SYSTEM_MODULE
+        # STEAM_SYSTEM_MODULE
         # ONEPASSWORD_SYSTEM_MODULE
       ];
 

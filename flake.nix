@@ -6,27 +6,25 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
 
+    # declerative config file management
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # theming engine
     stylix = {
       url = "github:nix-community/stylix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # screen share picker for hyprland with preview window
     hyprland-preview-share-picker = {
       url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Pin matching Hyprland 0.55.4 commit from upstream's hyprpm.toml.
-    hyprland-scroll-overview = {
-      url = "github:yayuuu/hyprland-scroll-overview/cfc23b194ba9378d1606c7aa73060f6ffbe38445";
-      flake = false;
-    };
-
+    # desktop shells
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,6 +33,13 @@
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # nice overview for seeing all workspaces on hyprland
+    # Pin matching Hyprland 0.55.4 commit from upstream's hyprpm.toml.
+    hyprland-scroll-overview = {
+      url = "github:yayuuu/hyprland-scroll-overview/cfc23b194ba9378d1606c7aa73060f6ffbe38445";
+      flake = false;
     };
 
   };

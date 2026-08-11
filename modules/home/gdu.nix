@@ -10,26 +10,29 @@
     }:
 
     let
-      colors = config.lib.stylix.colors.withHashtag;
+      colors = config.nos.theme.colors;
     in
     {
+      # Custom config below renders semantic colors directly.
+      stylix.targets.gdu.enable = false;
+
       home.packages = [ pkgs.gdu ];
 
       xdg.configFile."gdu/gdu.yaml".text = ''
         style:
           selected-row:
-            text-color: "${colors.base00}"
-            background-color: "${colors.base0D}"
+            text-color: "${colors.background}"
+            background-color: "${colors.primary}"
           result-row:
-            number-color: "${colors.base0D}"
-            directory-color: "${colors.base0D}"
+            number-color: "${colors.primary}"
+            directory-color: "${colors.primary}"
           footer:
-            text-color: "${colors.base05}"
-            background-color: "${colors.base00}"
-            number-color: "${colors.base0D}"
+            text-color: "${colors.foreground}"
+            background-color: "${colors.background}"
+            number-color: "${colors.primary}"
           header:
-            text-color: "${colors.base05}"
-            background-color: "${colors.base00}"
+            text-color: "${colors.foreground}"
+            background-color: "${colors.background}"
 
         # --- Scanning & Engine Preferences ---
         sorting:

@@ -380,10 +380,10 @@ if [[ "$gpu" == nvidia ]]; then
   fi
 fi
 
-if ask_yes_no "Enable Steam and gaming support" y; then
-  gaming=true
+if ask_yes_no "Enable Steam support" y; then
+  steam=true
 else
-  gaming=false
+  steam=false
 fi
 
 if ask_yes_no "Enable battery management" "$(if compgen -G '/sys/class/power_supply/BAT*' >/dev/null; then echo y; else echo n; fi)"; then
@@ -492,7 +492,7 @@ if [[ "$gpu" == nvidia ]]; then
 fi
 
 printf '\nOptional Features\n'
-printf '  Steam and gaming:            %s\n' "$(status_label "$gaming")"
+printf '  Steam:                       %s\n' "$(status_label "$steam")"
 printf '  Battery management:          %s\n' "$(status_label "$battery")"
 printf '  Deep suspend:                %s\n' "$(status_label "$deep_sleep")"
 printf '  Intel thermald:              %s\n' "$(status_label "$thermald")"
@@ -551,7 +551,7 @@ sed -i \
   -e "s|flakeDirectory = \"/home/CHANGE_ME/NixOS\";|flakeDirectory = \"$escaped_flake\";|" \
   -e "s|stateVersion = \"26.05\";|stateVersion = \"$escaped_state_version\";|" \
   -e "s|initialHashedPassword = null;|initialHashedPassword = \"$escaped_password_hash\";|" \
-  -e "s|gaming = true;|gaming = $gaming;|" \
+  -e "s|steam = true;|steam = $steam;|" \
   -e "s|mode = \"uefi\";|mode = \"$boot_mode\";|" \
   -e "s|device = null;|device = $boot_device_value;|" \
   -e "s|deepSleep = false;|deepSleep = $deep_sleep;|" \
@@ -583,9 +583,9 @@ inject_module() {
   inject_module GPU_MODULE "self.nixosModules.$gpu"
 [[ "$nvidia_prime_value" != null ]] &&
   inject_module INTEGRATED_GPU_MODULE "self.nixosModules.$integrated_gpu"
-[[ "$gaming" == true ]] &&
-  inject_module GAMING_SYSTEM_MODULE "self.nixosModules.gaming"
-[[ "$gaming" != true ]] && sed -i '/^[[:space:]]*"steam"[[:space:]]*$/d' "$host_dir/apps.nix"
+[[ "$steam" == true ]] &&
+  inject_module STEAM_SYSTEM_MODULE "self.nixosModules.steam"
+[[ "$steam" != true ]] && sed -i '/^[[:space:]]*"steam"[[:space:]]*$/d' "$host_dir/apps.nix"
 [[ "$battery" == true ]] && {
   inject_module BATTERY_SYSTEM_MODULE "self.nixosModules.battery"
   inject_module BATTERY_HOME_MODULE "self.lib.homeModules.battery"

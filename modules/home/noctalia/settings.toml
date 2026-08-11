@@ -235,20 +235,8 @@ variant = "destructive"
 [shell.shadow]
 alpha = 0.25999999418854713
 
-[theme]
-builtin = "Tokyo-Night"
-
 [theme.templates]
 enable_builtin_templates = false
-
-[wallpaper]
-directory = "/home/cdt/Pictures/Wallpapers"
-
-[wallpaper.default]
-path = "/home/cdt/Pictures/Wallpapers/sunset-lake.png"
-
-[wallpaper.last]
-path = "/home/cdt/Pictures/Wallpapers/sunset-lake.png"
 
 [widget.battery]
 show_label = false
@@ -262,7 +250,6 @@ show_label = false
 [widget.workspaces]
 focused_color = "secondary"
 focused_output_only = true
-font_family = "JetBrainsMono NF"
 font_weight = 400
 inactive_pill_size = 1.4000000000000001
 scale = 0.80000000000000004

@@ -4,13 +4,11 @@
   flake.lib.homeModules.kitty =
     {
       config,
-      lib,
       pkgs,
       ...
     }:
 
     let
-      stylix = config.lib.stylix.colors.withHashtag;
       kittyWithoutSystemdScopes = pkgs.kitty.overrideAttrs (old: {
         postPatch = (old.postPatch or "") + ''
           substituteInPlace kitty/child.py \
@@ -54,13 +52,6 @@
           cursor_trail_start_threshold = 2;
           open_url_with = "${config.home.homeDirectory}/.config/kitty/open-url.sh";
         };
-
-        # Stylix's generated theme is included first; keep ANSI success colors
-        # aligned with system accent afterward.
-        extraConfig = lib.mkAfter ''
-          color2 ${stylix.base0D}
-          color10 ${stylix.base0D}
-        '';
       };
     };
 }
