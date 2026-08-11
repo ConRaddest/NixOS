@@ -77,9 +77,11 @@
           snacks-nvim
           yazi-nvim
           plenary-nvim
+          smart-splits-nvim
           gitsigns-nvim
           neogit
           diffview-nvim
+          grug-far-nvim
           nvim-web-devicons
           bufferline-nvim
         ];
