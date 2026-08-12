@@ -167,6 +167,23 @@ which_key.add({
 		desc = "Search file contents",
 	},
 	{
+		"<leader>sb",
+		function()
+			local file = vim.api.nvim_buf_get_name(0)
+
+			if file == "" then
+				vim.notify("Buffer has no file", vim.log.levels.WARN)
+				return
+			end
+
+			require("telescope.builtin").live_grep({
+				search_dirs = { file },
+				prompt_title = "Search current file",
+			})
+		end,
+		desc = "Search current file",
+	},
+	{
 		"<leader>sr",
 		function()
 			if vim.bo.filetype:match("^snacks_picker") then
