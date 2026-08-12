@@ -62,6 +62,7 @@
 
       home = {
         packages = managementPackages ++ [
+          pkgs.eza
           nos-fonts
           nos-mono-fonts
         ];

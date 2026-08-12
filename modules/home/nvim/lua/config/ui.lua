@@ -19,6 +19,7 @@ require("snacks").setup({
 			explorer = {
 				-- Keep preview hidden until explicitly toggled with Alt+p.
 				hidden = true,
+				ignored = true,
 				layout = { preset = "sidebar", preview = { enabled = false, main = true } },
 				win = {
 					input = {
@@ -38,6 +39,7 @@ require("snacks").setup({
 			},
 			files = {
 				hidden = true,
+				ignored = true,
 			},
 		},
 		win = {

@@ -3,7 +3,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.keymap.set("n", "<Space>", "<Nop>", {
+vim.keymap.set({ "n", "x" }, "<Space>", "<Nop>", {
 	silent = true,
 })
 local which_key = require("which-key")
@@ -195,7 +195,7 @@ which_key.add({
 	},
 	{ "<leader>q", "<cmd>confirm qall<cr>", desc = "Quit Neovim" },
 	{ "<leader>w", "<cmd>write<cr>", desc = "Save" },
-})
+}, { mode = { "n", "x" } })
 
 vim.keymap.set("n", "<C-/>", "gcc", {
 	desc = "Toggle comment for current line",
