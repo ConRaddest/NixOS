@@ -32,8 +32,14 @@
         initialHashedPassword = host.initialHashedPassword;
       };
 
-      security.sudo.wheelNeedsPassword = true;
-      security.sudo.extraConfig = "Defaults pwfeedback";
-      security.polkit.enable = true;
+      security = {
+        polkit = {
+          enable = true;
+        };
+        sudo = {
+          extraConfig = "Defaults pwfeedback";
+          wheelNeedsPassword = true;
+        };
+      };
     };
 }

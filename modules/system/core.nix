@@ -12,17 +12,18 @@
     {
       # Hide noisy early kernel/firmware warnings from the TTY while still
       # showing systemd boot progress. Warnings remain available in journalctl/dmesg.
-      boot.consoleLogLevel = 0;
-      boot.initrd.verbose = false;
-
-      # Keep Linux TTY colors at kernel defaults, regardless of theme modules.
-      console.colors = lib.mkForce [ ];
-      boot.kernelParams = [
-        "quiet"
-        "loglevel=0"
-        "udev.log_level=3"
-        "systemd.show_status=true"
-      ];
+      boot = {
+        consoleLogLevel = 0;
+        initrd = {
+          verbose = false;
+        };
+        kernelParams = [
+          "quiet"
+          "loglevel=0"
+          "udev.log_level=3"
+          "systemd.show_status=true"
+        ];
+      };
 
       fileSystems = builtins.listToAttrs (
         map (mount: {

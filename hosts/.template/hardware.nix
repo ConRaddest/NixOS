@@ -15,15 +15,19 @@ in
 
       # Replace these values with output from:
       # sudo nixos-generate-config --show-hardware-config
-      boot.initrd.availableKernelModules = [
-        "nvme"
-        "xhci_pci"
-        "usbhid"
-        "usb_storage"
-      ];
-      boot.initrd.kernelModules = [ ];
-      boot.kernelModules = [ ];
-      boot.extraModulePackages = [ ];
+      boot = {
+        extraModulePackages = [ ];
+        initrd = {
+          availableKernelModules = [
+            "nvme"
+            "xhci_pci"
+            "usbhid"
+            "usb_storage"
+          ];
+          kernelModules = [ ];
+        };
+        kernelModules = [ ];
+      };
 
       fileSystems."/" = {
         device = "/dev/disk/by-uuid/REPLACE_ROOT_UUID";

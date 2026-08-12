@@ -60,61 +60,56 @@
       # Keep Linux virtual consoles on kernel colors.
       stylix.targets.fish.enable = false;
 
-      home.sessionVariables = lib.optionalAttrs (flakeDirectory != null) {
-        NOS_DIR = flakeDirectory;
-      };
-
-      programs.fish = {
-        enable = true;
-        shellAliases = {
-          ls = "eza --icons";
-          ll = "eza -la --icons";
-          cd = "z";
-          ff = "fastfetch";
-          startw = "uwsm start hyprland-uwsm.desktop";
-        };
-        plugins = [
-          {
-            name = "foreign-env";
-            src = pkgs.fishPlugins.foreign-env.src;
-          }
-        ];
-        interactiveShellInit = ''
-          set -g fish_greeting
-
-          if test "$TERM" != linux
-            set -g fish_color_command ${colors.primary}
-            set -g fish_color_param ${colors.foreground}
-          end
-        ''
-        + lib.optionalString (flakeDirectory != null) ''
-
-          if test -f "${flakeDirectory}/.env"
-            fenv source "${flakeDirectory}/.env"
-          end
-        '';
-      };
-
-      programs.zoxide = {
-        enable = true;
-        enableFishIntegration = true;
-      };
-
-      home.packages =
-        managementPackages
-        ++ (with pkgs; [
+      home = {
+        packages = managementPackages ++ [
           nos-fonts
           nos-mono-fonts
+        ];
+        sessionVariables = lib.optionalAttrs (flakeDirectory != null) {
+          NOS_DIR = flakeDirectory;
+        };
+      };
 
-          # cli utilities
-          eza # better ls
-          jq # json cli proccessor
-          nix-search-cli # search nix packages
-          tldr # command summaries
-          tree # folder
-          unzip # unzip files
-        ]);
+      programs = {
+        fish = {
+          enable = true;
+          interactiveShellInit = ''
+            set -g fish_greeting
 
-      programs.kitty.shellIntegration.enableFishIntegration = true;
+            if test "$TERM" != linux
+              set -g fish_color_command ${colors.primary}
+              set -g fish_color_param ${colors.foreground}
+            end
+          ''
+          + lib.optionalString (flakeDirectory != null) ''
+
+            if test -f "${flakeDirectory}/.env"
+              fenv source "${flakeDirectory}/.env"
+            end
+          '';
+          plugins = [
+            {
+              name = "foreign-env";
+              src = pkgs.fishPlugins.foreign-env.src;
+            }
+          ];
+          shellAliases = {
+            cd = "z";
+            ff = "fastfetch";
+            ll = "eza -la --icons";
+            ls = "eza --icons";
+            startw = "uwsm start hyprland-uwsm.desktop";
+          };
+        };
+        kitty = {
+          shellIntegration = {
+            enableFishIntegration = true;
+          };
+        };
+        zoxide = {
+          enable = true;
+          enableFishIntegration = true;
+        };
+      };
     };
 }

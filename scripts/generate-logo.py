@@ -5,9 +5,15 @@ import argparse
 import random
 import sys
 from pathlib import Path
+from typing import TypeAlias
 
-DIRECTIONS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-PIPES = {
+Cell: TypeAlias = tuple[int, int]
+Seed: TypeAlias = int | str
+Walls: TypeAlias = list[list[list[bool]]]
+Edges: TypeAlias = list[list[bool]]
+
+DIRECTIONS: tuple[Cell, ...] = ((-1, 0), (0, 1), (1, 0), (0, -1))
+PIPES: dict[int, str] = {
     1: "║",
     2: "═",
     3: "╚",
@@ -26,48 +32,61 @@ PIPES = {
 }
 
 
-def parse_args():
+class Args(argparse.Namespace):
+    cell_rows: int = 10
+    cell_columns: int = 11
+    passage_width: int = 1
+    character_aspect: float = 3.0
+    seed: str = "legion"
+    start_row: int = 0
+    start_column: int = 0
+    entrance_row: int | None = None
+    exit_row: int | None = None
+    output: str = "assets/nixodus-logo.txt"
+
+
+def parse_args() -> Args:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cell-rows", type=int, default=10, help="maze cell rows")
-    parser.add_argument("--cell-columns", type=int, default=11, help="maze cell columns")
-    parser.add_argument(
+    _ = parser.add_argument("--cell-rows", type=int, default=10, help="maze cell rows")
+    _ = parser.add_argument("--cell-columns", type=int, default=11, help="maze cell columns")
+    _ = parser.add_argument(
         "--passage-width",
         type=int,
         default=1,
         help="visual passage width; vertical character count",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--character-aspect",
         type=float,
         default=3.0,
         help="terminal character height divided by width",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--seed",
         default="legion",
         help="alphanumeric or hyphenated random layout seed",
     )
-    parser.add_argument("--start-row", type=int, default=0, help="generation start row")
-    parser.add_argument("--start-column", type=int, default=0, help="generation start column")
-    parser.add_argument(
+    _ = parser.add_argument("--start-row", type=int, default=0, help="generation start row")
+    _ = parser.add_argument("--start-column", type=int, default=0, help="generation start column")
+    _ = parser.add_argument(
         "--entrance-row",
         type=int,
         help="left-side entrance cell row; omitted for a closed maze",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--exit-row",
         type=int,
         help="right-side exit cell row; omitted for a closed maze",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--output",
         default="assets/nixodus-logo.txt",
         help="output path, or - for stdout",
     )
-    return parser.parse_args()
+    return parser.parse_args(namespace=Args())
 
 
-def validate_args(args):
+def validate_args(args: Args) -> None:
     if args.cell_rows < 2 or args.cell_columns < 2:
         raise ValueError("cell rows and columns must be at least 2")
     if args.passage_width < 1:
@@ -86,15 +105,15 @@ def validate_args(args):
         raise ValueError("exit row is outside maze")
 
 
-def carve_maze(rows, columns, seed, start):
+def carve_maze(rows: int, columns: int, seed: Seed, start: Cell) -> Walls:
     rng = random.Random(seed)
-    walls = [[[True] * 4 for _ in range(columns)] for _ in range(rows)]
-    visited = {start}
-    stack = [start]
+    walls: Walls = [[[True] * 4 for _ in range(columns)] for _ in range(rows)]
+    visited: set[Cell] = {start}
+    stack: list[Cell] = [start]
 
     while stack:
         row, column = stack[-1]
-        choices = []
+        choices: list[tuple[int, Cell]] = []
 
         for direction, (row_delta, column_delta) in enumerate(DIRECTIONS):
             next_row = row + row_delta
@@ -108,7 +127,7 @@ def carve_maze(rows, columns, seed, start):
                 choices.append((direction, next_cell))
 
         if not choices:
-            stack.pop()
+            _ = stack.pop()
             continue
 
         direction, (next_row, next_column) = rng.choice(choices)
@@ -120,7 +139,7 @@ def carve_maze(rows, columns, seed, start):
     return walls
 
 
-def build_edges(walls, entrance_row, exit_row):
+def build_edges(walls: Walls, entrance_row: int | None, exit_row: int | None) -> tuple[Edges, Edges]:
     rows = len(walls)
     columns = len(walls[0])
     if entrance_row is not None:
@@ -128,8 +147,8 @@ def build_edges(walls, entrance_row, exit_row):
     if exit_row is not None:
         walls[exit_row][columns - 1][1] = False
 
-    horizontal = [[False] * columns for _ in range(rows + 1)]
-    vertical = [[False] * (columns + 1) for _ in range(rows)]
+    horizontal: Edges = [[False] * columns for _ in range(rows + 1)]
+    vertical: Edges = [[False] * (columns + 1) for _ in range(rows)]
 
     for row in range(rows):
         for column in range(columns):
@@ -141,7 +160,7 @@ def build_edges(walls, entrance_row, exit_row):
     return horizontal, vertical
 
 
-def junction_mask(horizontal, vertical, row, column):
+def junction_mask(horizontal: Edges, vertical: Edges, row: int, column: int) -> int:
     rows = len(vertical)
     columns = len(horizontal[0])
     return (
@@ -152,11 +171,11 @@ def junction_mask(horizontal, vertical, row, column):
     )
 
 
-def render_maze(horizontal, vertical, passage_width, character_aspect):
+def render_maze(horizontal: Edges, vertical: Edges, passage_width: int, character_aspect: float) -> str:
     rows = len(vertical)
     columns = len(horizontal[0])
     horizontal_width = max(1, round(passage_width * character_aspect))
-    lines = []
+    lines: list[str] = []
 
     for row in range(rows + 1):
         wall_line = ""
@@ -178,7 +197,7 @@ def render_maze(horizontal, vertical, passage_width, character_aspect):
     return "\n".join(lines) + "\n"
 
 
-def main():
+def main() -> None:
     args = parse_args()
     try:
         validate_args(args)
@@ -204,12 +223,12 @@ def main():
     character_rows = args.cell_rows * (args.passage_width + 1) + 1
     character_columns = args.cell_columns * (horizontal_width + 1) + 1
     if args.output == "-":
-        sys.stdout.write(maze)
+        _ = sys.stdout.write(maze)
         return
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(maze)
+    _ = output_path.write_text(maze)
     print(
         f"Wrote {output_path} ({character_rows}x{character_columns} characters)",
         file=sys.stderr,

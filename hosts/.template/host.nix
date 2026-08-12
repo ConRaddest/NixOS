@@ -156,9 +156,11 @@ let
         trackpadName = null;
       };
 
-      home.username = host.username;
-      home.homeDirectory = host.homeDirectory;
-      home.stateVersion = host.stateVersion;
+      home = {
+        homeDirectory = host.homeDirectory;
+        stateVersion = host.stateVersion;
+        username = host.username;
+      };
 
       nixpkgs.config.allowUnfree = true;
 
@@ -167,65 +169,67 @@ let
   };
 in
 {
-  flake.nixosModules."${hostName}Configuration" =
-    { stateVersion, ... }:
-    {
-      imports = [
-        self.nixosModules."${hostName}Hardware"
-        inputs.home-manager.nixosModules.home-manager
+  flake = {
+    nixosModules."${hostName}Configuration" =
+      { stateVersion, ... }:
+      {
+        imports = [
+          self.nixosModules."${hostName}Hardware"
+          inputs.home-manager.nixosModules.home-manager
 
-        self.nixosModules.options
-        self.nixosModules.boot
-        self.nixosModules.core
-        self.nixosModules.rsa
-        self.nixosModules.networking
-        self.nixosModules.nix
-        self.nixosModules.security
-        self.nixosModules.vscode
+          self.nixosModules.options
+          self.nixosModules.boot
+          self.nixosModules.core
+          self.nixosModules.rsa
+          self.nixosModules.networking
+          self.nixosModules.nix
+          self.nixosModules.security
+          self.nixosModules.vscode
 
-        self.nixosModules.hyprland
-        self.nixosModules.portals
+          self.nixosModules.hyprland
+          self.nixosModules.portals
 
-        # GPU_MODULE
-        # INTEGRATED_GPU_MODULE
-        # BLUETOOTH_SYSTEM_MODULE
-        # AUDIO_SYSTEM_MODULE
-        # BATTERY_SYSTEM_MODULE
-        # PRINTING_SYSTEM_MODULE
-        # DOCKER_SYSTEM_MODULE
-        # STEAM_SYSTEM_MODULE
-        # ONEPASSWORD_SYSTEM_MODULE
-      ];
+          # GPU_MODULE
+          # INTEGRATED_GPU_MODULE
+          # BLUETOOTH_SYSTEM_MODULE
+          # AUDIO_SYSTEM_MODULE
+          # BATTERY_SYSTEM_MODULE
+          # PRINTING_SYSTEM_MODULE
+          # DOCKER_SYSTEM_MODULE
+          # STEAM_SYSTEM_MODULE
+          # ONEPASSWORD_SYSTEM_MODULE
+        ];
 
-      nos = {
-        boot = host.boot;
-        hardware = host.hardware;
+        nos = {
+          boot = host.boot;
+          hardware = host.hardware;
+        };
+
+        networking.hostName = hostName;
+        system.stateVersion = stateVersion;
+
+        home-manager = {
+          useGlobalPkgs = false;
+          useUserPackages = true;
+          extraSpecialArgs = specialArgs;
+          users.${host.username} = homeConfig;
+        };
       };
 
-      networking.hostName = hostName;
-      system.stateVersion = stateVersion;
+    nixosConfigurations = {
+      "${hostName}" = inputs.nixpkgs.lib.nixosSystem {
+        inherit specialArgs;
+        system = host.system;
+        modules = [ self.nixosModules."${hostName}Configuration" ];
+      };
+    };
 
-      home-manager = {
-        useGlobalPkgs = false;
-        useUserPackages = true;
+    homeConfigurations = {
+      "${host.username}@${hostName}" = inputs.home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
         extraSpecialArgs = specialArgs;
-        users.${host.username} = homeConfig;
+        modules = [ homeConfig ];
       };
-    };
-
-  flake.nixosConfigurations = {
-    "${hostName}" = inputs.nixpkgs.lib.nixosSystem {
-      inherit specialArgs;
-      system = host.system;
-      modules = [ self.nixosModules."${hostName}Configuration" ];
-    };
-  };
-
-  flake.homeConfigurations = {
-    "${host.username}@${hostName}" = inputs.home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      extraSpecialArgs = specialArgs;
-      modules = [ homeConfig ];
     };
   };
 }

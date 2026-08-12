@@ -8,18 +8,21 @@
       npmPrefix = "${config.home.homeDirectory}/.npm-link";
     in
     {
-      home.packages = [ pkgs.nodejs ];
-
-      # Keep `npm link` out of the immutable Nix store.
-      home.sessionPath = [
-        "${npmPrefix}/bin"
-      ];
-
-      home.file = {
-        ".npmrc".text = ''
-          prefix=${npmPrefix}
-        '';
-        ".npm-link/.keep".text = "";
+      home = {
+        file = {
+          ".npm-link/.keep" = {
+            text = "";
+          };
+          ".npmrc" = {
+            text = ''
+              prefix=${npmPrefix}
+            '';
+          };
+        };
+        packages = [ pkgs.nodejs ];
+        sessionPath = [
+          "${npmPrefix}/bin"
+        ];
       };
     };
 }

@@ -52,13 +52,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Definition" }))
 		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Declaration" }))
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
-		vim.keymap.set(
-			"n",
-			"gi",
-			vim.lsp.buf.implementation,
-			vim.tbl_extend("force", opts, { desc = "Implementation" })
-		)
+		-- Keep Neovim defaults: grr references, gri implementation, grn rename, gra code action.
 		vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
 
 		vim.keymap.set(

@@ -43,6 +43,23 @@ function M.toggle_snacks_explorer()
 	Snacks.explorer({ focus = true })
 end
 
+function M.focus_snacks_explorer()
+	local explorer = Snacks.picker.get({ source = "explorer" })[1]
+
+	if not vim.bo.filetype:match("^snacks_picker") then
+		snacks_editor_window = vim.api.nvim_get_current_win()
+	end
+
+	if not explorer then
+		Snacks.explorer({ focus = true })
+		explorer = Snacks.picker.get({ source = "explorer" })[1]
+	end
+
+	if explorer then
+		explorer:focus("list", { show = true })
+	end
+end
+
 function M.focus_snacks_explorer_input()
 	local explorer = Snacks.picker.get({ source = "explorer" })[1]
 
@@ -57,19 +74,6 @@ function M.focus_snacks_explorer_input()
 	end
 end
 
-local function save_current_buffer()
-	if vim.api.nvim_buf_get_name(0) ~= "" then
-		vim.cmd("write")
-		return
-	end
-
-	local path = vim.fn.input("Save as: ", vim.fn.getcwd() .. "/", "file")
-
-	if path ~= "" then
-		vim.cmd("write " .. vim.fn.fnameescape(path))
-	end
-end
-
 which_key.add({
 	{
 		"<leader><leader>",
@@ -78,19 +82,16 @@ which_key.add({
 		end,
 		desc = "Find files",
 	},
-	{
-		"<C-b>",
-		M.toggle_snacks_explorer,
-		desc = "Snacks explorer",
-	},
-	{ "<M-Left>", "<cmd>BufferLineCyclePrev<cr>", desc = "Previous buffer" },
-	{ "<M-Right>", "<cmd>BufferLineCycleNext<cr>", desc = "Next buffer" },
+	{ "<leader>e", M.focus_snacks_explorer, desc = "Focus sidebar" },
+	{ "<leader>f", group = "Files" },
+	{ "<leader>fe", M.toggle_snacks_explorer, desc = "Snacks explorer" },
+	{ "<leader>fs", M.focus_snacks_explorer_input, desc = "Focus Snacks search" },
 	{ "<leader>v", "<cmd>vsplit<cr>", desc = "Vertical split" },
 	{ "<leader>h", "<cmd>split<cr>", desc = "Horizontal split" },
 	{ "<leader>c", "<cmd>close<cr>", desc = "Close split" },
 	{ "<leader>o", "<C-w>o", desc = "Close other splits" },
 	{ "<leader>=", "<C-w>=", desc = "Equalize splits" },
-	{ "<leader>e", "<cmd>Yazi<cr>", desc = "File explorer" },
+	{ "<leader>fy", "<cmd>Yazi<cr>", desc = "File explorer" },
 	{ "<leader>g", group = "Git" },
 	{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
 	{
@@ -194,11 +195,16 @@ which_key.add({
 	},
 	{ "<leader>q", "<cmd>confirm qall<cr>", desc = "Quit Neovim" },
 	{ "<leader>w", "<cmd>write<cr>", desc = "Save" },
-	{ "<C-s>", save_current_buffer, desc = "Save" },
 })
 
-vim.keymap.set({ "n", "i" }, "<C-/>", M.focus_snacks_explorer_input, {
-	desc = "Focus explorer search",
+vim.keymap.set("n", "<C-/>", "gcc", {
+	desc = "Toggle comment for current line",
+	remap = true,
+})
+
+vim.keymap.set("x", "<C-/>", "gc", {
+	desc = "Toggle comment for selected lines",
+	remap = true,
 })
 
 local function close_current_buffer()
@@ -236,26 +242,45 @@ end
 
 vim.keymap.set("n", "<C-c>", close_current_buffer, {
 	desc = "Close buffer",
-	nowait = true,
-})
-vim.keymap.set("n", "<C-w>", close_current_buffer, {
-	desc = "Close buffer",
-	nowait = true,
 })
 
-vim.keymap.set("i", "<C-s>", function()
-	vim.cmd("stopinsert")
-	vim.schedule(save_current_buffer)
-end, {
-	desc = "Exit insert mode and save",
+vim.keymap.set("n", "<C-s>", "<cmd>write<cr>", {
+	desc = "Save buffer",
+})
+
+vim.keymap.set("i", "<C-s>", "<Esc><cmd>write<cr>", {
+	desc = "Save buffer and enter normal mode",
 })
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>", {
 	desc = "Clear search highlighting",
 })
 
-vim.keymap.set("n", "<C-f>", "/", {
-	desc = "Find text",
+vim.keymap.set("n", "o", function()
+	local current_line = vim.api.nvim_get_current_line()
+	if current_line:match("%S") then
+		return "o"
+	end
+
+	local current_row = vim.api.nvim_win_get_cursor(0)[1]
+	local next_row = vim.fn.nextnonblank(current_row + 1)
+	local reference_row = next_row > 0 and next_row or vim.fn.prevnonblank(current_row - 1)
+	if reference_row == 0 then
+		return "o"
+	end
+
+	local reference_line = vim.fn.getline(reference_row)
+	local indentation = reference_line:match("^%s*") or ""
+	local content = reference_line:sub(#indentation + 1)
+	if next_row > 0 and content:match("^[%]%)}]") then
+		local indent_unit = vim.bo.expandtab and string.rep(" ", vim.fn.shiftwidth()) or "\t"
+		indentation = indentation .. indent_unit
+	end
+
+	return "o" .. indentation
+end, {
+	desc = "Open indented line",
+	expr = true,
 })
 
 local function clear_selection_matches()
@@ -285,19 +310,6 @@ end
 
 vim.api.nvim_create_autocmd({ "CursorMoved", "ModeChanged" }, {
 	callback = highlight_selection_matches,
-})
-
-vim.keymap.set("x", "<C-f>", function()
-	vim.cmd("normal! y")
-
-	local text = vim.fn.getreg('"'):gsub("\n", "\\n")
-	local pattern = "\\V" .. vim.fn.escape(text, "\\")
-
-	vim.fn.setreg("/", pattern)
-	vim.opt.hlsearch = true
-	vim.cmd("normal! n")
-end, {
-	desc = "Search selected text",
 })
 
 -- Let UI module record active editor before explorer takes focus.

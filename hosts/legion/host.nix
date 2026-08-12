@@ -140,11 +140,12 @@ let
 
   homeConfig = {
     imports = [
+      host.theme
+
       # Shell and core user environment
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
       self.lib.homeModules.theme
-      host.theme
       self.lib.homeModules.apps
       self.lib.homeModules.audio
       self.lib.homeModules.battery
@@ -172,7 +173,6 @@ let
       self.lib.homeModules.screenSharePicker
       self.lib.homeModules.slack
       self.lib.homeModules.steam
-      self.lib.homeModules.teamsForLinux
       self.lib.homeModules.windows
       self.lib.homeModules.zapzap
     ];
@@ -204,9 +204,11 @@ let
         trackpadName = "msft0001:01-06cb:cd5f-touchpad";
       };
 
-      home.username = host.username;
-      home.homeDirectory = host.homeDirectory;
-      home.stateVersion = host.stateVersion;
+      home = {
+        homeDirectory = host.homeDirectory;
+        stateVersion = host.stateVersion;
+        username = host.username;
+      };
 
       nixpkgs.config.allowUnfree = true;
 
@@ -218,72 +220,74 @@ in
   # ============================================================
   # System modules
   # ============================================================
+  flake = {
 
-  flake.nixosModules."${hostName}Configuration" =
-    { stateVersion, ... }:
-    {
-      imports = [
-        self.nixosModules."${hostName}Hardware"
-        inputs.home-manager.nixosModules.home-manager
+    nixosModules."${hostName}Configuration" =
+      { stateVersion, ... }:
+      {
+        imports = [
+          self.nixosModules."${hostName}Hardware"
+          inputs.home-manager.nixosModules.home-manager
 
-        self.nixosModules.options
-        self.nixosModules.boot
-        self.nixosModules.core
-        self.nixosModules.rsa
-        self.nixosModules.networking
-        self.nixosModules.nix
-        self.nixosModules.security
-        self.nixosModules.vscode
+          self.nixosModules.options
+          self.nixosModules.boot
+          self.nixosModules.core
+          self.nixosModules.rsa
+          self.nixosModules.networking
+          self.nixosModules.nix
+          self.nixosModules.security
+          self.nixosModules.vscode
 
-        self.nixosModules.hyprland
-        self.nixosModules.portals
+          self.nixosModules.hyprland
+          self.nixosModules.portals
 
-        self.nixosModules.bluetooth
-        self.nixosModules.nvidia
+          self.nixosModules.bluetooth
+          self.nixosModules.nvidia
 
-        self.nixosModules.audio
-        self.nixosModules.battery
-        self.nixosModules.printing
+          self.nixosModules.audio
+          self.nixosModules.battery
+          self.nixosModules.printing
 
-        self.nixosModules.docker
-        self.nixosModules.steam
-        self.nixosModules.onepassword
-      ];
+          self.nixosModules.docker
+          self.nixosModules.steam
+          self.nixosModules.onepassword
+        ];
 
-      nos = {
-        boot = host.boot;
-        hardware = host.hardware;
+        nos = {
+          boot = host.boot;
+          hardware = host.hardware;
+        };
+
+        networking.hostName = hostName;
+        system.stateVersion = stateVersion;
+
+        home-manager = {
+          useGlobalPkgs = false;
+          useUserPackages = true;
+          extraSpecialArgs = specialArgs;
+          users.${host.username} = homeConfig;
+        };
       };
 
-      networking.hostName = hostName;
-      system.stateVersion = stateVersion;
+    # ============================================================
+    # Outputs
+    # ============================================================
 
-      home-manager = {
-        useGlobalPkgs = false;
-        useUserPackages = true;
+    nixosConfigurations = {
+      ${hostName} = inputs.nixpkgs.lib.nixosSystem {
+        inherit specialArgs;
+        system = host.system;
+        modules = [ self.nixosModules.legionConfiguration ];
+      };
+
+    };
+
+    homeConfigurations = {
+      "${host.username}@${hostName}" = inputs.home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
         extraSpecialArgs = specialArgs;
-        users.${host.username} = homeConfig;
+        modules = [ homeConfig ];
       };
-    };
-
-  # ============================================================
-  # Outputs
-  # ============================================================
-
-  flake.nixosConfigurations = {
-    ${hostName} = inputs.nixpkgs.lib.nixosSystem {
-      inherit specialArgs;
-      system = host.system;
-      modules = [ self.nixosModules.legionConfiguration ];
-    };
-
-  };
-
-  flake.homeConfigurations = {
-    "${host.username}@${hostName}" = inputs.home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      extraSpecialArgs = specialArgs;
-      modules = [ homeConfig ];
     };
   };
 }

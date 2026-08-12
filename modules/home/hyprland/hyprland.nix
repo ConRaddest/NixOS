@@ -113,72 +113,65 @@
       # Wallpaper runs independently from desktop shell. Stylix supplies image.
       services.hyprpaper.enable = true;
 
-      xdg.configFile."hypr/nix/plugins.lua".text = ''
-        hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
-      '';
-
-      xdg.configFile."hypr/nix/monitors.lua".text = ''
-        return {
-          ${lib.concatMapStringsSep ",\n" monitorLua host.monitors}
-        }
-      '';
-
-      xdg.configFile."hypr/nix/shell.lua".text = ''
-        return {
-          launcher = ${builtins.toJSON desktopShell.launcher},
-          process_list = ${builtins.toJSON desktopShell.processList},
-          bar_toggle = ${
-            if desktopShell.barToggle == null then "nil" else builtins.toJSON desktopShell.barToggle
-          },
-          volume_up = ${builtins.toJSON desktopShell.volumeUp},
-          volume_down = ${builtins.toJSON desktopShell.volumeDown},
-          volume_mute = ${builtins.toJSON desktopShell.volumeMute},
-          mic_mute = ${builtins.toJSON desktopShell.micMute},
-          setup = function()
-            ${desktopShell.setup}
-          end,
-        }
-      '';
-
-      xdg.configFile."hypr/nix/input.lua".text =
-        lib.optionalString config.nos.trackpad ''
-          hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
-        ''
-        + lib.optionalString (config.nos.trackpadName != null) ''
-          hl.device({
-            name = ${builtins.toJSON config.nos.trackpadName},
-            accel_profile = "adaptive",
-            natural_scroll = true,
-            sensitivity = 0.0,
-          })
-        '';
-
-      xdg.configFile."hypr/nix/colors.lua".text = ''
-        hl.config({
-          general = {
-            col = {
-              -- Match background to hide Hyprland xray border artifacts.
-              active_border = "rgb(${colors.background})",
-              inactive_border = "rgb(${colors.background})",
-            },
-          },
-          group = {
-            col = {
-              border_active = "rgb(${colors.primary})",
-              border_inactive = "rgb(${colors.border})",
-              border_locked_active = "rgb(${colors.info})",
-              border_locked_inactive = "rgb(${colors.border})",
-            },
-          },
-        })
-      '';
-
-      # NixOS system configuration owns portal backends.
-      xdg.portal.enable = lib.mkForce false;
-
-      # Keep Lua config live-editable while Nix owns generated support files.
-      xdg.configFile."hypr/hyprland.lua".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
+      xdg = {
+        configFile = {
+          "hypr/hyprland.lua" = {
+            source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
+          };
+          "hypr/nix/colors.lua" = {
+            source = pkgs.replaceVars ./colors.lua {
+              inherit (colors)
+                background
+                border
+                info
+                primary
+                ;
+            };
+          };
+          "hypr/nix/input.lua" = {
+            text =
+              lib.optionalString config.nos.trackpad ''
+                hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
+              ''
+              + lib.optionalString (config.nos.trackpadName != null) ''
+                hl.device({
+                  name = ${builtins.toJSON config.nos.trackpadName},
+                  accel_profile = "adaptive",
+                  natural_scroll = true,
+                  sensitivity = 0.0,
+                })
+              '';
+          };
+          "hypr/nix/monitors.lua" = {
+            text = ''
+              return {
+                ${lib.concatMapStringsSep ",\n" monitorLua host.monitors}
+              }
+            '';
+          };
+          "hypr/nix/plugins.lua" = {
+            text = ''
+              hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
+            '';
+          };
+          "hypr/nix/shell.lua" = {
+            source = pkgs.replaceVars ./shell.lua {
+              barToggle =
+                if desktopShell.barToggle == null then "nil" else builtins.toJSON desktopShell.barToggle;
+              inherit (desktopShell) setup;
+              launcher = builtins.toJSON desktopShell.launcher;
+              micMute = builtins.toJSON desktopShell.micMute;
+              processList = builtins.toJSON desktopShell.processList;
+              volumeDown = builtins.toJSON desktopShell.volumeDown;
+              volumeMute = builtins.toJSON desktopShell.volumeMute;
+              volumeUp = builtins.toJSON desktopShell.volumeUp;
+            };
+          };
+        };
+        portal = {
+          enable = lib.mkForce false;
+        };
+      };
 
       systemd.user.services.nos-hyprpolkitagent = {
         Unit = {

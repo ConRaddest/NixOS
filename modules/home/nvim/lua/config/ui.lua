@@ -24,14 +24,12 @@ require("snacks").setup({
 					input = {
 						keys = {
 							["<Esc>"] = { "focus_list", mode = { "n", "i" } },
-							["<C-b>"] = { keymaps.toggle_snacks_explorer, mode = { "n", "i" } },
 							["<M-p>"] = { "toggle_preview", mode = { "n", "i" } },
 						},
 					},
 					list = {
 						keys = {
 							["<Esc>"] = keymaps.focus_snacks_editor,
-							["<C-b>"] = keymaps.toggle_snacks_explorer,
 							["<M-p>"] = "toggle_preview",
 							["P"] = false,
 						},
@@ -59,7 +57,7 @@ require("snacks").setup({
 
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = function()
-		Snacks.explorer({ focus = true })
+		Snacks.explorer({ focus = false })
 	end,
 })
 

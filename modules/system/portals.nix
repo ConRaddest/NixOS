@@ -16,14 +16,16 @@
           xdg-desktop-portal-termfilechooser
         ];
 
-        config.common.default = [
-          "hyprland"
-          "gtk"
-        ];
+        config.common = {
+          default = [
+            "hyprland"
+            "gtk"
+          ];
 
-        config.common."org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
-        config.common."org.freedesktop.impl.portal.RemoteDesktop" = [ "hyprland" ];
-        config.common."org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
+          "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+          "org.freedesktop.impl.portal.RemoteDesktop" = [ "hyprland" ];
+          "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
+        };
       };
     };
 }

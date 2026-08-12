@@ -42,46 +42,51 @@
     {
       boot.kernelParams = lib.optional config.nos.hardware.deepSleep "mem_sleep_default=deep";
 
-      services.power-profiles-daemon.enable = true;
-      services.upower.enable = true;
+      services = {
+        power-profiles-daemon.enable = true;
+        upower.enable = true;
+        thermald.enable = config.nos.hardware.thermald;
 
-      services.thermald.enable = config.nos.hardware.thermald;
+        # Hyprland owns power-key and lid-switch handling.
+        logind.settings.Login = {
+          HandlePowerKey = "ignore";
+          HandleLidSwitch = "ignore";
+          HandleLidSwitchExternalPower = "ignore";
+          HandleLidSwitchDocked = "ignore";
+        };
 
-      # Hyprland owns power-key and lid-switch handling.
-      services.logind.settings.Login = {
-        HandlePowerKey = "ignore";
-        HandleLidSwitch = "ignore";
-        HandleLidSwitchExternalPower = "ignore";
-        HandleLidSwitchDocked = "ignore";
+        # Trigger systemd units from udev instead of running longer commands directly in udev.
+        udev.extraRules = ''
+          ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-battery.service"
+          ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-ac.service"
+        '';
       };
 
       powerManagement.resumeCommands = ''
         ${setCurrentPowerProfile} || true
       '';
 
-      # Trigger systemd units from udev instead of running longer commands directly in udev.
-      services.udev.extraRules = ''
-        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-battery.service"
-        ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-ac.service"
-      '';
+      systemd.services = {
+        power-profiles-daemon.enable = true;
 
-      systemd.services.power-profile-battery = {
-        description = "Set power profile when running on battery";
-        after = [ "power-profiles-daemon.service" ];
-        wants = [ "power-profiles-daemon.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${setPowerProfile} power-saver";
+        power-profile-battery = {
+          description = "Set power profile when running on battery";
+          after = [ "power-profiles-daemon.service" ];
+          wants = [ "power-profiles-daemon.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${setPowerProfile} power-saver";
+          };
         };
-      };
 
-      systemd.services.power-profile-ac = {
-        description = "Set power profile when running on AC power";
-        after = [ "power-profiles-daemon.service" ];
-        wants = [ "power-profiles-daemon.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${setPowerProfile} performance";
+        power-profile-ac = {
+          description = "Set power profile when running on AC power";
+          after = [ "power-profiles-daemon.service" ];
+          wants = [ "power-profiles-daemon.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${setPowerProfile} performance";
+          };
         };
       };
     };

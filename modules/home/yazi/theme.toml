@@ -1,0 +1,110 @@
+[mgr]
+cwd             = { fg = "@primary@" }
+find_keyword    = { fg = "@warning@", bold = true, underline = true }
+find_position   = { fg = "@foreground@", bg = "reset", bold = true }
+marker_copied   = { fg = "@success@",  bg = "@success@" }
+marker_cut      = { fg = "@error@",    bg = "@error@" }
+marker_marked   = { fg = "@info@",   bg = "@info@" }
+marker_selected = { fg = "@warning@", bg = "@warning@" }
+count_copied    = { bg = "@success@" }
+count_cut       = { bg = "@error@" }
+count_selected  = { bg = "@warning@" }
+border_symbol   = "│"
+border_style    = { fg = "@border@" }
+
+[indicator]
+parent  = { fg = "@highlight@", bg = "@selection@" }
+current = { fg = "@highlight@", bg = "@selection@", bold = true }
+preview = { fg = "@highlight@", bg = "@selection@" }
+padding = { open = "▐", close = "▌" }
+
+[tabs]
+active    = { fg = "@selection@", bg = "@primary@", bold = true }
+inactive  = { fg = "@primary@", bg = "@selection@" }
+sep_inner = { open = " ", close = " " }
+sep_outer = { open = " ", close = " " }
+
+[mode]
+normal_main = { fg = "@selection@", bg = "@primary@", bold = true }
+normal_alt  = { fg = "@primary@", bg = "@selection@" }
+select_main = { bg = "@info@",   bold = true }
+select_alt  = { fg = "@info@",   bg = "@selection@" }
+unset_main  = { bg = "@foreground@", bold = true }
+unset_alt   = { fg = "@foreground@", bg = "@selection@" }
+
+[status]
+sep_left  = { open = " ", close = " " }
+sep_right = { open = " ", close = " " }
+perm_sep        = { fg = "@border@" }
+perm_type       = { fg = "@primary@" }
+perm_read       = { fg = "@warning@" }
+perm_write      = { fg = "@error@" }
+perm_exec       = { fg = "@success@" }
+progress_label  = { fg = "@foreground@", bold = true }
+progress_normal = { fg = "@success@", bg = "@selection@" }
+progress_error  = { fg = "@warning@", bg = "@error@" }
+
+[confirm]
+border  = { fg = "@primary@" }
+title   = { fg = "@primary@", bold = true }
+body    = { fg = "@foreground@" }
+list    = { fg = "@foreground@" }
+btn_yes = { fg = "@selection@", bg = "@primary@", bold = true }
+btn_no  = { fg = "@foreground@", bg = "@selection@" }
+
+[pick]
+border   = { fg = "@primary@" }
+active   = { fg = "@foreground@", bold = true }
+inactive = { fg = "@foreground@" }
+
+[input]
+border   = { fg = "@primary@" }
+title    = { fg = "@primary@" }
+value    = { fg = "@foreground@" }
+selected = { reversed = true }
+
+[cmp]
+border   = { fg = "@primary@" }
+active   = { fg = "@selection@", bg = "@primary@" }
+inactive = { fg = "@foreground@" }
+
+[tasks]
+border  = { fg = "@primary@" }
+title   = { fg = "@primary@" }
+hovered = { fg = "@foreground@", bold = true }
+
+[which]
+mask            = { bg = "@selection@" }
+rest            = { fg = "@border@" }
+desc            = { fg = "@foreground@" }
+separator       = "  "
+separator_style = { fg = "@border@" }
+
+[help]
+on      = { fg = "@info@" }
+run     = { fg = "@foreground@" }
+hovered = { reversed = true, bold = true }
+footer  = { bg = "@foreground@" }
+
+[spot]
+border   = { fg = "@primary@" }
+title    = { fg = "@primary@" }
+tbl_cell = { fg = "@foreground@", bg = "@selection@" }
+
+[icon]
+dirs = []
+prepend_conds = [
+  { if = "dir & hovered", text = "󰝰", fg = "@primary@" },
+  { if = "dir",           text = "󰉋", fg = "@primary@" },
+]
+
+[filetype]
+rules = [
+  { mime = "image/*", fg = "@foreground@" },
+  { mime = "{audio,video}/*", fg = "@foreground@" },
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "@foreground@" },
+  { mime = "application/{pdf,doc,rtf}", fg = "@foreground@" },
+  { mime = "vfs/{absent,stale}", fg = "@foreground@" },
+  { url = "*/", fg = "@foreground@" },
+  { url = "*", fg = "@foreground@" },
+]

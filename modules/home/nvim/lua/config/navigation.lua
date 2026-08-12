@@ -7,15 +7,6 @@ smart_splits.setup({
 	default_amount = 3,
 })
 
-vim.keymap.set("n", "<C-h>", smart_splits.move_cursor_left, { desc = "Focus left split" })
-vim.keymap.set("n", "<C-j>", smart_splits.move_cursor_down, { desc = "Focus lower split" })
-vim.keymap.set("n", "<C-k>", smart_splits.move_cursor_up, { desc = "Focus upper split" })
-vim.keymap.set("n", "<C-l>", smart_splits.move_cursor_right, { desc = "Focus right split" })
-vim.keymap.set("n", "<C-Left>", smart_splits.move_cursor_left, { desc = "Focus left split" })
-vim.keymap.set("n", "<C-Down>", smart_splits.move_cursor_down, { desc = "Focus lower split" })
-vim.keymap.set("n", "<C-Up>", smart_splits.move_cursor_up, { desc = "Focus upper split" })
-vim.keymap.set("n", "<C-Right>", smart_splits.move_cursor_right, { desc = "Focus right split" })
-
 vim.keymap.set("n", "<M-h>", smart_splits.resize_left, { desc = "Resize split left" })
 vim.keymap.set("n", "<M-j>", smart_splits.resize_down, { desc = "Resize split down" })
 vim.keymap.set("n", "<M-k>", smart_splits.resize_up, { desc = "Resize split up" })

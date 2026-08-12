@@ -350,40 +350,10 @@
 
       };
 
-      xdg.configFile."windows/docker-compose.yaml".text = ''
-        services:
-          windows:
-            image: dockurr/windows:latest
-            container_name: Windows
-            restart: "no"
-            stop_grace_period: 120s
-
-            devices:
-              - /dev/kvm
-              - /dev/net/tun
-
-            cap_add:
-              - NET_ADMIN
-
-            ports:
-              - "127.0.0.1:8006:8006"
-              - "127.0.0.1:3389:3389/tcp"
-              - "127.0.0.1:3389:3389/udp"
-              - "127.0.0.1:11433:11433/tcp"
-
-            volumes:
-              - ''${HOME}/VMs/windows/storage:/storage
-              - ''${HOME}/VMs/windows/shared:/shared
-
-            environment:
-              TZ: "${host.windows.timeZone}"
-              VERSION: "11"
-              RAM_SIZE: "${host.windows.memory}"
-              CPU_CORES: "${toString host.windows.cpuCores}"
-              DISK_SIZE: "${host.windows.diskSize}"
-              USERNAME: ''${WINDOWS_USERNAME:-Docker}
-              PASSWORD: ''${WINDOWS_PASSWORD:?Run windows-install to save WINDOWS_PASSWORD in ~/NixOS/.env}
-      '';
+      xdg.configFile."windows/docker-compose.yaml".source = pkgs.replaceVars ./docker-compose.yaml {
+        inherit (host.windows) diskSize memory timeZone;
+        cpuCores = toString host.windows.cpuCores;
+      };
 
       home.packages = with pkgs; [
         docker-compose
