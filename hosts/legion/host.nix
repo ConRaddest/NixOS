@@ -21,7 +21,10 @@ let
     initialHashedPassword = null;
     steam = true;
     desktopShell = "noctalia"; # "dms" || "noctalia"
-    theme = self.lib.homeModules.themeTokyoNight;
+    theme = {
+      name = "tokyo-night";
+      wallpaper = "backgrounds/1-sunset-lake.png";
+    };
 
     boot = {
       mode = "uefi";
@@ -140,8 +143,6 @@ let
 
   homeConfig = {
     imports = [
-      host.theme
-
       # Shell and core user environment
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
@@ -199,6 +200,7 @@ let
       _module.args = { inherit font; };
 
       nos = {
+        inherit (host) theme;
         flakeDirectory = host.flakeDirectory;
         trackpad = true;
         trackpadName = "msft0001:01-06cb:cd5f-touchpad";

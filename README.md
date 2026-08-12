@@ -430,17 +430,20 @@ Notes:
 
 ## Theming
 
-`homeModules.theme` imports Stylix and applies shared theme options, fonts, cursor, wallpaper, and application targets. Each theme is a dendritic Home Manager module under `modules/home/theme/themes/`; its folder contains the Nix palette definition and wallpaper.
+`homeModules.theme` imports Stylix and applies shared theme options, fonts, cursor, wallpaper, and application targets. Theme data uses native directories under `themes/<name>/`, with `colors.toml` as source of truth and wallpapers under `backgrounds/`.
 
-Theme palettes use hashtagged `#RRGGBB` colors. The theme engine resolves semantic roles such as `primary`, `background`, `success`, and `error` through `config.nos.theme.colors`. Stylix themes supported applications while custom Fastfetch, GDU, Hyprland Lua, LazyDocker, Noctalia, shell, Starship, Yazi, and screen-share-picker adapters consume the same semantic colors.
+The engine resolves canonical colors, adapts them to Base16 for Stylix, and exposes the complete palette through `config.nos.theme.colors`. Custom Fastfetch, GDU, Hyprland Lua, Kitty, LazyDocker, Neovim, Noctalia, shell, Starship, Yazi, and screen-share-picker adapters consume the same colors. Optional `hyprland.lua` files apply after the generated Hyprland palette.
 
-Select a theme directly in each host definition:
+Select theme and wallpaper in each host definition:
 
 ```nix
-theme = self.lib.homeModules.themeTokyoNight;
+theme = {
+  name = "tokyo-night";
+  wallpaper = "backgrounds/1-sunset-lake.png";
+};
 ```
 
-Add `host.theme` beside `self.lib.homeModules.theme` in the host's Home Manager imports. Change the module reference, then rebuild:
+To add a theme, create its directory in `themes/`, provide `colors.toml` and bundled wallpapers, select it, then rebuild:
 
 ```bash
 nos-build

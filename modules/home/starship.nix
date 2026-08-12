@@ -19,10 +19,10 @@
 
         settings = {
           add_newline = true;
-          format = "[░▒▓](fg:${theme.accentDark})$os[](fg:${theme.accentDark} bg:${theme.primary})$directory[](fg:${theme.primary} bg:${theme.selection})$git_branch$git_status[](fg:${theme.selection} bg:${theme.background})$nodejs$bun$rust$golang$php[](fg:${theme.background} bg:${theme.surface})$time[ ](fg:${theme.surface})$line_break$character";
+          format = "[░▒▓](fg:${theme.magenta})$os[](fg:${theme.magenta} bg:${theme.accent})$directory[](fg:${theme.accent} bg:${theme.selection})$git_branch$git_status[](fg:${theme.selection} bg:${theme.background})$nodejs$bun$rust$golang$php[](fg:${theme.background} bg:${theme.dark_background})$time[ ](fg:${theme.dark_background})$line_break$character";
 
           directory = {
-            style = "fg:${theme.background} bg:${theme.primary}";
+            style = "fg:${theme.background} bg:${theme.accent}";
             format = "[ $path ]($style)";
             truncation_length = 3;
             truncation_symbol = "…/";
@@ -37,54 +37,54 @@
           git_branch = {
             symbol = "";
             style = "bg:${theme.selection}";
-            format = "[[ $symbol $branch ](fg:${theme.primary} bg:${theme.selection})]($style)";
+            format = "[[ $symbol $branch ](fg:${theme.accent} bg:${theme.selection})]($style)";
           };
 
           git_status = {
             style = "bg:${theme.selection}";
-            format = "[[($all_status$ahead_behind )](fg:${theme.primary} bg:${theme.selection})]($style)";
+            format = "[[($all_status$ahead_behind )](fg:${theme.accent} bg:${theme.selection})]($style)";
           };
 
           nodejs = {
             symbol = "";
             style = "bg:${theme.background}";
-            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
+            format = "[[ $symbol ($version) ](fg:${theme.accent} bg:${theme.background})]($style)";
           };
 
           bun = {
             symbol = "";
             style = "bg:${theme.background}";
-            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
+            format = "[[ $symbol ($version) ](fg:${theme.accent} bg:${theme.background})]($style)";
           };
 
           rust = {
             symbol = "";
             style = "bg:${theme.background}";
-            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
+            format = "[[ $symbol ($version) ](fg:${theme.accent} bg:${theme.background})]($style)";
           };
 
           golang = {
             symbol = "";
             style = "bg:${theme.background}";
-            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
+            format = "[[ $symbol ($version) ](fg:${theme.accent} bg:${theme.background})]($style)";
           };
 
           php = {
             symbol = "";
             style = "bg:${theme.background}";
-            format = "[[ $symbol ($version) ](fg:${theme.primary} bg:${theme.background})]($style)";
+            format = "[[ $symbol ($version) ](fg:${theme.accent} bg:${theme.background})]($style)";
           };
 
           time = {
             disabled = false;
             time_format = "%R";
-            style = "bg:${theme.surface}";
-            format = "[[  $time ](fg:${theme.foreground} bg:${theme.surface})]($style)";
+            style = "bg:${theme.dark_background}";
+            format = "[[  $time ](fg:${theme.foreground} bg:${theme.dark_background})]($style)";
           };
 
           os = {
             disabled = false;
-            style = "bg:${theme.accentDark} fg:${theme.background}";
+            style = "bg:${theme.magenta} fg:${theme.background}";
             format = "[ $symbol ]($style)";
             symbols = {
               Windows = "󰍲";
@@ -114,8 +114,8 @@
           };
 
           character = {
-            success_symbol = "[❯](bold ${theme.primary})";
-            error_symbol = "[❯](bold ${theme.primary})";
+            success_symbol = "[❯](bold ${theme.accent})";
+            error_symbol = "[❯](bold ${theme.accent})";
           };
         };
       };

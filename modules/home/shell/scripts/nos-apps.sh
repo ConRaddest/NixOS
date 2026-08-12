@@ -51,10 +51,16 @@ current_apps() {
 # ╰──────────────────────────────────────────────────────────╯
 
 package_preview() {
-  local attr="$1"
+  local attr="$1" homepage
   nix eval --raw "nixpkgs#$attr.meta.description" 2>/dev/null || true
   printf '\n\n'
-  nix eval --raw "nixpkgs#$attr.meta.homepage" 2>/dev/null || true
+
+  homepage=$(nix eval --raw "nixpkgs#$attr.meta.homepage" 2>/dev/null || true)
+  if [[ "$homepage" == http://* || "$homepage" == https://* ]]; then
+    printf $'\e]8;;%s\e\\%s\e]8;;\e\\' "$homepage" "$homepage"
+  else
+    printf '%s' "$homepage"
+  fi
 }
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -100,14 +106,10 @@ search_apps() {
   local query="${1:-}"
   [[ -n "$query" ]] || return 0
 
-  nix-search "$query" 2>/dev/null | awk '
-    NF {
-      name = $1
-      desc = $0
-      sub(/^[^[:space:]]+[[:space:]]*/, "", desc)
-      sub(/^@[[:space:]]*/, "", desc)
-      print name "\t" desc
-    }
+  nix-search --json "$query" 2>/dev/null | jq -r '
+    (. // [])[]
+    | [(.path | sub("^nixpkgs\\."; "")), (.description // "")]
+    | @tsv
   '
 }
 

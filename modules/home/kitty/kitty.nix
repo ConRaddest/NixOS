@@ -17,8 +17,12 @@
               "raise NotImplementedError"
         '';
       });
+      colors = config.nos.theme.colors;
     in
     {
+      # Preserve full canonical ANSI palette beyond Base16 mapping.
+      stylix.targets.kitty.enable = false;
+
       xdg.configFile."kitty/open-url.sh" = {
         executable = true;
         text = ''
@@ -45,6 +49,32 @@
         };
 
         settings = {
+          font_family = config.stylix.fonts.monospace.name;
+          font_size = config.stylix.fonts.sizes.terminal;
+          foreground = colors.foreground;
+          background = colors.background;
+          selection_foreground = colors.selection_foreground;
+          selection_background = colors.selection_background;
+          cursor = colors.bright_foreground;
+          cursor_text_color = colors.background;
+          active_border_color = colors.accent;
+          active_tab_background = colors.accent;
+          color0 = colors.background;
+          color1 = colors.red;
+          color2 = colors.green;
+          color3 = colors.yellow;
+          color4 = colors.blue;
+          color5 = colors.magenta;
+          color6 = colors.cyan;
+          color7 = colors.foreground;
+          color8 = colors.muted;
+          color9 = colors.bright_red;
+          color10 = colors.bright_green;
+          color11 = colors.bright_yellow;
+          color12 = colors.bright_blue;
+          color13 = colors.bright_magenta;
+          color14 = colors.bright_cyan;
+          color15 = colors.bright_foreground;
           window_padding_width = 6;
           placement_strategy = "top-left";
           watcher = "nvim-padding.py";

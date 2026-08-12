@@ -121,12 +121,19 @@
           "hypr/nix/colors.lua" = {
             source = pkgs.replaceVars ./colors.lua {
               inherit (colors)
+                accent
                 background
-                border
-                info
-                primary
+                cyan
+                muted
                 ;
             };
+          };
+          "hypr/nix/theme.lua" = {
+            source =
+              let
+                themeOverride = "${config.nos.theme.directory}/hyprland.lua";
+              in
+              if builtins.pathExists themeOverride then themeOverride else pkgs.writeText "hypr-theme.lua" "";
           };
           "hypr/nix/input.lua" = {
             text =

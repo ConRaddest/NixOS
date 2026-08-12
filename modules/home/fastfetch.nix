@@ -18,7 +18,7 @@
           --seed ${lib.escapeShellArg hostName} \
           --output "$out"
       '';
-      accent = colors.secondary;
+      accent = colors.accent;
     in
     {
       home.packages = [ pkgs.fastfetch ];

@@ -98,8 +98,9 @@ hl.config({
 	},
 })
 
--- Stylix colors generated from the shared Base16 palette.
+-- Stylix colors generated from shared canonical palette.
 require("nix.colors")
+require("nix.theme")
 
 -- ============================================================
 -- animations

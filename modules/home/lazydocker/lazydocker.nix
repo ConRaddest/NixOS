@@ -24,10 +24,10 @@
       xdg.configFile."lazydocker/config.yml".text = ''
         gui:
           theme:
-            activeBorderColor: ["${colors.primary}", "bold"]
-            inactiveBorderColor: ["${colors.border}"]
+            activeBorderColor: ["${colors.accent}", "bold"]
+            inactiveBorderColor: ["${colors.muted}"]
             selectedLineBgColor: ["${colors.selection}"]
-            optionsTextColor: ["${colors.primary}"]
+            optionsTextColor: ["${colors.accent}"]
             defaultFgColor: ["${colors.foreground}"]
       '';
 

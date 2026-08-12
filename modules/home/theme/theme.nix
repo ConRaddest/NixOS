@@ -7,31 +7,91 @@
       font,
       lib,
       pkgs,
+      self,
       ...
     }:
 
     let
       cfg = config.nos.theme;
-      base16Names = [
-        "base00"
-        "base01"
-        "base02"
-        "base03"
-        "base04"
-        "base05"
-        "base06"
-        "base07"
-        "base08"
-        "base09"
-        "base0A"
-        "base0B"
-        "base0C"
-        "base0D"
-        "base0E"
-        "base0F"
+      themeDirectory = "${self}/themes/${cfg.name}";
+      colorsFile = "${themeDirectory}/colors.toml";
+      backgroundsDirectory = "${themeDirectory}/backgrounds";
+      selectedWallpaper = "${themeDirectory}/${cfg.wallpaper}";
+
+      theme = if builtins.pathExists colorsFile then fromTOML (builtins.readFile colorsFile) else { };
+      mode =
+        theme.mode or (if builtins.pathExists "${themeDirectory}/light.mode" then "light" else "dark");
+      colors = theme // {
+        inherit mode;
+        orange = theme.orange or theme.yellow;
+        brown = theme.brown or (theme.orange or theme.yellow);
+        selection_background = theme.selection_background or theme.selection;
+        selection_foreground = theme.selection_foreground or theme.bright_foreground;
+      };
+
+      canonicalColorNames = [
+        "accent"
+        "selection"
+        "muted"
+        "background"
+        "dark_background"
+        "darker_background"
+        "lighter_background"
+        "foreground"
+        "dark_foreground"
+        "light_foreground"
+        "bright_foreground"
+        "red"
+        "yellow"
+        "orange"
+        "green"
+        "cyan"
+        "blue"
+        "magenta"
+        "brown"
+        "bright_red"
+        "bright_yellow"
+        "bright_green"
+        "bright_cyan"
+        "bright_blue"
+        "bright_magenta"
+        "selection_background"
+        "selection_foreground"
       ];
-      colors = config.lib.stylix.colors.withHashtag;
-      roleColors = colors // cfg.extraColors;
+      canonicalColors = map (name: colors.${name} or null) canonicalColorNames;
+
+      palette = {
+        base00 = colors.background;
+        base01 = colors.dark_background;
+        base02 = colors.selection;
+        base03 = colors.muted;
+        base04 = colors.dark_foreground;
+        base05 = colors.foreground;
+        base06 = colors.light_foreground;
+        base07 = colors.bright_foreground;
+        base08 = colors.red;
+        base09 = colors.orange;
+        base0A = colors.yellow;
+        base0B = colors.green;
+        base0C = colors.cyan;
+        base0D = colors.blue;
+        base0E = colors.magenta;
+        base0F = colors.brown;
+      };
+
+      backgroundFiles =
+        if builtins.pathExists backgroundsDirectory then
+          builtins.attrNames (
+            lib.filterAttrs (
+              _: type:
+              builtins.elem type [
+                "regular"
+                "symlink"
+              ]
+            ) (builtins.readDir backgroundsDirectory)
+          )
+        else
+          [ ];
     in
     {
       imports = [ inputs.stylix.homeModules.stylix ];
@@ -39,78 +99,88 @@
       options.nos.theme = {
         name = lib.mkOption {
           type = lib.types.str;
-          description = "Human-readable name of selected theme.";
+          description = "Theme directory name under themes/.";
         };
 
-        polarity = lib.mkOption {
+        wallpaper = lib.mkOption {
+          type = lib.types.str;
+          description = "Wallpaper path relative to selected theme directory.";
+        };
+
+        directory = lib.mkOption {
+          type = lib.types.str;
+          readOnly = true;
+          internal = true;
+        };
+
+        mode = lib.mkOption {
           type = lib.types.enum [
             "dark"
             "light"
           ];
-          description = "Selected theme polarity.";
+          readOnly = true;
+          internal = true;
         };
 
-        wallpaper = lib.mkOption {
-          type = lib.types.path;
-          description = "Wallpaper bundled with selected theme.";
-        };
-
-        palette = lib.mkOption {
-          type = lib.types.attrsOf lib.types.str;
-          description = "Hashtagged Base16 palette for selected theme.";
-        };
-
-        extraColors = lib.mkOption {
-          type = lib.types.attrsOf lib.types.str;
-          default = { };
-          description = "Named non-Base16 colors available to semantic roles.";
-        };
-
-        roles = lib.mkOption {
-          type = lib.types.attrsOf lib.types.str;
-          description = "Semantic color roles mapped to Base16 palette entries or named extra colors.";
+        backgrounds = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          readOnly = true;
+          internal = true;
         };
 
         colors = lib.mkOption {
           type = lib.types.attrsOf lib.types.str;
           readOnly = true;
           internal = true;
-          description = "Resolved semantic colors in #RRGGBB form.";
+          description = "Canonical theme colors with standard selection fallbacks.";
         };
       };
 
       config = {
         assertions = [
           {
-            assertion = lib.all (name: builtins.hasAttr name cfg.palette) base16Names;
-            message = "Theme ${cfg.name} must define every Base16 color from base00 through base0F.";
+            assertion = builtins.pathExists colorsFile;
+            message = "Theme ${cfg.name} must provide themes/${cfg.name}/colors.toml.";
           }
           {
-            assertion = lib.all (color: builtins.match "#[0-9a-fA-F]{6}" color != null) (
-              builtins.attrValues (cfg.palette // cfg.extraColors)
-            );
-            message = "Theme ${cfg.name} palette and extra colors must use #RRGGBB notation.";
+            assertion = builtins.pathExists selectedWallpaper;
+            message = "Theme ${cfg.name} wallpaper ${cfg.wallpaper} does not exist.";
           }
           {
-            assertion = lib.all (colorName: builtins.hasAttr colorName roleColors) (
-              builtins.attrValues cfg.roles
-            );
-            message = "Theme ${cfg.name} roles must reference a Base16 palette entry or named extra color.";
+            assertion = builtins.elem mode [
+              "dark"
+              "light"
+            ];
+            message = "Theme ${cfg.name} mode must be dark or light.";
+          }
+          {
+            assertion = lib.all (color: color != null) canonicalColors;
+            message = "Theme ${cfg.name} is missing one or more canonical colors.";
+          }
+          {
+            assertion = lib.all (
+              color: color == null || builtins.match "#[0-9a-fA-F]{6}" color != null
+            ) canonicalColors;
+            message = "Theme ${cfg.name} canonical colors must use #RRGGBB notation.";
           }
         ];
 
-        nos.theme.colors = lib.mapAttrs (_: colorName: roleColors.${colorName}) cfg.roles;
+        nos.theme = {
+          inherit colors mode;
+          backgrounds = map (name: "${backgroundsDirectory}/${name}") backgroundFiles;
+          directory = themeDirectory;
+        };
 
         stylix = {
           enable = true;
           autoEnable = true;
-          polarity = cfg.polarity;
-          image = cfg.wallpaper;
+          polarity = mode;
+          image = selectedWallpaper;
           imageScalingMode = "fill";
-          base16Scheme = cfg.palette // {
+          base16Scheme = palette // {
             scheme = cfg.name;
-            author = "NixOS configuration";
-            variant = cfg.polarity;
+            author = "NixOS Stylix theme engine";
+            variant = mode;
           };
 
           fonts = {
@@ -143,13 +213,17 @@
             name = "Adwaita";
             size = 22;
           };
-
         };
 
-        home.file."Pictures/Wallpapers/${baseNameOf cfg.wallpaper}" = {
-          source = cfg.wallpaper;
-          force = true;
-        };
+        home.file = builtins.listToAttrs (
+          map (name: {
+            name = "Pictures/Wallpapers/${cfg.name}/${name}";
+            value = {
+              source = "${backgroundsDirectory}/${name}";
+              force = true;
+            };
+          }) backgroundFiles
+        );
       };
     };
 }

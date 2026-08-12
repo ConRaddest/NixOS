@@ -1,14 +1,14 @@
 style:
   selected-row:
     text-color: "@background@"
-    background-color: "@primary@"
+    background-color: "@accent@"
   result-row:
-    number-color: "@primary@"
-    directory-color: "@primary@"
+    number-color: "@accent@"
+    directory-color: "@accent@"
   footer:
     text-color: "@foreground@"
     background-color: "@background@"
-    number-color: "@primary@"
+    number-color: "@accent@"
   header:
     text-color: "@foreground@"
     background-color: "@background@"

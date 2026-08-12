@@ -8,10 +8,10 @@
       stylix.targets.fzf.colors.override.withHashtag = {
         base01 = config.nos.theme.colors.selection;
         base04 = config.nos.theme.colors.foreground;
-        base07 = config.nos.theme.colors.highlight;
-        base0A = config.nos.theme.colors.accentDark;
-        base0C = config.nos.theme.colors.primary;
-        base0D = config.nos.theme.colors.primary;
+        base07 = config.nos.theme.colors.bright_foreground;
+        base0A = config.nos.theme.colors.accent;
+        base0C = config.nos.theme.colors.accent;
+        base0D = config.nos.theme.colors.accent;
       };
 
       programs.fzf = {

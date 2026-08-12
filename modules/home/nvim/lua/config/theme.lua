@@ -1,5 +1,10 @@
 -- Colorscheme and theme-specific highlights.
 
+local ok, theme = pcall(require, "nix.theme")
+if not ok then
+	theme = { muted = "#414868" }
+end
+
 require("tokyonight").setup({
 	style = "night",
 })
@@ -11,7 +16,7 @@ vim.opt.fillchars:append({
 })
 
 local function visible_split_borders()
-	vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#414868", bg = "NONE" })
+	vim.api.nvim_set_hl(0, "WinSeparator", { fg = theme.muted, bg = "NONE" })
 end
 
 visible_split_borders()

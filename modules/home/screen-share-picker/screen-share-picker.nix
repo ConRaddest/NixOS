@@ -32,11 +32,11 @@
           {
             inherit backgroundOpacity;
             inherit (colors)
+              accent
               background
+              dark_background
               foreground
               muted
-              primary
-              surface
               ;
             fontMono = font.mono;
           };

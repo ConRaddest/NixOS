@@ -19,7 +19,7 @@
       home.packages = [ pkgs.gdu ];
 
       xdg.configFile."gdu/gdu.yaml".source = pkgs.replaceVars ./gdu.yaml {
-        inherit (colors) background foreground primary;
+        inherit (colors) accent background foreground;
         maxCores = toString host.gduMaxCores;
       };
     };

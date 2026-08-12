@@ -18,12 +18,12 @@
             force = true;
             source = pkgs.replaceVars ./lazygit.yaml {
               inherit (colors)
+                accent
                 blue
-                border
                 foreground
+                muted
                 orange
-                primary
-                warning
+                yellow
                 ;
             };
           };
@@ -33,6 +33,11 @@
           "nvim/lua/config.lua" = {
             source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
           };
+          "nvim/lua/nix/theme.lua".text = ''
+            return {
+              muted = ${builtins.toJSON colors.muted},
+            }
+          '';
         };
         dataFile = {
           "mime/packages/code-workspace.xml" = {

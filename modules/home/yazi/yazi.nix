@@ -148,15 +148,15 @@
           "yazi/theme.toml" = {
             source = pkgs.replaceVars ./theme.toml {
               inherit (theme)
-                border
-                error
+                accent
+                bright_foreground
+                cyan
                 foreground
-                highlight
-                info
-                primary
+                green
+                muted
+                red
                 selection
-                success
-                warning
+                yellow
                 ;
             };
           };

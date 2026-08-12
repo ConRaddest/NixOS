@@ -10,50 +10,48 @@
 
     let
       colors = config.nos.theme.colors;
-      palette = config.lib.stylix.colors.withHashtag;
-      ansi = {
-        black = palette.base00;
-        red = palette.base08;
-        green = palette.base0B;
-        yellow = palette.base0A;
-        blue = palette.base0D;
-        magenta = palette.base0E;
-        cyan = palette.base0C;
-        white = palette.base05;
-      };
       terminal = {
-        normal = ansi;
+        normal = {
+          black = colors.background;
+          red = colors.red;
+          green = colors.green;
+          yellow = colors.yellow;
+          blue = colors.blue;
+          magenta = colors.magenta;
+          cyan = colors.cyan;
+          white = colors.foreground;
+        };
         bright = {
-          black = palette.base03;
-          red = palette.base08;
-          green = palette.base0B;
-          yellow = palette.base0A;
-          blue = palette.base0D;
-          magenta = palette.base0E;
-          cyan = palette.base0C;
-          white = palette.base07;
+          black = colors.muted;
+          red = colors.bright_red;
+          green = colors.bright_green;
+          yellow = colors.bright_yellow;
+          blue = colors.bright_blue;
+          magenta = colors.bright_magenta;
+          cyan = colors.bright_cyan;
+          white = colors.bright_foreground;
         };
         foreground = colors.foreground;
         background = colors.background;
-        cursor = colors.primary;
+        cursor = colors.accent;
         cursorText = colors.background;
-        selectionFg = colors.highlight;
+        selectionFg = colors.selection_foreground;
         selectionBg = colors.selection;
       };
       paletteMode = {
-        mPrimary = colors.primary;
+        mPrimary = colors.accent;
         mOnPrimary = colors.background;
-        mSecondary = colors.secondary;
+        mSecondary = colors.magenta;
         mOnSecondary = colors.background;
-        mTertiary = colors.info;
+        mTertiary = colors.cyan;
         mOnTertiary = colors.background;
-        mError = colors.error;
+        mError = colors.red;
         mOnError = colors.background;
         mSurface = colors.background;
         mOnSurface = colors.foreground;
-        mSurfaceVariant = colors.surface;
-        mOnSurfaceVariant = colors.highlight;
-        mOutline = colors.border;
+        mSurfaceVariant = colors.dark_background;
+        mOnSurfaceVariant = colors.bright_foreground;
+        mOutline = colors.muted;
         mShadow = colors.background;
         mHover = colors.selection;
         mOnHover = colors.foreground;
@@ -61,7 +59,7 @@
       };
       settings = lib.recursiveUpdate (builtins.fromTOML (builtins.readFile ./settings.toml)) {
         theme = {
-          mode = config.nos.theme.polarity;
+          mode = config.nos.theme.mode;
           source = "custom";
           custom_palette = "nixos";
         };

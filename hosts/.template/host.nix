@@ -20,7 +20,10 @@ let
     initialHashedPassword = null;
     steam = true;
     desktopShell = "dms"; # "dms" or "noctalia"
-    theme = self.lib.homeModules.themeTokyoNight;
+    theme = {
+      name = "tokyo-night";
+      wallpaper = "backgrounds/1-sunset-lake.png";
+    };
 
     boot = {
       mode = "uefi";
@@ -96,7 +99,6 @@ let
       self.lib.homeModules.shell
       self.lib.homeModules.appearance
       self.lib.homeModules.theme
-      host.theme
       self.lib.homeModules.apps
       # AUDIO_HOME_MODULE
       # BATTERY_HOME_MODULE
@@ -151,6 +153,7 @@ let
       _module.args = { inherit font; };
 
       nos = {
+        inherit (host) theme;
         flakeDirectory = host.flakeDirectory;
         trackpad = false;
         trackpadName = null;
