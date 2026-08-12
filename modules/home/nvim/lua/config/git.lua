@@ -1,4 +1,4 @@
--- Git signs, scrollbar markers, diffs, and Git UI.
+-- Git signs, scrollbar markers, and full-screen LazyGit UI.
 
 require("gitsigns").setup({})
 
@@ -7,33 +7,6 @@ require("scrollbar").setup({
 })
 require("scrollbar.handlers.gitsigns").setup()
 
-require("diffview").setup({
-	keymaps = {
-		view = {
-			{ "n", "<Esc>", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-		},
-		file_panel = {
-			{ "n", "<Esc>", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-		},
-		file_history_panel = {
-			{ "n", "<Esc>", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-		},
-	},
-})
-
-require("neogit").setup({
-	integrations = {
-		diffview = true,
-	},
-	mappings = {
-		status = {
-			["<Esc>"] = "Close",
-		},
-	},
-})
-
-vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		require("neogit.lib.hl").setup(require("neogit.config").values)
-	end,
-})
+vim.g.lazygit_floating_window_scaling_factor = 1
+vim.g.lazygit_floating_window_border_chars = { "", "", "", "", "", "", "", "" }
+vim.g.lazygit_floating_window_winblend = 0

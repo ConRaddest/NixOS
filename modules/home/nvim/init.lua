@@ -1,6 +1,7 @@
 -- Load feature modules in dependency order.
 require("config.options")
 require("config.theme")
+require("config.colors")
 require("config.keymaps")
 require("config.ui")
 require("config.navigation")

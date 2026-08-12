@@ -636,7 +636,7 @@ fi
 { ... }:
 
 let
-  hostName = builtins.baseNameOf (toString ./.);
+  hostName = baseNameOf (toString ./.);
 in
 {
   flake.nixosModules."${host_name}Hardware" =

@@ -8,7 +8,7 @@
 let
   # Copy this directory to hosts/<host-name>. hostName then derives from
   # directory name, keeping NixOS and Home Manager outputs unique.
-  hostName = builtins.baseNameOf (toString ./.);
+  hostName = baseNameOf (toString ./.);
 
   host = {
     system = "x86_64-linux";

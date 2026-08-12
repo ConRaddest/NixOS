@@ -92,7 +92,7 @@ which_key.add({
 	{ "<leader>=", "<C-w>=", desc = "Equalize splits" },
 	{ "<leader>e", "<cmd>Yazi<cr>", desc = "File explorer" },
 	{ "<leader>g", group = "Git" },
-	{ "<leader>gg", "<cmd>Neogit<cr>", desc = "Git status" },
+	{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
 	{
 		"<leader>gc",
 		function()
@@ -117,14 +117,12 @@ which_key.add({
 		end,
 		desc = "Toggle changed hunks",
 	},
-	{ "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Review changes" },
-	{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
 	{ "<leader>s", group = "Search" },
 	{ "<leader>l", group = "Language" },
 	{ "<leader>d", group = "Diagnostics" },
 	{ "<leader>t", group = "Test / tasks" },
-	{ "<leader>q", group = "Session" },
 	{ "<leader>y", group = "Yank" },
+	{ "<leader>p", "<cmd>CccPick<cr>", desc = "Pick color" },
 	{
 		"<leader>yd",
 		function()
@@ -194,7 +192,7 @@ which_key.add({
 		end,
 		desc = "Search and replace",
 	},
-	{ "<C-q>", "<cmd>confirm qall<cr>", desc = "Quit Neovim" },
+	{ "<leader>q", "<cmd>confirm qall<cr>", desc = "Quit Neovim" },
 	{ "<leader>w", "<cmd>write<cr>", desc = "Save" },
 	{ "<C-s>", save_current_buffer, desc = "Save" },
 })

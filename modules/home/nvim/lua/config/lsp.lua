@@ -63,7 +63,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		vim.keymap.set(
 			"n",
-			"<leader>la",
+			"<leader>ca",
 			vim.lsp.buf.code_action,
 			vim.tbl_extend("force", opts, { desc = "Code action" })
 		)

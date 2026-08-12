@@ -21,7 +21,7 @@
 
         # Keep complete snapshots in JSON, but let Stylix own dynamic store paths
         # and values already derived from shared theme config.
-        settings = builtins.removeAttrs (builtins.fromJSON (builtins.readFile ./settings.json)) [
+        settings = removeAttrs (builtins.fromJSON (builtins.readFile ./settings.json)) [
           "currentThemeName"
           "customThemeFile"
           "popupTransparency"
@@ -29,7 +29,7 @@
           "fontFamily"
           "monoFontFamily"
         ];
-        session = builtins.removeAttrs (builtins.fromJSON (builtins.readFile ./session.json)) [
+        session = removeAttrs (builtins.fromJSON (builtins.readFile ./session.json)) [
           "wallpaperPath"
           "wallpaperPathLight"
           "wallpaperPathDark"

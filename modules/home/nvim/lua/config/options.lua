@@ -1,6 +1,7 @@
 -- Core editor options and filetype-specific indentation.
 
 -- Editor behavior
+vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = "both"
 vim.opt.number = true

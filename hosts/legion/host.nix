@@ -10,7 +10,7 @@ let
   # Host
   # ============================================================
 
-  hostName = builtins.baseNameOf (toString ./.);
+  hostName = baseNameOf (toString ./.);
   host = {
     system = "x86_64-linux";
     username = "cdt";

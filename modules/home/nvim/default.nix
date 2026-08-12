@@ -9,6 +9,9 @@
       ...
     }:
 
+    let
+      colors = config.nos.theme.colors;
+    in
     {
       xdg.desktopEntries.nvim = {
         name = "Neovim";
@@ -64,6 +67,25 @@
           config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
         "nvim/lua/config".source =
           config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/lua/config";
+        "lazygit/config.yml" = {
+          force = true;
+          text = ''
+            gui:
+              nerdFontsVersion: "3"
+              theme:
+                activeBorderColor: ["${colors.orange}", "bold"]
+                inactiveBorderColor: ["${colors.blue}"]
+                searchingActiveBorderColor: ["${colors.orange}", "bold"]
+                optionsTextColor: ["${colors.blue}"]
+                selectedLineBgColor: ["${colors.border}"]
+                cherryPickedCommitFgColor: ["${colors.blue}"]
+                cherryPickedCommitBgColor: ["${colors.primary}"]
+                markedBaseCommitFgColor: ["${colors.blue}"]
+                markedBaseCommitBgColor: ["${colors.warning}"]
+                unstagedChangesColor: ["${colors.blue}"]
+                defaultFgColor: ["${colors.foreground}"]
+          '';
+        };
       };
 
       # Use Neovim's Tokyo Night theme instead of Stylix's reduced Base16 syntax palette.
@@ -86,11 +108,12 @@
           smart-splits-nvim
           gitsigns-nvim
           nvim-scrollbar
-          neogit
-          diffview-nvim
+          lazygit-nvim
           grug-far-nvim
           nvim-web-devicons
           bufferline-nvim
+          nvim-colorizer-lua
+          ccc-nvim
 
           # Language intelligence
           nvim-lspconfig
@@ -137,6 +160,8 @@
           overseer-nvim
           persistence-nvim
         ];
+
+        extraPackages = [ pkgs.lazygit ];
 
         initLua = ''
           require("config")

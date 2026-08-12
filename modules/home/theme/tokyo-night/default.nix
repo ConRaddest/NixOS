@@ -20,12 +20,12 @@
           base05 = "#a9b1d6"; # Default foreground
           base06 = "#c0caf5"; # Light foreground
           base07 = "#d5d6db"; # Light background
-          base08 = "#f7768e"; # Red: errors and variables
-          base09 = "#ff9e64"; # Orange: integers and constants
-          base0A = "#e0af68"; # Yellow: warnings and types
-          base0B = "#9ece6a"; # Green: success and strings
-          base0C = "#7dcfff"; # Cyan: regex and support
-          base0D = "#7aa2f7"; # Blue: functions and headings
+          base08 = "#f1738c"; # Red: errors and variables
+          base09 = "#f3a170"; # Orange: integers and constants
+          base0A = "#dfaf69"; # Yellow: warnings and types
+          base0B = "#9dc672"; # Green: success and strings
+          base0C = "#8dcbef"; # Cyan: regex and support
+          base0D = "#7ba2f6"; # Blue: functions and headings
           base0E = "#bb9af7"; # Purple: keywords and control flow
           base0F = "#c53b53"; # Deprecated and embedded-language tags
         };
@@ -49,6 +49,7 @@
           error = "base08";
           orange = "base09";
           warning = "base0A";
+          blue = "base0D";
           success = "base0B";
           info = "base0C";
           primary = "base0E";

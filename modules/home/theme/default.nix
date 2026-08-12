@@ -146,7 +146,7 @@
 
         };
 
-        home.file."Pictures/Wallpapers/${builtins.baseNameOf cfg.wallpaper}" = {
+        home.file."Pictures/Wallpapers/${baseNameOf cfg.wallpaper}" = {
           source = cfg.wallpaper;
           force = true;
         };
