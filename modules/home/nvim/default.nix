@@ -59,8 +59,12 @@
         run ${pkgs.shared-mime-info}/bin/update-mime-database ${lib.escapeShellArg "${config.xdg.dataHome}/mime"}
       '';
 
-      xdg.configFile."nvim/lua/config.lua".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
+      xdg.configFile = {
+        "nvim/lua/config.lua".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
+        "nvim/lua/config".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/lua/config";
+      };
 
       # Use Neovim's Tokyo Night theme instead of Stylix's reduced Base16 syntax palette.
       stylix.targets.neovim.enable = false;
@@ -76,10 +80,12 @@
           tokyonight-nvim
           which-key-nvim
           snacks-nvim
+          telescope-nvim
           yazi-nvim
           plenary-nvim
           smart-splits-nvim
           gitsigns-nvim
+          nvim-scrollbar
           neogit
           diffview-nvim
           grug-far-nvim
