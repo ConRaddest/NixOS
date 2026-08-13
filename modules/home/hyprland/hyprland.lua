@@ -7,6 +7,7 @@ local shell = require("nix.shell")
 local configuredMonitors = require("nix.monitors")
 local monitorWorkspaces = {}
 local workspaceAspectRatio = {}
+
 local windows = {
 	{ title = "windows-install" },
 	{ title = "windows-uninstall" },
@@ -23,7 +24,7 @@ local windows = {
 	{ class = "termfilechooser" },
 	{ class = "1password" },
 	{ class = "lazy-docker" },
-	{ class = "org.gnome.Calculator", size = { 360, 616 } },
+	{ class = "org.gnome.Calculator", size = { 360, 620 } },
 }
 
 for _, w in ipairs(windows) do
@@ -56,6 +57,8 @@ local function assignWorkspaces(monitor, workspaces)
 	end
 end
 
+local workspaceScroll = {}
+
 local function scrollWorkspace(offset)
 	local monitor = hl.get_active_monitor()
 	if not monitor or not monitor.active_workspace then
@@ -63,15 +66,35 @@ local function scrollWorkspace(offset)
 	end
 
 	local workspaces = monitorWorkspaces[monitor.name] or {}
-	for index, id in ipairs(workspaces) do
-		if id == monitor.active_workspace.id then
-			local target = workspaces[index + offset]
-			if target then
-				hl.dispatch(hl.dsp.focus({ workspace = target }))
+	local state = workspaceScroll[monitor.name]
+	local index = state and state.index
+
+	if not index then
+		for currentIndex, id in ipairs(workspaces) do
+			if id == monitor.active_workspace.id then
+				index = currentIndex
+				break
 			end
-			return
 		end
 	end
+
+	local targetIndex = index and index + offset
+	local target = targetIndex and workspaces[targetIndex]
+	if not target then
+		return
+	end
+
+	local generation = (state and state.generation or 0) + 1
+	workspaceScroll[monitor.name] = { index = targetIndex, generation = generation }
+	hl.dispatch(hl.dsp.focus({ workspace = target }))
+
+	-- Keep fast wheel events moving from queued target, then resync with Hyprland.
+	hl.timer(function()
+		local current = workspaceScroll[monitor.name]
+		if current and current.generation == generation then
+			workspaceScroll[monitor.name] = nil
+		end
+	end, { timeout = 180, type = "oneshot" })
 end
 
 for _, monitor in ipairs(configuredMonitors) do
@@ -100,6 +123,9 @@ hl.config({
 			layout = "vertical",
 			wallpaper = 0,
 			blur = false,
+			input = {
+				scroll_event_delay = 0,
+			},
 			shadow = {
 				enabled = false,
 			},
@@ -111,6 +137,9 @@ hl.config({
 		sensitivity = 1.5,
 		repeat_rate = 35,
 		repeat_delay = 200,
+	},
+	binds = {
+		scroll_event_delay = 0,
 	},
 	cursor = {
 		no_hardware_cursors = true,
@@ -183,7 +212,6 @@ end
 
 hl.bind("SUPER + Space", hl.dsp.exec_cmd(shell.launcher))
 hl.bind("SUPER + P", hl.dsp.exec_cmd(shell.process_list))
-hl.bind("SUPER + I", hl.dsp.exec_cmd(shell.bar_toggle))
 
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
@@ -235,9 +263,43 @@ hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc 
 hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", true), { desc = "Install Nix package" })
 hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", true), { desc = "Remove Nix package" })
 
-hl.bind("SUPER + X", hl.dsp.exec_cmd("wtype -M shift -k delete -m shift"), { desc = "Universal cut" })
-hl.bind("SUPER + C", hl.dsp.exec_cmd("wtype -M ctrl -k insert -m ctrl"), { desc = "Universal copy" })
-hl.bind("SUPER + V", hl.dsp.exec_cmd("wtype -M shift -k insert -m shift"), { desc = "Universal paste" })
+local function sendShortcutOnce(mods, key)
+	return function()
+		hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
+		hl.timer(function()
+			hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
+		end, { timeout = 50, type = "oneshot" })
+	end
+end
+
+local function activeWindowIsTerminal()
+	local window = hl.get_active_window()
+	if not window then
+		return false
+	end
+
+	for _, tag in ipairs(window.tags or {}) do
+		if tag:gsub("%*$", "") == "terminal" then
+			return true
+		end
+	end
+
+	return window.class == "kitty"
+end
+
+local function universalClipboardShortcut(defaultMods, defaultKey, terminalMods, terminalKey)
+	return function()
+		if activeWindowIsTerminal() then
+			sendShortcutOnce(terminalMods, terminalKey)()
+		else
+			sendShortcutOnce(defaultMods, defaultKey)()
+		end
+	end
+end
+
+hl.bind("SUPER + X", sendShortcutOnce("CTRL", "X"), { desc = "Universal cut" })
+hl.bind("SUPER + C", universalClipboardShortcut("CTRL", "C", "CTRL", "Insert"), { desc = "Universal copy" })
+hl.bind("SUPER + V", universalClipboardShortcut("CTRL", "V", "SHIFT", "Insert"), { desc = "Universal paste" })
 
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(shell.volume_up), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(shell.volume_down), { locked = true, repeating = true })
