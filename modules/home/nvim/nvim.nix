@@ -126,6 +126,7 @@
 
           # Language intelligence
           nvim-lspconfig
+          lazydev-nvim
           blink-cmp
           friendly-snippets
           nvim-autopairs
@@ -133,6 +134,7 @@
             parsers: with parsers; [
               bash
               c
+              cpp
               c_sharp
               css
               glsl
@@ -164,6 +166,9 @@
 
           # Testing, tasks, and sessions
           nvim-nio
+          nvim-dap
+          nvim-dap-ui
+          nvim-dap-virtual-text
           neotest
           neotest-python
           neotest-dotnet

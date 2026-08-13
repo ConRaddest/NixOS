@@ -1,5 +1,3 @@
--- Project-wide content search and replacement.
-
 require("telescope").setup({
 	defaults = {
 		layout_strategy = "horizontal",
@@ -38,7 +36,7 @@ local function setup_grug_far_window(buffer)
 	vim.bo[buffer].buflisted = false
 	vim.bo[buffer].bufhidden = "hide"
 
-	if _G.Snacks then
+	if Snacks then
 		for _, explorer in ipairs(Snacks.picker.get({ source = "explorer" })) do
 			explorer:close()
 		end

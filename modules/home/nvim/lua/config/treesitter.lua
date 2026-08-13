@@ -5,6 +5,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = {
 		"bash",
 		"c",
+		"cpp",
 		"cs",
 		"css",
 		"glsl",

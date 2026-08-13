@@ -9,10 +9,14 @@
         # Languages / runtimes
         dotnet-sdk_10
         python3
+        python3Packages.debugpy
+        netcoredbg
 
         # Search / project navigation
         fd
         ripgrep
+        ast-grep
+        tree-sitter
 
         # Language servers
         lua-language-server
@@ -27,6 +31,8 @@
         tailwindcss-language-server
         emmet-language-server
         glsl_analyzer
+        yaml-language-server
+        clang-tools
 
         # Formatters / linters
         nixfmt

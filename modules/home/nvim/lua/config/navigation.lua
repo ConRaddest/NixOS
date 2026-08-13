@@ -2,6 +2,7 @@
 
 local smart_splits = require("smart-splits")
 
+---@diagnostic disable-next-line: missing-fields
 smart_splits.setup({
 	at_edge = "stop",
 	default_amount = 3,
@@ -11,11 +12,6 @@ vim.keymap.set("n", "<M-Left>", smart_splits.resize_left, { desc = "Resize split
 vim.keymap.set("n", "<M-Down>", smart_splits.resize_down, { desc = "Resize split down" })
 vim.keymap.set("n", "<M-Up>", smart_splits.resize_up, { desc = "Resize split up" })
 vim.keymap.set("n", "<M-Right>", smart_splits.resize_right, { desc = "Resize split right" })
-
-vim.keymap.set("", "<leader>H", smart_splits.swap_buf_left, { desc = "Swap split left" })
-vim.keymap.set("", "<leader>J", smart_splits.swap_buf_down, { desc = "Swap split down" })
-vim.keymap.set("", "<leader>K", smart_splits.swap_buf_up, { desc = "Swap split up" })
-vim.keymap.set("", "<leader>L", smart_splits.swap_buf_right, { desc = "Swap split right" })
 
 require("yazi").setup({
 	open_for_directories = true,
@@ -30,6 +26,7 @@ require("yazi").setup({
 	end,
 	floating_window_scaling_factor = 0.9,
 	yazi_floating_window_border = "rounded",
+	---@diagnostic disable-next-line: missing-fields
 	hooks = {
 		yazi_opened = function(_, buffer)
 			vim.keymap.set({ "n", "t" }, "<Esc>", function()

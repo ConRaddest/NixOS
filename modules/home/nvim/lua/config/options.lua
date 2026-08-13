@@ -24,6 +24,10 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "python" },
@@ -38,44 +42,5 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "make" },
 	callback = function()
 		vim.bo.expandtab = false
-	end,
-})
-
--- Restore contextual indentation when insert-mode movement enters an empty line.
-vim.api.nvim_create_autocmd("CursorMovedI", {
-	callback = function()
-		local row = vim.api.nvim_win_get_cursor(0)[1]
-		local line = vim.api.nvim_get_current_line()
-		if not line:match("^%s*$") then
-			return
-		end
-
-		local next_row = vim.fn.nextnonblank(row + 1)
-		if next_row == 0 then
-			return
-		end
-
-		local next_line = vim.fn.getline(next_row)
-		local width = vim.fn.indent(next_row)
-		if
-			next_line:match("^%s*[%}%]%)]")
-			or next_line:match("^%s*/?>")
-			or next_line:match("^%s*</")
-		then
-			width = width + vim.fn.shiftwidth()
-		end
-
-		local indentation
-		if vim.bo.expandtab then
-			indentation = string.rep(" ", width)
-		else
-			local tabstop = vim.bo.tabstop
-			indentation = string.rep("\t", math.floor(width / tabstop)) .. string.rep(" ", width % tabstop)
-		end
-
-		if line ~= indentation then
-			vim.api.nvim_set_current_line(indentation)
-		end
-		vim.api.nvim_win_set_cursor(0, { row, #indentation })
 	end,
 })

@@ -53,19 +53,6 @@ function M.close_snacks_explorer()
 	vim.schedule(M.focus_snacks_editor)
 end
 
-function M.toggle_snacks_explorer()
-	local explorer = Snacks.picker.get({ source = "explorer" })[1]
-
-	if explorer then
-		M.close_snacks_explorer()
-		return
-	end
-
-	M.close_grug_far()
-	snacks_editor_window = vim.api.nvim_get_current_win()
-	Snacks.explorer({ focus = true })
-end
-
 function M.focus_snacks_explorer()
 	M.close_grug_far()
 	local explorer = Snacks.picker.get({ source = "explorer" })[1]
@@ -81,21 +68,6 @@ function M.focus_snacks_explorer()
 
 	if explorer then
 		explorer:focus("list", { show = true })
-	end
-end
-
-function M.focus_snacks_explorer_input()
-	M.close_grug_far()
-	local explorer = Snacks.picker.get({ source = "explorer" })[1]
-
-	if not explorer then
-		snacks_editor_window = vim.api.nvim_get_current_win()
-		Snacks.explorer({ focus = true })
-		explorer = Snacks.picker.get({ source = "explorer" })[1]
-	end
-
-	if explorer then
-		explorer:focus("input", { show = true })
 	end
 end
 
@@ -131,15 +103,13 @@ which_key.add({
 	},
 	{ "<leader>e", M.focus_snacks_explorer, desc = "Focus sidebar" },
 	{ "<leader>r", M.focus_grug_far, desc = "Search and replace" },
-	{ "<leader>f", group = "Files" },
-	{ "<leader>fe", M.toggle_snacks_explorer, desc = "Snacks explorer" },
-	{ "<leader>fs", M.focus_snacks_explorer_input, desc = "Focus Snacks search" },
+	{ "<leader>b", group = "Buffers" },
+	{ "<leader>f", "<cmd>Yazi<cr>", desc = "File explorer" },
 	{ "<leader>v", "<cmd>vsplit<cr>", desc = "Vertical split" },
 	{ "<leader>h", "<cmd>split<cr>", desc = "Horizontal split" },
 	{ "<leader>c", "<cmd>close<cr>", desc = "Close split" },
 	{ "<leader>o", "<C-w>o", desc = "Close other splits" },
 	{ "<leader>=", "<C-w>=", desc = "Equalize splits" },
-	{ "<leader>fy", "<cmd>Yazi<cr>", desc = "File explorer" },
 	{ "<leader>g", group = "Git" },
 	{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
 	{
@@ -185,8 +155,9 @@ which_key.add({
 		desc = "Search file contents",
 	},
 	{ "<leader>l", group = "Language" },
-	{ "<leader>d", group = "Diagnostics" },
+	{ "<leader>d", group = "Diagnostics / debug" },
 	{ "<leader>t", group = "Test / tasks" },
+	{ "<leader>S", group = "Sessions" },
 	{ "<leader>y", group = "Yank" },
 	{ "<leader>p", "<cmd>CccPick<cr>", desc = "Pick color" },
 	{
@@ -220,8 +191,7 @@ which_key.add({
 		desc = "Yank buffer file path",
 	},
 	{ "<leader>q", "<cmd>confirm qall<cr>", desc = "Quit Neovim" },
-	{ "<leader>w", "<cmd>write<cr>", desc = "Save" },
-}, { mode = { "n", "x", "s", "o" } })
+}, { mode = "n" })
 
 vim.keymap.set("n", "<C-/>", "gcc", {
 	desc = "Toggle comment for current line",
@@ -294,53 +264,18 @@ local function close_current_buffer()
 	Snacks.bufdelete({ buf = buffer, force = true })
 end
 
-vim.keymap.set("n", "<C-c>", close_current_buffer, {
-	desc = "Close buffer",
-})
-
-vim.keymap.set("n", "<C-M-w>", function()
+vim.keymap.set("n", "<C-c>", close_current_buffer, { desc = "Delete buffer" })
+vim.keymap.set("n", "<leader>bd", close_current_buffer, { desc = "Delete buffer" })
+vim.keymap.set("n", "<leader>bD", function()
 	Snacks.bufdelete.all()
-end, {
-	desc = "Close all buffers",
-})
-
-vim.keymap.set("n", "<C-s>", "<cmd>write<cr>", {
-	desc = "Save buffer",
-})
-
-vim.keymap.set("i", "<C-s>", "<Esc><cmd>write<cr>", {
-	desc = "Save buffer and enter normal mode",
-})
+end, { desc = "Delete all buffers" })
+vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Previous buffer" })
+vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "<C-s>", "<cmd>write<cr>", { desc = "Save buffer" })
+vim.keymap.set("i", "<C-s>", "<cmd>write<cr>", { desc = "Save buffer" })
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>", {
 	desc = "Clear search highlighting",
-})
-
-vim.keymap.set("n", "o", function()
-	local current_line = vim.api.nvim_get_current_line()
-	if current_line:match("%S") then
-		return "o"
-	end
-
-	local current_row = vim.api.nvim_win_get_cursor(0)[1]
-	local next_row = vim.fn.nextnonblank(current_row + 1)
-	local reference_row = next_row > 0 and next_row or vim.fn.prevnonblank(current_row - 1)
-	if reference_row == 0 then
-		return "o"
-	end
-
-	local reference_line = vim.fn.getline(reference_row)
-	local indentation = reference_line:match("^%s*") or ""
-	local content = reference_line:sub(#indentation + 1)
-	if next_row > 0 and content:match("^[%]%)}]") then
-		local indent_unit = vim.bo.expandtab and string.rep(" ", vim.fn.shiftwidth()) or "\t"
-		indentation = indentation .. indent_unit
-	end
-
-	return "o" .. indentation
-end, {
-	desc = "Open indented line",
-	expr = true,
 })
 
 local function clear_selection_matches()

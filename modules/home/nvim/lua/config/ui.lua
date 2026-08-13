@@ -12,13 +12,16 @@ require("snacks").setup({
 				ignored = true,
 				layout = {
 					preset = "sidebar",
-					preview = { enabled = false, main = true },
+					preview = "main",
+					hidden = { "preview" },
 					layout = { width = 0.25, min_width = 1 },
 				},
 				win = {
 					input = {
 						keys = {
+							---@diagnostic disable-next-line: assign-type-mismatch
 							["<Esc>"] = { keymaps.focus_snacks_editor, mode = { "n", "i" } },
+							---@diagnostic disable-next-line: assign-type-mismatch
 							["<C-c>"] = { keymaps.close_snacks_explorer, mode = { "n", "i" } },
 							["<M-p>"] = { "toggle_preview", mode = { "n", "i" } },
 						},
@@ -52,7 +55,10 @@ require("snacks").setup({
 	},
 })
 
+vim.ui.select = Snacks.picker.select
+
 -- Put affirmative choice first for explorer move/delete confirmations.
+---@diagnostic disable-next-line: duplicate-set-field
 Snacks.picker.util.confirm = function(prompt, action)
 	Snacks.picker.select({ "Yes", "No" }, {
 		prompt = prompt,
