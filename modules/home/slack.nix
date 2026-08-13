@@ -19,7 +19,7 @@
 
       xdg.desktopEntries.slack = {
         name = "Slack";
-        comment = "Slack Desktop";
+        comment = "Slack for desktop";
         exec = "slack-x11 %U";
         icon = "slack";
         type = "Application";
@@ -31,6 +31,6 @@
       };
 
       # Slack does not expose a usable XDG icon in every package version.
-      home.file.".local/share/icons/hicolor/scalable/apps/slack.svg".source = ./slack.svg;
+      # home.file.".local/share/icons/hicolor/scalable/apps/slack.svg".source = ./slack.svg;
     };
 }

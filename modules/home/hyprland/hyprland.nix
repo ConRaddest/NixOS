@@ -101,6 +101,9 @@
           "hypr/hyprland.lua" = {
             source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
           };
+          "hypr/config" = {
+            source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/config";
+          };
           "hypr/nix/colors.lua" = {
             source = pkgs.replaceVars ./colors.lua {
               inherit (colors)

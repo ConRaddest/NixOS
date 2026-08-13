@@ -380,16 +380,16 @@ Applications are stored in:
 hosts/<hostname>/apps.nix
 ```
 
-Set `nos.apps` to a list of Nixpkgs package attribute strings:
+Set `home.packages` to a standard Nix package list:
 
 ```nix
-{ ... }:
+{ pkgs, ... }:
 
 {
-  nos.apps = [
-    "firefox"
-    "libreoffice"
-    "kdePackages.kcalc"
+  home.packages = with pkgs; [
+    firefox
+    libreoffice
+    kdePackages.kcalc
   ];
 }
 ```

@@ -73,7 +73,6 @@ let
         workspaces = [
           1
           2
-          3
         ];
       }
       {
@@ -82,6 +81,7 @@ let
         position = "1920x0";
         scale = 1;
         workspaces = [
+          3
           4
           5
           6

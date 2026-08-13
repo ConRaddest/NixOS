@@ -17,7 +17,6 @@ style:
 sorting:
   by: size
   order: desc
-max-cores: @maxCores@
 max-path-length: 70
 depth: 0
 top: 0
@@ -83,3 +82,5 @@ db: ""
 log-file: /dev/null
 input-file: ""
 output-file: ""
+
+max-cores: @maxCores@

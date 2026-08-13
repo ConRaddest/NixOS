@@ -23,16 +23,16 @@ write_apps_file() {
   tmp=$(mktemp --suffix=.nix)
   cat > "$names"
 
-  if grep -Ev '^[a-zA-Z0-9][a-zA-Z0-9+._-]*(\.[a-zA-Z0-9][a-zA-Z0-9+._-]*)*$|^[[:space:]]*$' "$names" >&2; then
+  if grep -Ev "^[a-zA-Z_][a-zA-Z0-9_'-]*(\.[a-zA-Z_][a-zA-Z0-9_'-]*)*$|^[[:space:]]*$" "$names" >&2; then
     printf 'Invalid Nixpkgs package attribute.\n' >&2
     rm -f "$names" "$tmp"
     return 1
   fi
 
   {
-    printf '{ ... }:\n\n{\n  nos.apps = [\n'
+    printf '{ pkgs, ... }:\n\n{\n  home.packages = with pkgs; [\n'
     sed '/^[[:space:]]*$/d' "$names" | sort -u | while IFS= read -r attr; do
-      printf '    "%s"\n' "$attr"
+      printf '    %s\n' "$attr"
     done
     printf '  ];\n}\n'
   } > "$tmp"
@@ -43,7 +43,7 @@ write_apps_file() {
 }
 
 current_apps() {
-  sed -nE 's/^[[:space:]]*"([a-zA-Z0-9][a-zA-Z0-9+._-]*(\.[a-zA-Z0-9][a-zA-Z0-9+._-]*)*)"[[:space:]]*$/\1/p' "$apps_file"
+  sed -nE "s/^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_'-]*(\.[a-zA-Z_][a-zA-Z0-9_'-]*)*)[[:space:]]*$/\1/p" "$apps_file"
 }
 
 # ╭──────────────────────────────────────────────────────────╮

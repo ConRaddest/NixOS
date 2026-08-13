@@ -1,18 +1,9 @@
--- Explorer, picker, indentation guides, and buffer tabs.
+-- Explorer, picker, and buffer tabs.
 
 local keymaps = require("config.keymaps")
 
 require("snacks").setup({
 	explorer = { enabled = true },
-	indent = {
-		enabled = true,
-		indent = {
-			enabled = true,
-			char = "│",
-		},
-		scope = { enabled = false },
-		chunk = { enabled = false },
-	},
 	picker = {
 		enabled = true,
 		sources = {

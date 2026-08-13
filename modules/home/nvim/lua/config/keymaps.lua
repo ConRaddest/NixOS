@@ -95,6 +95,13 @@ which_key.add({
 	{ "<leader>g", group = "Git" },
 	{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
 	{
+		"<leader>gf",
+		function()
+			Snacks.picker.git_log_file()
+		end,
+		desc = "File history",
+	},
+	{
 		"<leader>gc",
 		function()
 			local trouble = require("trouble")
@@ -270,6 +277,12 @@ end
 
 vim.keymap.set("n", "<C-c>", close_current_buffer, {
 	desc = "Close buffer",
+})
+
+vim.keymap.set("n", "<C-M-w>", function()
+	Snacks.bufdelete.all()
+end, {
+	desc = "Close all buffers",
 })
 
 vim.keymap.set("n", "<C-s>", "<cmd>write<cr>", {
