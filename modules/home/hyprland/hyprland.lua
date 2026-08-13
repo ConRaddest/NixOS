@@ -1,21 +1,79 @@
--- Load Nix-built plugins before applying their config.
 require("nix.plugins")
+require("nix.colors")
+require("nix.theme")
 pcall(require, "nix.input")
 
--- ============================================================
--- monitors
--- ============================================================
-
+local shell = require("nix.shell")
+local configuredMonitors = require("nix.monitors")
 local monitorWorkspaces = {}
+local workspaceAspectRatio = {}
+local windows = {
+	{ title = "windows-install" },
+	{ title = "windows-uninstall" },
+	{ title = "windows-credentials" },
+	{ title = "windows-vm-start" },
+
+	{ title = "nos-install" },
+	{ title = "nos-remove" },
+	{ class = "nos-build" },
+	{ class = "nos-refresh" },
+	{ class = "nos-update" },
+
+	{ class = "xdg-desktop-portal-gtk" },
+	{ class = "termfilechooser" },
+	{ class = "1password" },
+	{ class = "lazy-docker" },
+	{ class = "org.gnome.Calculator", size = { 360, 616 } },
+}
+
+for _, w in ipairs(windows) do
+	hl.window_rule({
+		match = w.title and { title = w.title } or { class = w.class },
+		float = true,
+		center = true,
+		size = w.size or { 1000, 650 },
+		pin = w.pin,
+		stay_focused = w.stay_focused,
+	})
+end
+
+local function applyWorkspaceAspectRatio(workspace)
+	local enabled = workspaceAspectRatio[workspace.id]
+	if enabled == nil then
+		enabled = true
+	end
+
+	local ratio = enabled and { 16, 9 } or { 0, 0 }
+	hl.config({ layout = { single_window_aspect_ratio = ratio } })
+end
+
+hl.on("workspace.active", applyWorkspaceAspectRatio)
 
 local function assignWorkspaces(monitor, workspaces)
 	monitorWorkspaces[monitor] = workspaces
 	for _, ws in ipairs(workspaces) do
-		hl.workspace_rule({ workspace = tostring(ws), monitor = monitor, default = true })
+		hl.workspace_rule({ workspace = tostring(ws), monitor = monitor, default = true, persistent = true })
 	end
 end
 
-local configuredMonitors = require("nix.monitors")
+local function scrollWorkspace(offset)
+	local monitor = hl.get_active_monitor()
+	if not monitor or not monitor.active_workspace then
+		return
+	end
+
+	local workspaces = monitorWorkspaces[monitor.name] or {}
+	for index, id in ipairs(workspaces) do
+		if id == monitor.active_workspace.id then
+			local target = workspaces[index + offset]
+			if target then
+				hl.dispatch(hl.dsp.focus({ workspace = target }))
+			end
+			return
+		end
+	end
+end
+
 for _, monitor in ipairs(configuredMonitors) do
 	assignWorkspaces(monitor.output, monitor.workspaces)
 	hl.monitor({
@@ -26,9 +84,13 @@ for _, monitor in ipairs(configuredMonitors) do
 	})
 end
 
--- ============================================================
--- visuals
--- ============================================================
+local function openTerminal(klass, cmd, keepOpen)
+	local suffix = keepOpen and "; exec fish" or ""
+	return hl.dsp.exec_cmd(
+		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. suffix .. "'"
+	)
+end
+
 hl.config({
 	plugin = {
 		scrolloverview = {
@@ -44,7 +106,6 @@ hl.config({
 		},
 	},
 
-	-- input
 	input = {
 		accel_profile = "flat",
 		sensitivity = 1.5,
@@ -55,7 +116,6 @@ hl.config({
 		no_hardware_cursors = true,
 	},
 
-	-- cosmetics
 	general = {
 		gaps_in = 4,
 		gaps_out = 8,
@@ -65,15 +125,15 @@ hl.config({
 
 	decoration = {
 		rounding = 8,
-		active_opacity = 0.95,
-		inactive_opacity = 0.93,
+		active_opacity = 0.98,
+		inactive_opacity = 0.96,
 		fullscreen_opacity = 1.0,
 		blur = {
 			enabled = true,
 			special = true,
 			size = 3,
 			passes = 3,
-			xray = true,
+			xray = false,
 		},
 		shadow = {
 			enabled = true,
@@ -89,8 +149,7 @@ hl.config({
 		single_window_aspect_ratio = { 16, 9 },
 	},
 
-	-- misc
-	dwindle = { preserve_split = true, smart_split = true },
+	dwindle = { preserve_split = true, smart_split = false },
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,
@@ -98,15 +157,6 @@ hl.config({
 	},
 })
 
--- Stylix colors generated from shared canonical palette.
-require("nix.colors")
-require("nix.theme")
-
--- ============================================================
--- animations
--- ============================================================
-
--- fast and snappy, macos feels
 hl.curve("spring", {
 	type = "spring",
 	mass = 1,
@@ -131,71 +181,24 @@ for _, animation in ipairs(animations) do
 	hl.animation(animation)
 end
 
--- ============================================================
--- keybinds
--- ============================================================
-
-local shell = require("nix.shell")
 hl.bind("SUPER + Space", hl.dsp.exec_cmd(shell.launcher))
 hl.bind("SUPER + P", hl.dsp.exec_cmd(shell.process_list))
-if shell.bar_toggle then
-	hl.bind("SUPER + I", hl.dsp.exec_cmd(shell.bar_toggle))
-end
+hl.bind("SUPER + I", hl.dsp.exec_cmd(shell.bar_toggle))
 
--- Hyprland owns power events so behavior remains consistent across AC and dock states.
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
 
--- apps
 hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("terminal"))
 hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi -e yazi"))
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("uwsm app -- kitty"))
-
--- workspaces
 hl.bind("SUPER + W", hl.dsp.window.close())
 hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
 hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
-
-hl.bind(
-	"SUPER + F",
-	hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }),
-	{ desc = "Toggle fullscreen" }
-)
-
--- quick switch between two most recent workspaces
+hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
-
--- workspace overview
 hl.bind("SUPER + A", function()
 	hl.plugin.scrolloverview.overview("toggle")
 end)
-
--- scroll through the workspaces with super + scroll
-local function scrollWorkspace(offset)
-	local monitor = hl.get_active_monitor()
-	local workspace = monitor and monitor.active_workspace
-	local workspaces = monitor and monitorWorkspaces[monitor.name] or { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
-	if not workspace then
-		return
-	end
-
-	local lastUsedIndex = 0
-	for index, id in ipairs(workspaces) do
-		local candidate = hl.get_workspace(id)
-		if candidate and not candidate.is_empty then
-			lastUsedIndex = index
-		end
-	end
-	local maxIndex = math.min(math.max(lastUsedIndex + 1, 1), #workspaces)
-
-	for index, id in ipairs(workspaces) do
-		local targetIndex = index + offset
-		if id == workspace.id and targetIndex >= 1 and targetIndex <= maxIndex then
-			hl.dispatch(hl.dsp.focus({ workspace = workspaces[targetIndex] }))
-			return
-		end
-	end
-end
 
 hl.bind("SUPER + mouse_up", function()
 	scrollWorkspace(1)
@@ -204,246 +207,71 @@ hl.bind("SUPER + mouse_down", function()
 	scrollWorkspace(-1)
 end)
 
--- move monitors to and from workspaces
 local directions = { "left", "right", "up", "down" }
-local oppositeDirection = { left = "right", right = "left", up = "down", down = "up" }
-
-local function rangesOverlap(aStart, aEnd, bStart, bEnd)
-	return math.min(aEnd, bEnd) > math.max(aStart, bStart)
-end
-
-local function hasTiledWindowInDirection(window, direction)
-	local workspace = window.workspace
-	if not workspace then
-		return false
-	end
-
-	local position = window.at
-	local size = window.size
-	local centerX = position.x + size.x / 2
-	local centerY = position.y + size.y / 2
-
-	for _, other in ipairs(hl.get_workspace_windows(workspace)) do
-		if other ~= window and not other.floating and not other.hidden then
-			local otherPosition = other.at
-			local otherSize = other.size
-			local otherCenterX = otherPosition.x + otherSize.x / 2
-			local otherCenterY = otherPosition.y + otherSize.y / 2
-			local overlapsHorizontally =
-				rangesOverlap(position.x, position.x + size.x, otherPosition.x, otherPosition.x + otherSize.x)
-			local overlapsVertically =
-				rangesOverlap(position.y, position.y + size.y, otherPosition.y, otherPosition.y + otherSize.y)
-
-			if
-				(direction == "left" and otherCenterX < centerX and overlapsVertically)
-				or (direction == "right" and otherCenterX > centerX and overlapsVertically)
-				or (direction == "up" and otherCenterY < centerY and overlapsHorizontally)
-				or (direction == "down" and otherCenterY > centerY and overlapsHorizontally)
-			then
-				return true
-			end
-		end
-	end
-
-	return false
-end
-
-local function smartMoveWindow(direction)
-	local window = hl.get_active_window()
-	local layout = window and window.layout
-	if not window or window.floating or window.fullscreen ~= 0 or not layout or layout.name ~= "dwindle" then
-		hl.dispatch(hl.dsp.window.move({ direction = direction }))
-		return
-	end
-
-	-- Keep an existing row/column intact. At its outer edge, the window in the
-	-- opposite direction still identifies the current split axis.
-	if
-		hasTiledWindowInDirection(window, direction)
-		or hasTiledWindowInDirection(window, oppositeDirection[direction])
-	then
-		hl.dispatch(hl.dsp.window.move({ direction = direction }))
-		return
-	end
-
-	-- Movement perpendicular to the current split rotates that split. The
-	-- focused leaf may then be on the opposite side, so swap its two siblings.
-	hl.dispatch(hl.dsp.layout("togglesplit"))
-	if hasTiledWindowInDirection(window, direction) then
-		hl.dispatch(hl.dsp.layout("swapsplit"))
-	end
-end
-
 for _, dir in ipairs(directions) do
 	hl.bind("SUPER + " .. dir, hl.dsp.focus({ direction = dir }))
-	hl.bind("SUPER + SHIFT + " .. dir, function()
-		smartMoveWindow(dir)
-	end)
+	hl.bind("SUPER + SHIFT + " .. dir, hl.dsp.window.move({ direction = dir }))
 end
 
--- change workspaces
 for ws = 1, 9 do
 	hl.bind("SUPER + " .. ws, hl.dsp.focus({ workspace = ws }))
 	hl.bind("SUPER + SHIFT + " .. ws, hl.dsp.window.move({ workspace = ws }))
 end
 
--- window resizing
--- expand horizontally (increase width)
 hl.bind("SUPER + equal", hl.dsp.window.resize({ x = 100, y = 0, relative = true }))
-
--- shrink horizontally (decrease width)
 hl.bind("SUPER + minus", hl.dsp.window.resize({ x = -100, y = 0, relative = true }))
-
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
-
--- color picker
 hl.bind("SUPER + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
 
--- screenshot
 local screenshot_cmd = "mkdir -p ~/Screenshots && "
 	.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
 	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_cmd))
 
--- NOS helpers
-local function openTerminal(klass, cmd, keepOpen)
-	local suffix = keepOpen and "; exec fish" or ""
-	return hl.dsp.exec_cmd(
-		"uwsm app -- kitty --class " .. klass .. " --title " .. klass .. " -e bash -lic '" .. cmd .. suffix .. "'"
-	)
-end
-
 hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("uwsm app -- nos-build"), { desc = "Build NixOS configuration" })
 hl.bind("SUPER + SHIFT + U", hl.dsp.exec_cmd("uwsm app -- nos-update"), { desc = "Update NixOS configuration" })
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc = "Refresh Home Manager" })
 hl.bind("SUPER + SHIFT + I", openTerminal("nos-install", "nos-install", true), { desc = "Install Nix package" })
 hl.bind("SUPER + SHIFT + X", openTerminal("nos-remove", "nos-remove", true), { desc = "Remove Nix package" })
-hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc = "Refresh Home Manager" })
 
--- universal copy / paste
-local universal_shortcut_pressed = {}
+hl.bind("SUPER + X", hl.dsp.exec_cmd("wtype -M shift -k delete -m shift"), { desc = "Universal cut" })
+hl.bind("SUPER + C", hl.dsp.exec_cmd("wtype -M ctrl -k insert -m ctrl"), { desc = "Universal copy" })
+hl.bind("SUPER + V", hl.dsp.exec_cmd("wtype -M shift -k insert -m shift"), { desc = "Universal paste" })
 
-local function sendShortcutOnce(mods, key)
-	-- Clear any stale synthetic state, then send a short, real-looking tap.
-	hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
-	hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
-	hl.timer(function()
-		hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
-	end, { timeout = 90, type = "oneshot" })
-end
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(shell.volume_up), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(shell.volume_down), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(shell.volume_mute), { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(shell.mic_mute), { locked = true, repeating = true })
 
-local function bindShortcut(bind, mods, key, desc, windowsMods, windowsKey)
-	hl.bind(bind, function()
-		if universal_shortcut_pressed[bind] then
-			return
-		end
-		universal_shortcut_pressed[bind] = true
+hl.bind(
+	"XF86MonBrightnessUp",
+	hl.dsp.exec_cmd("brightnessctl --quiet --class=backlight set +5%"),
+	{ locked = true, repeating = true }
+)
+hl.bind(
+	"XF86MonBrightnessDown",
+	hl.dsp.exec_cmd("brightnessctl --quiet --class=backlight set 5%-"),
+	{ locked = true, repeating = true }
+)
 
-		local shortcutMods = mods
-		local shortcutKey = key
-		local win = hl.get_active_window()
-		if win and win.class == "windows-vm" then
-			shortcutMods = windowsMods or mods
-			shortcutKey = windowsKey or key
-		end
-		sendShortcutOnce(shortcutMods, shortcutKey)
-
-		-- Safety reset in case Hyprland misses the release event during focus churn.
-		hl.timer(function()
-			universal_shortcut_pressed[bind] = false
-			hl.dispatch(hl.dsp.send_key_state({ mods = shortcutMods, key = shortcutKey, state = "up" }))
-		end, { timeout = 1200, type = "oneshot" })
-	end, { desc = desc })
-
-	hl.bind(bind, function()
-		universal_shortcut_pressed[bind] = false
-	end, { release = true })
-end
-
-bindShortcut("SUPER + X", "SHIFT", "Delete", "Universal cut")
-bindShortcut("SUPER + C", "CTRL", "Insert", "Universal copy", "CTRL", "C")
-bindShortcut("SUPER + V", "SHIFT", "Insert", "Universal paste", "CTRL", "V")
-
--- toggle single window aspect ratio
-local single_window_aspect_enabled = true
 hl.bind("SUPER + M", function()
-	single_window_aspect_enabled = not single_window_aspect_enabled
-	if single_window_aspect_enabled then
-		hl.config({ layout = { single_window_aspect_ratio = { 16, 9 } } })
-	else
-		hl.config({ layout = { single_window_aspect_ratio = { 0, 0 } } })
+	local monitor = hl.get_active_monitor()
+	local workspace = monitor and monitor.active_workspace
+	if not workspace then
+		return
 	end
-end, { desc = "Toggle single-window max width" })
 
--- media / brightness
-local media = {
-	{ "XF86AudioRaiseVolume", shell.volume_up },
-	{ "XF86AudioLowerVolume", shell.volume_down },
-	{ "XF86AudioMute", shell.volume_mute },
-	{ "XF86AudioMicMute", shell.mic_mute },
-	{ "XF86MonBrightnessUp", "brightnessctl --quiet --class=backlight set +5%" },
-	{ "XF86MonBrightnessDown", "brightnessctl --quiet --class=backlight set 5%-" },
-}
-for _, b in ipairs(media) do
-	hl.bind(b[1], hl.dsp.exec_cmd(b[2]), { locked = true, repeating = true })
-end
+	local enabled = workspaceAspectRatio[workspace.id]
+	workspaceAspectRatio[workspace.id] = enabled == false
+	applyWorkspaceAspectRatio(workspace)
+end, { desc = "Toggle single-window max width for workspace" })
 
--- ============================================================
--- windows and layer rules
--- ============================================================
-local popupSize = { 1000, 650 }
-local popup_windows = {
-	{ title = "windows-install" },
-	{ title = "windows-uninstall" },
-	{ title = "windows-credentials" },
-	{ title = "windows-vm-start" },
-
-	{ title = "nos-install", size = popupSize },
-	{ title = "nos-remove", size = popupSize },
-	{ class = "nos-build", size = popupSize },
-	{ class = "nos-refresh", size = popupSize },
-	{ class = "nos-update", size = popupSize },
-
-	{ class = "xdg-desktop-portal-gtk" },
-	{ class = "termfilechooser" },
-	{ class = "1password" },
-	{ class = "lazy-docker" },
-	{ class = "org.gnome.Calculator", size = { 360, 616 } },
-}
-
-for _, w in ipairs(popup_windows) do
-	hl.window_rule({
-		match = w.title and { title = w.title } or { class = w.class },
-		float = true,
-		center = true,
-		size = w.size or { 1300, 800 },
-		pin = w.pin,
-		stay_focused = w.stay_focused,
-	})
-end
-
-hl.window_rule({
-	match = { title = ".*(Screen is being shared|Screen Share Active).*" },
-	workspace = "special:screenshare-preview silent",
-	no_focus = true,
-	suppress_event = "activate activatefocus",
-})
-
-hl.layer_rule({
-	match = { namespace = "^ch\\.wysbd\\.hyprland-preview-share-picker$" },
-	blur = true,
-	xray = true,
-	ignore_alpha = 0.01,
-})
-
-hl.window_rule({ match = { float = true }, opacity = "0.935 override 0.935 override 1.0 override" })
-
--- Electron renders transparent rounded corners on native VS Code dialogs.
--- Force these surfaces opaque to prevent corner artifacts.
-hl.window_rule({
-	match = { class = "^code$", title = "^Visual Studio Code$", float = true },
-	opaque = true,
-	opacity = "1.0 override 1.0 override 1.0 override",
-})
+-- hl.window_rule({
+-- 	match = { title = ".*(Screen is being shared|Screen Share Active).*" },
+-- 	workspace = "special:screenshare-preview silent",
+-- 	no_focus = true,
+-- 	suppress_event = "activate activatefocus",
+-- })
 
 shell.setup()

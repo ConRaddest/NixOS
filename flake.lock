@@ -231,28 +231,6 @@
         "type": "github"
       }
     },
-    "hyprland-preview-share-picker": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1782052593,
-        "narHash": "sha256-XE6RD/4Mhw/ZRBj0v94kLOERElat5V+e/X0L9eUGf7M=",
-        "ref": "refs/heads/master",
-        "rev": "e2f30ff85486e557018523da45ccbc846e3a499c",
-        "revCount": 55,
-        "submodules": true,
-        "type": "git",
-        "url": "https://github.com/WhySoBad/hyprland-preview-share-picker"
-      },
-      "original": {
-        "submodules": true,
-        "type": "git",
-        "url": "https://github.com/WhySoBad/hyprland-preview-share-picker"
-      }
-    },
     "hyprland-scroll-overview": {
       "flake": false,
       "locked": {
@@ -332,26 +310,6 @@
         "type": "github"
       }
     },
-    "noctalia": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1786338498,
-        "narHash": "sha256-qy3Cheg/FQ9ZaBPTIgdq4IkmkNtC6XBpmtC8nT+wU/Y=",
-        "owner": "noctalia-dev",
-        "repo": "noctalia-shell",
-        "rev": "45e721ba0fb47d6efc00ca47e156237954037c99",
-        "type": "github"
-      },
-      "original": {
-        "owner": "noctalia-dev",
-        "repo": "noctalia-shell",
-        "type": "github"
-      }
-    },
     "nur": {
       "inputs": {
         "flake-parts": [
@@ -382,12 +340,10 @@
         "dms": "dms",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
-        "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "noctalia": "noctalia",
         "stylix": "stylix"
       }
     },

@@ -207,6 +207,34 @@ vim.keymap.set("x", "<C-/>", "gc", {
 	remap = true,
 })
 
+local function centered_page_motion(motion)
+	return function()
+		local keys = vim.api.nvim_replace_termcodes(motion, true, false, true)
+		vim.cmd.normal({ args = { keys }, bang = true })
+
+		if vim.fn.line("w0") == 1 then
+			vim.cmd.normal({ args = { "gg" }, bang = true })
+		elseif vim.fn.line("w$") == vim.fn.line("$") then
+			vim.cmd.normal({ args = { "G" }, bang = true })
+		else
+			vim.cmd.normal({ args = { "zz" }, bang = true })
+		end
+	end
+end
+
+local centered_page_motions = {
+	["<C-d>"] = "<C-d>",
+	["<C-u>"] = "<C-u>",
+	["<C-f>"] = "<C-f>",
+	["<C-b>"] = "<C-b>",
+	["<PageDown>"] = "<C-f>",
+	["<PageUp>"] = "<C-b>",
+}
+
+for key, motion in pairs(centered_page_motions) do
+	vim.keymap.set("n", key, centered_page_motion(motion), { desc = "Page with centered cursor" })
+end
+
 local function close_current_buffer()
 	local buffer = vim.api.nvim_get_current_buf()
 

@@ -19,20 +19,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # screen share picker for hyprland with preview window
-    hyprland-preview-share-picker = {
-      url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # desktop shells
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

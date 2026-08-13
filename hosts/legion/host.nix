@@ -20,7 +20,6 @@ let
     stateVersion = "26.05";
     initialHashedPassword = null;
     steam.enable = true;
-    desktopShell = "dms"; # "dms" || "noctalia"
 
     theme = {
       name = "tokyo-night";
@@ -168,11 +167,10 @@ let
       self.lib.homeModules.yazi
 
       # Desktop environment
-      self.lib.homeModules.${host.desktopShell}
+      self.lib.homeModules.dms
       self.lib.homeModules.firefox
       self.lib.homeModules.hyprland
       self.lib.homeModules.kitty
-      self.lib.homeModules.screenSharePicker
       self.lib.homeModules.slack
       self.lib.homeModules.steam
       self.lib.homeModules.windows

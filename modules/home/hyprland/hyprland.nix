@@ -13,39 +13,21 @@
 
     let
       colors = lib.mapAttrs (_: lib.removePrefix "#") config.nos.theme.colors;
-      desktopShell =
-        if host.desktopShell == "dms" then
-          {
-            launcher = "dms ipc call spotlight toggle";
-            processList = "dms ipc call processlist toggle";
-            barToggle = null;
-            volumeUp = "dms ipc call audio increment 5";
-            volumeDown = "dms ipc call audio decrement 5";
-            volumeMute = "dms ipc call audio mute";
-            micMute = "dms ipc call audio micmute";
-            setup = ''
-              require("dms.binds")
-              require("dms.binds-user")
-              require("dms.outputs")
-              require("dms.windowrules")
-              require("dms.cursor")
-            '';
-          }
-        else if host.desktopShell == "noctalia" then
-          {
-            launcher = "noctalia msg panel-toggle launcher";
-            processList = "noctalia msg panel-toggle control-center system";
-            barToggle = ''
-              sh -c 'state="$XDG_RUNTIME_DIR/noctalia-bar-autohide"; noctalia msg config-reload || exit; if test -e "$state"; then rm -f "$state"; else noctalia msg bar-auto-hide-set on && noctalia msg bar-reserve-toggle && touch "$state"; fi'
-            '';
-            volumeUp = "noctalia msg volume-up 5";
-            volumeDown = "noctalia msg volume-down 5";
-            volumeMute = "noctalia msg volume-mute";
-            micMute = "noctalia msg mic-mute";
-            setup = "";
-          }
-        else
-          throw "Unsupported desktop shell: ${host.desktopShell}";
+      dms = {
+        launcher = "dms ipc call spotlight toggle";
+        processList = "dms ipc call processlist toggle";
+        volumeUp = "dms ipc call audio increment 5";
+        volumeDown = "dms ipc call audio decrement 5";
+        volumeMute = "dms ipc call audio mute";
+        micMute = "dms ipc call audio micmute";
+        setup = ''
+          require("dms.binds")
+          require("dms.binds-user")
+          require("dms.outputs")
+          require("dms.windowrules")
+          require("dms.cursor")
+        '';
+      };
       monitorLua = monitor: ''
         {
           output = ${builtins.toJSON monitor.output},
@@ -97,6 +79,7 @@
         hyprpicker
         slurp
         wl-clipboard
+        wtype
       ];
 
       home.sessionVariables = {
@@ -164,17 +147,15 @@
           "hypr/nix/shell.lua" = {
             text = ''
               return {
-                launcher = ${builtins.toJSON desktopShell.launcher},
-                process_list = ${builtins.toJSON desktopShell.processList},
-                bar_toggle = ${
-                  if desktopShell.barToggle == null then "nil" else builtins.toJSON desktopShell.barToggle
-                },
-                volume_up = ${builtins.toJSON desktopShell.volumeUp},
-                volume_down = ${builtins.toJSON desktopShell.volumeDown},
-                volume_mute = ${builtins.toJSON desktopShell.volumeMute},
-                mic_mute = ${builtins.toJSON desktopShell.micMute},
+                launcher = ${builtins.toJSON dms.launcher},
+                process_list = ${builtins.toJSON dms.processList},
+                bar_toggle = nil,
+                volume_up = ${builtins.toJSON dms.volumeUp},
+                volume_down = ${builtins.toJSON dms.volumeDown},
+                volume_mute = ${builtins.toJSON dms.volumeMute},
+                mic_mute = ${builtins.toJSON dms.micMute},
                 setup = function()
-                  ${desktopShell.setup}
+                  ${dms.setup}
                 end,
               }
             '';

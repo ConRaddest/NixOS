@@ -296,13 +296,7 @@ Mount points must be absolute. Use stable filesystem UUIDs rather than `/dev/sdX
 
 ### Desktop shell
 
-Select one supported shell in the host definition:
-
-```nix
-desktopShell = "noctalia"; # or "dms"
-```
-
-Hyprland keybinds, launcher commands, process view, media controls, and shell setup adapt to this value.
+DankMaterialShell provides the desktop shell, launcher, process view, media controls, and Hyprland integration.
 
 ### Monitors
 
@@ -432,7 +426,7 @@ Notes:
 
 `homeModules.theme` imports Stylix and applies shared theme options, fonts, cursor, wallpaper, and application targets. Theme data uses native directories under `themes/<name>/`, with `colors.toml` as source of truth and wallpapers under `backgrounds/`.
 
-The engine resolves canonical colors, adapts them to Base16 for Stylix, and exposes the complete palette through `config.nos.theme.colors`. Custom Fastfetch, GDU, Hyprland Lua, Kitty, LazyDocker, Neovim, Noctalia, shell, Starship, Yazi, and screen-share-picker adapters consume the same colors. Optional `hyprland.lua` files apply after the generated Hyprland palette.
+The engine resolves canonical colors, adapts them to Base16 for Stylix, and exposes the complete palette through `config.nos.theme.colors`. Custom Fastfetch, GDU, Hyprland Lua, Kitty, LazyDocker, Neovim, shell, Starship, and Yazi adapters consume the same colors. Optional `hyprland.lua` files apply after the generated Hyprland palette.
 
 Select theme and wallpaper in each host definition:
 
