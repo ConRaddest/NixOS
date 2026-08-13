@@ -106,7 +106,7 @@ search_apps() {
   local query="${1:-}"
   [[ -n "$query" ]] || return 0
 
-  nix-search --json "$query" 2>/dev/null | jq -r '
+  nix-search --exact=false --json "$query" 2>/dev/null | jq -r '
     (. // [])[]
     | [(.path | sub("^nixpkgs\\."; "")), (.description // "")]
     | @tsv
@@ -134,7 +134,7 @@ toggle_selected_app() {
 
 search_apps_with_selected_file() {
   local query="${1:-}"
-  local selected_file="$2"
+  local selected_file="$NOS_SELECTED_FILE"
 
   touch "$selected_file"
 

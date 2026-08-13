@@ -57,12 +57,6 @@ require("snacks").setup({
 	},
 })
 
-vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		Snacks.explorer({ focus = false })
-	end,
-})
-
 require("bufferline").setup({
 	options = {
 		show_tab_indicators = false,

@@ -26,7 +26,7 @@ trap cleanup EXIT
 selected_file_q=$(printf '%q' "$selected_file")
 
 # shellcheck disable=SC2016 # Inner shell expands positional parameters.
-reload_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; search_apps_with_selected_file "${1%% *}" "$2"'\'' _ {q} '"$selected_file_q"
+reload_cmd='NOS_SELECTED_FILE='"$selected_file_q"' bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; search_apps_with_selected_file "$1"'\'' _ {q}'
 # shellcheck disable=SC2016 # Inner shell expands positional parameters.
 toggle_cmd='bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; toggle_selected_app "$1" "$2"'\'' _ '"$selected_file_q"' {1}'
 # shellcheck disable=SC2016 # Inner shell expands positional parameters.
@@ -48,7 +48,7 @@ fzf_args=(
   --preview-label-pos='bottom'
   --preview-window 'down:35%:wrap'
   --bind "start:reload:$reload_cmd"
-  --bind "change:reload:sleep 0.3; $reload_cmd"
+  --bind "change:reload:sleep 0.5; $reload_cmd"
   --bind "tab:execute-silent($toggle_cmd)+transform($toggle_action_cmd)"
   --bind "shift-tab:execute-silent($toggle_cmd)+transform($toggle_action_cmd)"
   --bind 'ctrl-c:clear-query'
