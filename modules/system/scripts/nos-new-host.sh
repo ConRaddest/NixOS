@@ -551,7 +551,7 @@ sed -i \
   -e "s|flakeDirectory = \"/home/CHANGE_ME/NixOS\";|flakeDirectory = \"$escaped_flake\";|" \
   -e "s|stateVersion = \"26.05\";|stateVersion = \"$escaped_state_version\";|" \
   -e "s|initialHashedPassword = null;|initialHashedPassword = \"$escaped_password_hash\";|" \
-  -e "s|steam = true;|steam = $steam;|" \
+  -e "s|steam.enable = true;|steam.enable = $steam;|" \
   -e "s|mode = \"uefi\";|mode = \"$boot_mode\";|" \
   -e "s|device = null;|device = $boot_device_value;|" \
   -e "s|deepSleep = false;|deepSleep = $deep_sleep;|" \

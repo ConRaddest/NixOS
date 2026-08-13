@@ -18,7 +18,7 @@ let
     flakeDirectory = "/home/CHANGE_ME/NixOS";
     stateVersion = "26.05";
     initialHashedPassword = null;
-    steam = true;
+    steam.enable = true;
     desktopShell = "dms"; # "dms" or "noctalia"
     theme = {
       name = "tokyo-night";

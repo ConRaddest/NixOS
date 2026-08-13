@@ -162,17 +162,22 @@
             '';
           };
           "hypr/nix/shell.lua" = {
-            source = pkgs.replaceVars ./shell.lua {
-              barToggle =
-                if desktopShell.barToggle == null then "nil" else builtins.toJSON desktopShell.barToggle;
-              inherit (desktopShell) setup;
-              launcher = builtins.toJSON desktopShell.launcher;
-              micMute = builtins.toJSON desktopShell.micMute;
-              processList = builtins.toJSON desktopShell.processList;
-              volumeDown = builtins.toJSON desktopShell.volumeDown;
-              volumeMute = builtins.toJSON desktopShell.volumeMute;
-              volumeUp = builtins.toJSON desktopShell.volumeUp;
-            };
+            text = ''
+              return {
+                launcher = ${builtins.toJSON desktopShell.launcher},
+                process_list = ${builtins.toJSON desktopShell.processList},
+                bar_toggle = ${
+                  if desktopShell.barToggle == null then "nil" else builtins.toJSON desktopShell.barToggle
+                },
+                volume_up = ${builtins.toJSON desktopShell.volumeUp},
+                volume_down = ${builtins.toJSON desktopShell.volumeDown},
+                volume_mute = ${builtins.toJSON desktopShell.volumeMute},
+                mic_mute = ${builtins.toJSON desktopShell.micMute},
+                setup = function()
+                  ${desktopShell.setup}
+                end,
+              }
+            '';
           };
         };
         portal = {

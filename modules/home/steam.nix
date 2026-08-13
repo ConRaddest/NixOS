@@ -23,7 +23,7 @@
         '';
       };
     in
-    lib.mkIf host.steam {
+    lib.mkIf host.steam.enable {
       home.packages = [ steamLauncher ];
 
       xdg.desktopEntries.steam = {

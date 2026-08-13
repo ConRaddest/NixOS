@@ -20,16 +20,29 @@
           enable = true;
           wifi = {
             backend = "wpa_supplicant";
+            # Intel Wi-Fi previously deauthenticated every few minutes with
+            # power saving enabled. Keep this in NetworkManager, which owns Wi-Fi.
+            powersave = false;
           };
         };
       };
 
       services.resolved = {
         enable = true;
-        settings.Resolve.FallbackDNS = [
-          "1.1.1.1"
-          "8.8.8.8"
-        ];
+        settings.Resolve = {
+          # Router DNS can stop answering while existing connections remain up.
+          # Route all DNS through these servers instead of only using them when
+          # DHCP supplies no DNS server.
+          DNS = [
+            "1.1.1.1"
+            "8.8.8.8"
+          ];
+          Domains = [ "~." ];
+          FallbackDNS = [
+            "1.0.0.1"
+            "8.8.4.4"
+          ];
+        };
       };
     };
 }

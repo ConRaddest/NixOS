@@ -19,8 +19,9 @@ let
     flakeDirectory = "/home/cdt/NixOS";
     stateVersion = "26.05";
     initialHashedPassword = null;
-    steam = true;
-    desktopShell = "noctalia"; # "dms" || "noctalia"
+    steam.enable = true;
+    desktopShell = "dms"; # "dms" || "noctalia"
+
     theme = {
       name = "tokyo-night";
       wallpaper = "backgrounds/1-sunset-lake.png";

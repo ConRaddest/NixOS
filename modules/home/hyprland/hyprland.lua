@@ -408,6 +408,7 @@ local popup_windows = {
 	{ class = "termfilechooser" },
 	{ class = "1password" },
 	{ class = "lazy-docker" },
+	{ class = "org.gnome.Calculator", size = { 360, 616 } },
 }
 
 for _, w in ipairs(popup_windows) do
