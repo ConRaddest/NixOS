@@ -15,11 +15,11 @@ end, { desc = "Previous diagnostic" })
 vim.keymap.set("n", "]d", function()
 	vim.diagnostic.jump({ count = 1, float = true })
 end, { desc = "Next diagnostic" })
-vim.keymap.set("n", "<leader>lf", function()
+vim.keymap.set("", "<leader>lf", function()
 	require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format buffer" })
-vim.keymap.set("n", "<leader>dx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
-vim.keymap.set("n", "<leader>dX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer diagnostics" })
+vim.keymap.set("", "<leader>dx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
+vim.keymap.set("", "<leader>dX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer diagnostics" })
 
 require("trouble").setup({
 	modes = {

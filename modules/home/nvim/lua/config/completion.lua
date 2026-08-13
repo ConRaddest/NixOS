@@ -5,6 +5,7 @@ require("blink.cmp").setup({
 	keymap = {
 		preset = "enter",
 		["<C-y>"] = { "select_and_accept", "fallback" },
+		["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
 		["<S-Tab>"] = {
 			"snippet_backward",
 			function()

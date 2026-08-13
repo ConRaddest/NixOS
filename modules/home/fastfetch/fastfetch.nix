@@ -14,7 +14,7 @@
     let
       colors = config.nos.theme.colors;
       logo = pkgs.runCommand "fastfetch-logo-${hostName}" { nativeBuildInputs = [ pkgs.python3 ]; } ''
-        python3 ${self}/scripts/generate-logo.py \
+        python3 ${self}/modules/home/fastfetch/dynamic-maze.py \
           --seed ${lib.escapeShellArg hostName} \
           --output "$out"
       '';

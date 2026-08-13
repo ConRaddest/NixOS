@@ -1,4 +1,7 @@
 gui:
+  commandLogSize: 0
+  screenMode: "half"
+  sidePanelWidth: 0.25
   nerdFontsVersion: "3"
   theme:
     activeBorderColor: ["@orange@", "bold"]

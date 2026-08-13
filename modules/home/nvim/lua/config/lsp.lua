@@ -8,6 +8,7 @@ vim.lsp.config("*", {
 vim.lsp.config("lua_ls", {
 	settings = {
 		Lua = {
+			hint = { arrayIndex = "Disable" },
 			runtime = {
 				version = "LuaJIT",
 				path = { "lua/?.lua", "lua/?/init.lua" },
@@ -35,6 +36,8 @@ vim.lsp.enable({
 	"bashls",
 	"ts_ls",
 	"eslint",
+	"oxlint",
+	"glsl_analyzer",
 	"html",
 	"cssls",
 	"jsonls",
@@ -56,20 +59,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
 
 		vim.keymap.set(
-			"n",
+			"",
 			"<leader>ca",
 			vim.lsp.buf.code_action,
 			vim.tbl_extend("force", opts, { desc = "Code action" })
 		)
-		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
+		vim.keymap.set("", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
 		vim.keymap.set(
-			"n",
+			"",
 			"<leader>ls",
 			vim.lsp.buf.document_symbol,
 			vim.tbl_extend("force", opts, { desc = "Document symbols" })
 		)
 		vim.keymap.set(
-			"n",
+			"",
 			"<leader>lS",
 			vim.lsp.buf.workspace_symbol,
 			vim.tbl_extend("force", opts, { desc = "Workspace symbols" })

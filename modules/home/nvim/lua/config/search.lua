@@ -19,6 +19,9 @@ require("grug-far").setup({
 	prefills = {
 		flags = "--fixed-strings",
 	},
+	keymaps = {
+		close = false,
+	},
 })
 
 local function setup_grug_far_highlights()
@@ -26,6 +29,78 @@ local function setup_grug_far_highlights()
 end
 
 setup_grug_far_highlights()
+
+local function setup_grug_far_window(buffer)
+	if vim.bo[buffer].filetype ~= "grug-far" then
+		return
+	end
+
+	vim.bo[buffer].buflisted = false
+	vim.bo[buffer].bufhidden = "hide"
+
+	if _G.Snacks then
+		for _, explorer in ipairs(Snacks.picker.get({ source = "explorer" })) do
+			explorer:close()
+		end
+	end
+
+	local window = vim.fn.bufwinid(buffer)
+	if window == -1 then
+		return
+	end
+
+	local editor_window = vim.api.nvim_win_call(window, function()
+		return vim.fn.win_getid(vim.fn.winnr("l"))
+	end)
+
+	vim.keymap.set({ "n", "i" }, "<C-c>", function()
+		local instance = require("grug-far.instances").get_instance(buffer)
+		if instance then
+			instance:hide()
+		end
+
+		vim.schedule(function()
+			if vim.api.nvim_win_is_valid(editor_window) then
+				vim.api.nvim_set_current_win(editor_window)
+			end
+		end)
+	end, { buffer = buffer, desc = "Hide search and replace", nowait = true })
+
+	vim.keymap.set("n", "<Esc>", function()
+		if vim.api.nvim_win_is_valid(editor_window) then
+			vim.api.nvim_set_current_win(editor_window)
+		end
+	end, { buffer = buffer, desc = "Focus editor", nowait = true })
+
+	vim.schedule(function()
+		if not vim.api.nvim_win_is_valid(window) then
+			return
+		end
+
+		vim.api.nvim_set_current_win(window)
+		vim.api.nvim_win_set_width(window, math.max(1, math.floor(vim.o.columns * 0.25)))
+		vim.wo[window].winfixwidth = true
+		vim.wo[window].winhighlight = table.concat({
+			"Normal:NormalFloat",
+			"NormalNC:NormalFloat",
+			"SignColumn:NormalFloat",
+			"EndOfBuffer:NormalFloat",
+		}, ",")
+	end)
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "grug-far",
+	callback = function(event)
+		setup_grug_far_window(event.buf)
+	end,
+})
+
+vim.api.nvim_create_autocmd("BufWinEnter", {
+	callback = function(event)
+		setup_grug_far_window(event.buf)
+	end,
+})
 
 vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter" }, {
 	callback = setup_grug_far_highlights,

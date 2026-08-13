@@ -26,6 +26,7 @@
         vscode-langservers-extracted
         tailwindcss-language-server
         emmet-language-server
+        glsl_analyzer
 
         # Formatters / linters
         nixfmt

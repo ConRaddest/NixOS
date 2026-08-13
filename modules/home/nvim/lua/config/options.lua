@@ -41,7 +41,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Restore block indentation when insert-mode movement enters an empty block line.
+-- Restore contextual indentation when insert-mode movement enters an empty line.
 vim.api.nvim_create_autocmd("CursorMovedI", {
 	callback = function()
 		local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -50,19 +50,21 @@ vim.api.nvim_create_autocmd("CursorMovedI", {
 			return
 		end
 
-		local previous_row = vim.fn.prevnonblank(row - 1)
 		local next_row = vim.fn.nextnonblank(row + 1)
-		if previous_row == 0 or next_row == 0 then
+		if next_row == 0 then
 			return
 		end
 
-		local previous_line = vim.fn.getline(previous_row)
 		local next_line = vim.fn.getline(next_row)
-		if not previous_line:match("[%{%[(]%s*$") or not next_line:match("^%s*[%}%]%)]") then
-			return
+		local width = vim.fn.indent(next_row)
+		if
+			next_line:match("^%s*[%}%]%)]")
+			or next_line:match("^%s*/?>")
+			or next_line:match("^%s*</")
+		then
+			width = width + vim.fn.shiftwidth()
 		end
 
-		local width = vim.fn.indent(next_row) + vim.fn.shiftwidth()
 		local indentation
 		if vim.bo.expandtab then
 			indentation = string.rep(" ", width)

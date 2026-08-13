@@ -10,13 +10,13 @@ neotest.setup({
 	},
 })
 
-vim.keymap.set("n", "<leader>tn", function()
+vim.keymap.set("", "<leader>tn", function()
 	neotest.run.run()
 end, { desc = "Run nearest test" })
-vim.keymap.set("n", "<leader>tf", function()
+vim.keymap.set("", "<leader>tf", function()
 	neotest.run.run(vim.fn.expand("%"))
 end, { desc = "Run test file" })
-vim.keymap.set("n", "<leader>ts", neotest.summary.toggle, { desc = "Test summary" })
+vim.keymap.set("", "<leader>ts", neotest.summary.toggle, { desc = "Test summary" })
 require("overseer").setup({})
-vim.keymap.set("n", "<leader>tr", "<cmd>OverseerRun<cr>", { desc = "Run task" })
-vim.keymap.set("n", "<leader>tt", "<cmd>OverseerToggle<cr>", { desc = "Task list" })
+vim.keymap.set("", "<leader>tr", "<cmd>OverseerRun<cr>", { desc = "Run task" })
+vim.keymap.set("", "<leader>tt", "<cmd>OverseerToggle<cr>", { desc = "Task list" })

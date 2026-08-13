@@ -9,15 +9,27 @@ require("conform").setup({
 		sh = { "shfmt" },
 		bash = { "shfmt" },
 		cs = { "csharpier" },
-		javascript = { "prettierd" },
-		javascriptreact = { "prettierd" },
-		typescript = { "prettierd" },
-		typescriptreact = { "prettierd" },
+		javascript = { "tailwind_class_stacker" },
+		javascriptreact = { "tailwind_class_stacker" },
+		typescript = { "tailwind_class_stacker" },
+		typescriptreact = { "tailwind_class_stacker" },
 		css = { "prettierd" },
 		html = { "prettierd" },
 		json = { "prettierd" },
 		jsonc = { "prettierd" },
 		markdown = { "prettierd" },
+	},
+	formatters = {
+		tailwind_class_stacker = {
+			command = "node",
+			args = function(_, context)
+				return {
+					vim.fn.expand("~/Dev/tailwind-class-stacker/cli.js"),
+					context.filename,
+				}
+			end,
+			stdin = true,
+		},
 	},
 	format_on_save = {
 		timeout_ms = 1000,

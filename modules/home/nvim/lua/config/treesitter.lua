@@ -7,6 +7,7 @@ vim.api.nvim_create_autocmd("FileType", {
 		"c",
 		"cs",
 		"css",
+		"glsl",
 		"html",
 		"javascript",
 		"javascriptreact",

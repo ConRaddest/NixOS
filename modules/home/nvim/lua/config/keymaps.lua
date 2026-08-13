@@ -3,7 +3,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.keymap.set({ "n", "x" }, "<Space>", "<Nop>", {
+vim.keymap.set("n", "<Space>", "<Nop>", {
 	silent = true,
 })
 local which_key = require("which-key")
@@ -11,6 +11,9 @@ local which_key = require("which-key")
 which_key.setup({
 	preset = "modern",
 	delay = 150,
+	triggers = {
+		{ "<leader>", mode = { "n", "x", "s", "o" } },
+	},
 })
 
 local M = {}
@@ -30,20 +33,41 @@ function M.focus_snacks_editor()
 	vim.cmd("wincmd l")
 end
 
+function M.close_grug_far()
+	local instances = require("grug-far.instances")
+	local instance = instances.get_instance()
+
+	while instance do
+		instance:close()
+		instance = instances.get_instance()
+	end
+end
+
+function M.close_snacks_explorer()
+	local explorer = Snacks.picker.get({ source = "explorer" })[1]
+	if not explorer then
+		return
+	end
+
+	explorer:close()
+	vim.schedule(M.focus_snacks_editor)
+end
+
 function M.toggle_snacks_explorer()
 	local explorer = Snacks.picker.get({ source = "explorer" })[1]
 
 	if explorer then
-		explorer:close()
-		vim.schedule(M.focus_snacks_editor)
+		M.close_snacks_explorer()
 		return
 	end
 
+	M.close_grug_far()
 	snacks_editor_window = vim.api.nvim_get_current_win()
 	Snacks.explorer({ focus = true })
 end
 
 function M.focus_snacks_explorer()
+	M.close_grug_far()
 	local explorer = Snacks.picker.get({ source = "explorer" })[1]
 
 	if not vim.bo.filetype:match("^snacks_picker") then
@@ -61,6 +85,7 @@ function M.focus_snacks_explorer()
 end
 
 function M.focus_snacks_explorer_input()
+	M.close_grug_far()
 	local explorer = Snacks.picker.get({ source = "explorer" })[1]
 
 	if not explorer then
@@ -74,6 +99,28 @@ function M.focus_snacks_explorer_input()
 	end
 end
 
+function M.focus_grug_far()
+	local explorer = Snacks.picker.get({ source = "explorer" })[1]
+	if explorer then
+		M.focus_snacks_editor()
+		explorer:close()
+	end
+
+	local instances = require("grug-far.instances")
+	local instance = instances.get_instance()
+	if instance and instance:is_open() then
+		instance:open()
+		return
+	end
+
+	while instance do
+		instance:close()
+		instance = instances.get_instance()
+	end
+
+	vim.cmd("GrugFar")
+end
+
 which_key.add({
 	{
 		"<leader><leader>",
@@ -83,6 +130,7 @@ which_key.add({
 		desc = "Find files",
 	},
 	{ "<leader>e", M.focus_snacks_explorer, desc = "Focus sidebar" },
+	{ "<leader>r", M.focus_grug_far, desc = "Search and replace" },
 	{ "<leader>f", group = "Files" },
 	{ "<leader>fe", M.toggle_snacks_explorer, desc = "Snacks explorer" },
 	{ "<leader>fs", M.focus_snacks_explorer_input, desc = "Focus Snacks search" },
@@ -125,7 +173,17 @@ which_key.add({
 		end,
 		desc = "Toggle changed hunks",
 	},
-	{ "<leader>s", group = "Search" },
+	{
+		"<leader>s",
+		function()
+			if vim.bo.filetype:match("^snacks_picker") then
+				M.focus_snacks_editor()
+			end
+
+			require("telescope.builtin").live_grep()
+		end,
+		desc = "Search file contents",
+	},
 	{ "<leader>l", group = "Language" },
 	{ "<leader>d", group = "Diagnostics" },
 	{ "<leader>t", group = "Test / tasks" },
@@ -161,48 +219,9 @@ which_key.add({
 		end,
 		desc = "Yank buffer file path",
 	},
-	{
-		"<leader>sf",
-		function()
-			if vim.bo.filetype:match("^snacks_picker") then
-				M.focus_snacks_editor()
-			end
-
-			require("telescope.builtin").live_grep()
-		end,
-		desc = "Search file contents",
-	},
-	{
-		"<leader>sb",
-		function()
-			local file = vim.api.nvim_buf_get_name(0)
-
-			if file == "" then
-				vim.notify("Buffer has no file", vim.log.levels.WARN)
-				return
-			end
-
-			require("telescope.builtin").live_grep({
-				search_dirs = { file },
-				prompt_title = "Search current file",
-			})
-		end,
-		desc = "Search current file",
-	},
-	{
-		"<leader>sr",
-		function()
-			if vim.bo.filetype:match("^snacks_picker") then
-				M.focus_snacks_editor()
-			end
-
-			vim.cmd("GrugFar")
-		end,
-		desc = "Search and replace",
-	},
 	{ "<leader>q", "<cmd>confirm qall<cr>", desc = "Quit Neovim" },
 	{ "<leader>w", "<cmd>write<cr>", desc = "Save" },
-}, { mode = { "n", "x" } })
+}, { mode = { "n", "x", "s", "o" } })
 
 vim.keymap.set("n", "<C-/>", "gcc", {
 	desc = "Toggle comment for current line",

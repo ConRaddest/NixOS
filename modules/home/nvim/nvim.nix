@@ -10,6 +10,9 @@
 
     let
       colors = config.nos.theme.colors;
+      lazygit = pkgs.lazygit.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./lazygit-side-panel-width.patch ];
+      });
     in
     {
       xdg = {
@@ -132,6 +135,7 @@
               c
               c_sharp
               css
+              glsl
               html
               javascript
               jsdoc
@@ -167,7 +171,7 @@
           persistence-nvim
         ];
 
-        extraPackages = [ pkgs.lazygit ];
+        extraPackages = [ lazygit ];
 
         initLua = ''
           require("config")
