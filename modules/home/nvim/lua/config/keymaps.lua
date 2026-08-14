@@ -237,6 +237,15 @@ vim.keymap.set("x", "<C-/>", "gc", {
 	remap = true,
 })
 
+vim.keymap.set("x", "<C-f>", function()
+	local mode = vim.fn.mode()
+	local lines = vim.fn.getregion(vim.fn.getpos("v"), vim.fn.getpos("."), { type = mode })
+	local text = table.concat(lines, "\\n")
+	local pattern = "\\V" .. vim.fn.escape(text, "\\/")
+
+	vim.api.nvim_feedkeys(vim.keycode("<Esc>/") .. pattern, "n", false)
+end, { desc = "Search selected text" })
+
 local function centered_page_motion(motion)
 	return function()
 		local keys = vim.api.nvim_replace_termcodes(motion, true, false, true)
@@ -303,10 +312,22 @@ vim.keymap.set("n", "<leader>bd", close_current_buffer, { desc = "Delete buffer"
 vim.keymap.set("n", "<leader>bD", function()
 	Snacks.bufdelete.all()
 end, { desc = "Delete all buffers" })
+local function cycle_editor_buffer(command)
+	return function()
+		if vim.bo.buftype ~= "" or vim.bo.filetype == "NvimTree" or vim.bo.filetype == "grug-far" then
+			return
+		end
+
+		vim.cmd(command)
+	end
+end
+
 vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Previous buffer" })
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "<Tab>", cycle_editor_buffer("BufferLineCycleNext"), { desc = "Next buffer" })
+vim.keymap.set("n", "<S-Tab>", cycle_editor_buffer("BufferLineCyclePrev"), { desc = "Previous buffer" })
 vim.keymap.set("n", "<C-s>", "<cmd>write<cr>", { desc = "Save buffer" })
-vim.keymap.set("i", "<C-s>", "<cmd>write<cr>", { desc = "Save buffer" })
+vim.keymap.set("i", "<C-s>", "<Esc><cmd>write<cr>", { desc = "Save buffer and exit insert mode" })
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>", {
 	desc = "Clear search highlighting",

@@ -5,6 +5,9 @@ require("lazydev").setup({})
 
 vim.lsp.config("*", {
 	capabilities = require("blink.cmp").get_lsp_capabilities(),
+	flags = {
+		debounce_text_changes = 100,
+	},
 })
 
 vim.lsp.config("lua_ls", {
@@ -78,12 +81,29 @@ vim.lsp.enable({
 	"basedpyright",
 })
 
+local eslint_fix_group = vim.api.nvim_create_augroup("eslint-fix-on-save", { clear = true })
+
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(event)
 		local opts = { buffer = event.buf }
 		local client = vim.lsp.get_client_by_id(event.data.client_id)
 
+		if client and client.name == "eslint" then
+			vim.api.nvim_clear_autocmds({ group = eslint_fix_group, buffer = event.buf })
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				group = eslint_fix_group,
+				buffer = event.buf,
+				callback = function()
+					if #vim.lsp.get_clients({ bufnr = event.buf, name = "eslint" }) > 0 then
+						vim.cmd.LspEslintFixAll()
+					end
+				end,
+				desc = "Fix ESLint issues before saving",
+			})
+		end
+
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Definition" }))
+		vim.keymap.set({ "n", "x" }, "<F12>", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Definition" }))
 		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Declaration" }))
 		-- Keep Neovim defaults: grr references, gri implementation, grn rename, gra code action.
 		vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))

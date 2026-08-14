@@ -2,21 +2,8 @@ local configured_monitors = require("nix.monitors")
 
 local M = {}
 local monitor_workspaces = {}
-local workspace_aspect_ratio = {}
 local workspace_scroll = {}
-
-local function apply_workspace_aspect_ratio(workspace)
-	local enabled = workspace_aspect_ratio[workspace.id]
-	if enabled == nil then
-		enabled = true
-	end
-
-	hl.config({
-		layout = {
-			single_window_aspect_ratio = enabled and { 16, 9 } or { 0, 0 },
-		},
-	})
-end
+local aspect_ratio_enabled = true
 
 local function assign_workspaces(monitor, workspaces)
 	monitor_workspaces[monitor] = workspaces
@@ -68,18 +55,14 @@ function M.scroll_workspace(offset)
 	end, { timeout = 180, type = "oneshot" })
 end
 
-function M.toggle_workspace_aspect_ratio()
-	local monitor = hl.get_active_monitor()
-	local workspace = monitor and monitor.active_workspace
-	if not workspace then
-		return
-	end
-
-	workspace_aspect_ratio[workspace.id] = workspace_aspect_ratio[workspace.id] == false
-	apply_workspace_aspect_ratio(workspace)
+function M.toggle_aspect_ratio()
+	aspect_ratio_enabled = not aspect_ratio_enabled
+	hl.config({
+		layout = {
+			single_window_aspect_ratio = aspect_ratio_enabled and { 16, 9 } or { 0, 0 },
+		},
+	})
 end
-
-hl.on("workspace.active", apply_workspace_aspect_ratio)
 
 for _, monitor in ipairs(configured_monitors) do
 	assign_workspaces(monitor.output, monitor.workspaces)

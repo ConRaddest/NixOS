@@ -123,6 +123,6 @@ hl.bind(
 	{ locked = true, repeating = true }
 )
 
-hl.bind("SUPER + M", monitors.toggle_workspace_aspect_ratio, {
-	desc = "Toggle single-window max width for workspace",
+hl.bind("SUPER + M", monitors.toggle_aspect_ratio, {
+	desc = "Toggle single-window max width",
 })
