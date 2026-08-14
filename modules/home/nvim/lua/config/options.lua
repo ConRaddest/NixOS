@@ -1,6 +1,8 @@
 -- Core editor options and filetype-specific indentation.
 
 -- Editor behavior
+vim.g.side_panel_width = 35
+
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = "both"
@@ -17,6 +19,7 @@ vim.opt.mouse = "a"
 vim.opt.clipboard = "unnamedplus"
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.confirm = true
+vim.opt.hidden = true
 vim.opt.undofile = true
 vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 250

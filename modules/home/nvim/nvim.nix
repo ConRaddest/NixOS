@@ -10,9 +10,6 @@
 
     let
       colors = config.nos.theme.colors;
-      lazygit = pkgs.lazygit.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [ ./lazygit-side-panel-width.patch ];
-      });
     in
     {
       xdg = {
@@ -37,9 +34,7 @@
             source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
           };
           "nvim/lua/nix/theme.lua".text = ''
-            return {
-              muted = ${builtins.toJSON colors.muted},
-            }
+            return vim.json.decode([==[${builtins.toJSON colors}]==])
           '';
         };
         dataFile = {
@@ -120,6 +115,7 @@
           lazygit-nvim
           grug-far-nvim
           nvim-web-devicons
+          nvim-tree-lua
           bufferline-nvim
           nvim-colorizer-lua
           ccc-nvim
@@ -176,7 +172,7 @@
           persistence-nvim
         ];
 
-        extraPackages = [ lazygit ];
+        extraPackages = [ pkgs.lazygit ];
 
         initLua = ''
           require("config")

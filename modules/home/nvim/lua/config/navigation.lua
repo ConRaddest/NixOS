@@ -15,7 +15,7 @@ vim.keymap.set("n", "<M-Right>", smart_splits.resize_right, { desc = "Resize spl
 
 require("yazi").setup({
 	open_for_directories = true,
-	change_neovim_cwd_on_close = true,
+	change_neovim_cwd_on_close = false,
 	open_file_function = function(chosen_file)
 		if vim.fn.isdirectory(chosen_file) == 1 then
 			vim.cmd.cd(chosen_file)

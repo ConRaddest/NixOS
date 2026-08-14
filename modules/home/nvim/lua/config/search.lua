@@ -36,10 +36,9 @@ local function setup_grug_far_window(buffer)
 	vim.bo[buffer].buflisted = false
 	vim.bo[buffer].bufhidden = "hide"
 
-	if Snacks then
-		for _, explorer in ipairs(Snacks.picker.get({ source = "explorer" })) do
-			explorer:close()
-		end
+	local tree = require("nvim-tree.api").tree
+	if tree.is_visible() then
+		tree.close()
 	end
 
 	local window = vim.fn.bufwinid(buffer)
@@ -76,7 +75,7 @@ local function setup_grug_far_window(buffer)
 		end
 
 		vim.api.nvim_set_current_win(window)
-		vim.api.nvim_win_set_width(window, math.max(1, math.floor(vim.o.columns * 0.25)))
+		vim.api.nvim_win_set_width(window, vim.g.side_panel_width)
 		vim.wo[window].winfixwidth = true
 		vim.wo[window].winhighlight = table.concat({
 			"Normal:NormalFloat",

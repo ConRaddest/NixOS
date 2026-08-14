@@ -3,39 +3,10 @@
 local keymaps = require("config.keymaps")
 
 require("snacks").setup({
-	explorer = { enabled = true },
+	explorer = { enabled = false },
 	picker = {
 		enabled = true,
 		sources = {
-			explorer = {
-				-- Keep preview hidden until explicitly toggled with Alt+p.
-				ignored = true,
-				layout = {
-					preset = "sidebar",
-					preview = "main",
-					hidden = { "preview" },
-					layout = { width = 0.25, min_width = 1 },
-				},
-				win = {
-					input = {
-						keys = {
-							---@diagnostic disable-next-line: assign-type-mismatch
-							["<Esc>"] = { keymaps.focus_snacks_editor, mode = { "n", "i" } },
-							---@diagnostic disable-next-line: assign-type-mismatch
-							["<C-c>"] = { keymaps.close_snacks_explorer, mode = { "n", "i" } },
-							["<M-p>"] = { "toggle_preview", mode = { "n", "i" } },
-						},
-					},
-					list = {
-						keys = {
-							["<Esc>"] = keymaps.focus_snacks_editor,
-							["<C-c>"] = keymaps.close_snacks_explorer,
-							["<M-p>"] = "toggle_preview",
-							["P"] = false,
-						},
-					},
-				},
-			},
 			files = {
 				ignored = true,
 			},
@@ -57,25 +28,105 @@ require("snacks").setup({
 
 vim.ui.select = Snacks.picker.select
 
--- Put affirmative choice first for explorer move/delete confirmations.
----@diagnostic disable-next-line: duplicate-set-field
-Snacks.picker.util.confirm = function(prompt, action)
-	Snacks.picker.select({ "Yes", "No" }, {
-		prompt = prompt,
-		snacks = {
-			layout = {
-				layout = { max_width = 60 },
+require("nvim-tree").setup({
+	disable_netrw = true,
+	hijack_cursor = true,
+	sync_root_with_cwd = true,
+	filters = { dotfiles = false },
+	update_focused_file = {
+		enable = true,
+		update_root = false,
+	},
+	actions = {
+		open_file = {
+			resize_window = false,
+		},
+	},
+	view = {
+		width = vim.g.side_panel_width,
+		preserve_window_proportions = true,
+	},
+	renderer = {
+		root_folder_label = false,
+		highlight_git = "name",
+		indent_markers = { enable = true },
+		icons = {
+			show = {
+				git = false,
+			},
+			glyphs = {
+				default = "󰈚",
+				folder = {
+					default = "",
+					empty = "",
+					empty_open = "",
+					open = "",
+					symlink = "",
+				},
+				git = { unmerged = "" },
 			},
 		},
-	}, function(_, index)
-		if index == 1 then
-			action()
+	},
+	on_attach = function(buffer)
+		local api = require("nvim-tree.api")
+		local preview_enabled = false
+		local preview_request = 0
+
+		local function preview_node()
+			if not preview_enabled or vim.api.nvim_get_current_buf() ~= buffer then
+				return
+			end
+
+			local node = api.tree.get_node_under_cursor()
+			if node and node.type == "file" then
+				api.node.open.preview(node, { focus = false })
+			end
 		end
-	end)
-end
+
+		api.config.mappings.default_on_attach(buffer)
+		vim.keymap.set("n", "<Esc>", keymaps.focus_sidebar_editor, { buffer = buffer, desc = "Focus editor" })
+		vim.keymap.set("n", "<C-c>", keymaps.close_sidebar, { buffer = buffer, desc = "Close sidebar" })
+		vim.keymap.set("n", "<C-p>", function()
+			preview_enabled = not preview_enabled
+			preview_request = preview_request + 1
+			vim.notify("Sidebar preview " .. (preview_enabled and "enabled" or "disabled"))
+			preview_node()
+		end, { buffer = buffer, desc = "Toggle sidebar preview" })
+
+		-- NvimTree applies its window defaults after FileType autocmds.
+		vim.schedule(function()
+			local window = api.tree.winid()
+			if window and vim.api.nvim_win_is_valid(window) then
+				vim.wo[window].statuscolumn = ""
+				vim.wo[window].signcolumn = "no"
+			end
+		end)
+
+		vim.api.nvim_create_autocmd("CursorMoved", {
+			buffer = buffer,
+			callback = function()
+				if not preview_enabled then
+					return
+				end
+
+				preview_request = preview_request + 1
+				local request = preview_request
+
+				vim.defer_fn(function()
+					if request == preview_request then
+						preview_node()
+					end
+				end, 100)
+			end,
+		})
+	end,
+})
 
 require("bufferline").setup({
 	options = {
+		offsets = {
+			{ filetype = "NvimTree", text = "", separator = true },
+		},
 		show_tab_indicators = false,
 		show_close_icon = false,
 		custom_filter = function(buffer)

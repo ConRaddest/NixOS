@@ -11,6 +11,37 @@ local which_key = require("which-key")
 which_key.setup({
 	preset = "modern",
 	delay = 150,
+	icons = {
+		rules = {
+			{ pattern = "close", icon = "󰅖", color = "red" },
+			{ pattern = "equalize", icon = "󰕭", color = "blue" },
+			{ pattern = "split", icon = "", color = "blue" },
+			{ pattern = "sidebar", icon = "󰙅", color = "cyan" },
+			{ pattern = "color", icon = "󰏘", color = "purple" },
+			{ pattern = "language", icon = "󰘦", color = "orange" },
+			{ pattern = "test", icon = "󰙨", color = "green" },
+			{ pattern = "task", icon = "󰑮", color = "orange" },
+			{ pattern = "yank", icon = "󰆏", color = "yellow" },
+			{ pattern = "save", icon = "󰆓", color = "azure" },
+			{ pattern = "delete", icon = "󰆴", color = "red" },
+			{ pattern = "definition", icon = "󰊕", color = "cyan" },
+			{ pattern = "declaration", icon = "󰙠", color = "cyan" },
+			{ pattern = "symbol", icon = "󰘦", color = "orange" },
+			{ pattern = "rename", icon = "󰑕", color = "orange" },
+			{ pattern = "call", icon = "󰏻", color = "cyan" },
+			{ pattern = "hover", icon = "󰋼", color = "blue" },
+			{ pattern = "hunk", icon = "󰊢", color = "orange" },
+			{ pattern = "blame", icon = "󰊢", color = "yellow" },
+			{ pattern = "restore", icon = "󰦛", color = "azure" },
+			{ pattern = "run", icon = "󰐊", color = "green" },
+			{ pattern = "stop", icon = "󰓛", color = "red" },
+			{ pattern = "output", icon = "󰆍", color = "cyan" },
+			{ pattern = "breakpoint", icon = "", color = "red" },
+			{ pattern = "step", icon = "󰆹", color = "blue" },
+			{ pattern = "previous", icon = "󰒮", color = "blue" },
+			{ pattern = "next", icon = "󰒭", color = "blue" },
+		},
+	},
 	triggers = {
 		{ "<leader>", mode = { "n", "x", "s", "o" } },
 	},
@@ -18,15 +49,15 @@ which_key.setup({
 
 local M = {}
 
-local snacks_editor_window
+local sidebar_editor_window
 
-function M.focus_snacks_editor()
+function M.focus_sidebar_editor()
 	if
-		snacks_editor_window
-		and vim.api.nvim_win_is_valid(snacks_editor_window)
-		and vim.api.nvim_win_get_tabpage(snacks_editor_window) == vim.api.nvim_get_current_tabpage()
+		sidebar_editor_window
+		and vim.api.nvim_win_is_valid(sidebar_editor_window)
+		and vim.api.nvim_win_get_tabpage(sidebar_editor_window) == vim.api.nvim_get_current_tabpage()
 	then
-		vim.api.nvim_set_current_win(snacks_editor_window)
+		vim.api.nvim_set_current_win(sidebar_editor_window)
 		return
 	end
 
@@ -43,39 +74,41 @@ function M.close_grug_far()
 	end
 end
 
-function M.close_snacks_explorer()
-	local explorer = Snacks.picker.get({ source = "explorer" })[1]
-	if not explorer then
+function M.close_sidebar()
+	require("nvim-tree.api").tree.close()
+	vim.schedule(M.focus_sidebar_editor)
+end
+
+function M.focus_sidebar()
+	M.close_grug_far()
+
+	if vim.bo.filetype ~= "NvimTree" then
+		sidebar_editor_window = vim.api.nvim_get_current_win()
+	end
+
+	local tree = require("nvim-tree.api").tree
+	if not tree.is_visible() then
+		tree.open({ find_file = true, focus = true })
 		return
 	end
 
-	explorer:close()
-	vim.schedule(M.focus_snacks_editor)
+	tree.focus()
 end
 
-function M.focus_snacks_explorer()
-	M.close_grug_far()
-	local explorer = Snacks.picker.get({ source = "explorer" })[1]
-
-	if not vim.bo.filetype:match("^snacks_picker") then
-		snacks_editor_window = vim.api.nvim_get_current_win()
+function M.toggle_sidebar()
+	if require("nvim-tree.api").tree.is_visible() then
+		M.close_sidebar()
+		return
 	end
 
-	if not explorer then
-		Snacks.explorer({ focus = true })
-		explorer = Snacks.picker.get({ source = "explorer" })[1]
-	end
-
-	if explorer then
-		explorer:focus("list", { show = true })
-	end
+	M.focus_sidebar()
 end
 
 function M.focus_grug_far()
-	local explorer = Snacks.picker.get({ source = "explorer" })[1]
-	if explorer then
-		M.focus_snacks_editor()
-		explorer:close()
+	local tree = require("nvim-tree.api").tree
+	if tree.is_visible() then
+		M.focus_sidebar_editor()
+		tree.close()
 	end
 
 	local instances = require("grug-far.instances")
@@ -101,7 +134,8 @@ which_key.add({
 		end,
 		desc = "Find files",
 	},
-	{ "<leader>e", M.focus_snacks_explorer, desc = "Focus sidebar" },
+	{ "<leader>e", M.focus_sidebar, desc = "Focus sidebar" },
+	{ "<C-n>", M.toggle_sidebar, desc = "Toggle sidebar" },
 	{ "<leader>r", M.focus_grug_far, desc = "Search and replace" },
 	{ "<leader>b", group = "Buffers" },
 	{ "<leader>f", "<cmd>Yazi<cr>", desc = "File explorer" },
@@ -136,7 +170,7 @@ which_key.add({
 				end
 
 				vim.schedule(function()
-					M.focus_snacks_editor()
+					M.focus_sidebar_editor()
 					trouble.open("git_hunks")
 				end)
 			end)
@@ -146,8 +180,8 @@ which_key.add({
 	{
 		"<leader>s",
 		function()
-			if vim.bo.filetype:match("^snacks_picker") then
-				M.focus_snacks_editor()
+			if vim.bo.filetype == "NvimTree" then
+				M.focus_sidebar_editor()
 			end
 
 			require("telescope.builtin").live_grep()
