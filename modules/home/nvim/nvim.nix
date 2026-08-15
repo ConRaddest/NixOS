@@ -10,6 +10,18 @@
 
     let
       colors = config.nos.theme.colors;
+      themeOverride = "${config.nos.theme.directory}/neovim.lua";
+      themePlugin =
+        if builtins.pathExists themeOverride then
+          themeOverride
+        else
+          pkgs.writeText "neovim-theme.lua" "return {}";
+      plugins = pkgs.linkFarm "neovim-plugins" [
+        {
+          name = "theme.lua";
+          path = themePlugin;
+        }
+      ];
     in
     {
       xdg = {
@@ -27,28 +39,9 @@
                 ;
             };
           };
-          "nvim/lua/config" = {
-            source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/lua/config";
-          };
-          "nvim/lua/config.lua" = {
-            source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/NixOS/modules/home/nvim/init.lua";
-          };
-          "nvim/lua/nix/theme.lua".text = ''
-            return vim.json.decode([==[${builtins.toJSON colors}]==])
-          '';
-        };
-        dataFile = {
-          "mime/packages/code-workspace.xml" = {
-            text = ''
-              <?xml version="1.0" encoding="UTF-8"?>
-              <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-                <mime-type type="application/x-code-workspace">
-                  <comment>Visual Studio Code Workspace</comment>
-                  <glob pattern="*.code-workspace"/>
-                </mime-type>
-              </mime-info>
-            '';
-          };
+          "nvim/init.lua".source = ./init.lua;
+          "nvim/lua/config".source = ./lua/config;
+          "nvim/lua/plugins".source = plugins;
         };
         desktopEntries = {
           nvim = {
@@ -102,81 +95,13 @@
         vimAlias = true;
         vimdiffAlias = true;
 
-        plugins = with pkgs.vimPlugins; [
-          tokyonight-nvim
-          which-key-nvim
-          snacks-nvim
-          telescope-nvim
-          yazi-nvim
-          plenary-nvim
-          smart-splits-nvim
-          gitsigns-nvim
-          nvim-scrollbar
-          lazygit-nvim
-          grug-far-nvim
-          nvim-web-devicons
-          nvim-tree-lua
-          bufferline-nvim
-          nvim-colorizer-lua
-          ccc-nvim
-
-          # Language intelligence
-          nvim-lspconfig
-          lazydev-nvim
-          blink-cmp
-          friendly-snippets
-          nvim-autopairs
-          (nvim-treesitter.withPlugins (
-            parsers: with parsers; [
-              bash
-              c
-              cpp
-              c_sharp
-              css
-              glsl
-              html
-              javascript
-              jsdoc
-              json
-              lua
-              markdown
-              markdown_inline
-              nix
-              python
-              qmljs
-              regex
-              tsx
-              typescript
-              vim
-              vimdoc
-              yaml
-            ]
-          ))
-          nvim-treesitter-context
-          nvim-ts-autotag
-
-          # Formatting and diagnostics
-          conform-nvim
-          nvim-lint
-          trouble-nvim
-
-          # Testing, tasks, and sessions
-          nvim-nio
-          nvim-dap
-          nvim-dap-ui
-          nvim-dap-virtual-text
-          neotest
-          neotest-python
-          neotest-dotnet
-          overseer-nvim
-          persistence-nvim
+        extraPackages = with pkgs; [
+          fd
+          gcc
+          git
+          lazygit
+          ripgrep
         ];
-
-        extraPackages = [ pkgs.lazygit ];
-
-        initLua = ''
-          require("config")
-        '';
       };
     };
 }

@@ -51,78 +51,125 @@ local function universal_clipboard_shortcut(default_mods, default_key, terminal_
 	end
 end
 
-hl.bind("SUPER + Space", hl.dsp.exec_cmd(shell.launcher))
-hl.bind("SUPER + P", hl.dsp.exec_cmd(shell.process_list))
+local function open_workspace_terminal()
+	if active_window_is_terminal() then
+		send_shortcut_once("CTRL SHIFT", "F12")()
+	else
+		hl.dispatch(hl.dsp.exec_cmd("uwsm app -- kitty"))
+	end
+end
 
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+local function bind(keys, description, dispatcher, options)
+	assert(description and description ~= "", "Keybind description is required for " .. keys)
+	options = options or {}
+	options.desc = description
+	return hl.bind(keys, dispatcher, options)
+end
 
-hl.bind("SUPER + S", hl.dsp.workspace.toggle_special("terminal"))
-hl.bind("SUPER + E", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi -e yazi"))
-hl.bind("SUPER + Return", hl.dsp.exec_cmd("uwsm app -- kitty"))
-hl.bind("SUPER + W", hl.dsp.window.close())
-hl.bind("SUPER + J", hl.dsp.layout("togglesplit"))
-hl.bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
-hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
-hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
-hl.bind("SUPER + A", function()
-	hl.plugin.scrolloverview.overview("toggle")
-end)
+bind("SUPER + Space", "Open application launcher", hl.dsp.exec_cmd(shell.launcher))
+bind("SUPER + P", "Open process list", hl.dsp.exec_cmd(shell.process_list))
 
-hl.bind("SUPER + mouse_up", function()
+bind("XF86PowerOff", "Suspend system", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+bind("switch:on:Lid Switch", "Suspend when lid closes", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+
+bind("SUPER + S", "Toggle terminal workspace", hl.dsp.workspace.toggle_special("terminal"))
+bind("SUPER + E", "Open file manager", hl.dsp.exec_cmd("uwsm app -- kitty --class yazi --title yazi -e yazi"))
+bind("SUPER + Return", "Open terminal", open_workspace_terminal)
+bind("SUPER + W", "Close active window", hl.dsp.window.close())
+bind("SUPER + J", "Toggle split direction", hl.dsp.layout("togglesplit"))
+bind("SUPER + T", "Toggle floating window", hl.dsp.window.float({ action = "toggle" }))
+bind("SUPER + F", "Toggle fullscreen window", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+bind("SUPER + Tab", "Focus previous workspace", hl.dsp.focus({ workspace = "previous" }))
+
+bind("SUPER + mouse_up", "Focus next workspace", function()
 	monitors.scroll_workspace(1)
 end)
-hl.bind("SUPER + mouse_down", function()
+bind("SUPER + mouse_down", "Focus previous workspace", function()
 	monitors.scroll_workspace(-1)
 end)
 
 for _, direction in ipairs({ "left", "right", "up", "down" }) do
-	hl.bind("SUPER + " .. direction, hl.dsp.focus({ direction = direction }))
-	hl.bind("SUPER + SHIFT + " .. direction, hl.dsp.window.move({ direction = direction }))
+	bind("SUPER + " .. direction, "Focus window " .. direction, hl.dsp.focus({ direction = direction }))
+	bind(
+		"SUPER + SHIFT + " .. direction,
+		"Move window " .. direction,
+		hl.dsp.window.move({ direction = direction })
+	)
 end
 
 for workspace = 1, 9 do
-	hl.bind("SUPER + " .. workspace, hl.dsp.focus({ workspace = workspace }))
-	hl.bind("SUPER + SHIFT + " .. workspace, hl.dsp.window.move({ workspace = workspace }))
+	bind("SUPER + " .. workspace, "Focus workspace " .. workspace, hl.dsp.focus({ workspace = workspace }))
+	bind(
+		"SUPER + SHIFT + " .. workspace,
+		"Move window to workspace " .. workspace,
+		hl.dsp.window.move({ workspace = workspace })
+	)
 end
 
-hl.bind("SUPER + equal", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { repeating = true })
-hl.bind("SUPER + minus", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { repeating = true })
-hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
-hl.bind("SUPER + SHIFT + K", hl.dsp.exec_cmd("hyprpicker"))
+bind(
+	"SUPER + equal",
+	"Increase window width",
+	hl.dsp.window.resize({ x = 100, y = 0, relative = true }),
+	{ repeating = true }
+)
+bind(
+	"SUPER + minus",
+	"Decrease window width",
+	hl.dsp.window.resize({ x = -100, y = 0, relative = true }),
+	{ repeating = true }
+)
+bind("SUPER + mouse:272", "Drag window", hl.dsp.window.drag(), { mouse = true })
+bind("SUPER + mouse:273", "Resize window", hl.dsp.window.resize(), { mouse = true })
+bind(
+	"SUPER + SHIFT + K",
+	"Pick screen colour and copy hex code",
+	hl.dsp.exec_cmd("hyprpicker --autocopy --format=hex --lowercase-hex")
+)
+bind("SUPER + CTRL + S", "Start Matrix screensaver", hl.dsp.exec_cmd("nos-screensaver"))
 
 local screenshot_command = "mkdir -p ~/Screenshots && "
 	.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
 	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd(screenshot_command))
+bind("SUPER + SHIFT + S", "Capture screen region", hl.dsp.exec_cmd(screenshot_command))
 
-hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("uwsm app -- nos-build"), { desc = "Build NixOS configuration" })
-hl.bind("SUPER + SHIFT + U", hl.dsp.exec_cmd("uwsm app -- nos-update"), { desc = "Update NixOS configuration" })
-hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("uwsm app -- nos-refresh"), { desc = "Refresh Home Manager" })
-hl.bind("SUPER + SHIFT + I", open_terminal("nos-install", "nos-install", true), { desc = "Install Nix package" })
-hl.bind("SUPER + SHIFT + X", open_terminal("nos-remove", "nos-remove", true), { desc = "Remove Nix package" })
+bind("SUPER + SHIFT + B", "Build system configuration", hl.dsp.exec_cmd("uwsm app -- nos-build"))
+bind("SUPER + SHIFT + U", "Update system configuration", hl.dsp.exec_cmd("uwsm app -- nos-update"))
+bind("SUPER + SHIFT + R", "Refresh Home Manager", hl.dsp.exec_cmd("uwsm app -- nos-refresh"))
+bind("SUPER + SHIFT + I", "Install Nix package", open_terminal("nos-install", "nos-install", true))
+bind("SUPER + SHIFT + X", "Remove Nix package", open_terminal("nos-remove", "nos-remove", true))
 
-hl.bind("SUPER + X", send_shortcut_once("CTRL", "X"), { desc = "Universal cut" })
-hl.bind("SUPER + C", universal_clipboard_shortcut("CTRL", "C", "CTRL", "Insert"), { desc = "Universal copy" })
-hl.bind("SUPER + V", universal_clipboard_shortcut("CTRL", "V", "SHIFT", "Insert"), { desc = "Universal paste" })
+bind("SUPER + X", "Universal cut", send_shortcut_once("CTRL", "X"))
+bind("SUPER + C", "Universal copy", universal_clipboard_shortcut("CTRL", "C", "CTRL", "Insert"))
+bind("SUPER + V", "Universal paste", universal_clipboard_shortcut("CTRL", "V", "SHIFT", "Insert"))
 
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(shell.volume_up), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(shell.volume_down), { locked = true, repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd(shell.volume_mute), { locked = true, repeating = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(shell.mic_mute), { locked = true, repeating = true })
+bind("XF86AudioRaiseVolume", "Raise audio volume", hl.dsp.exec_cmd(shell.volume_up), {
+	locked = true,
+	repeating = true,
+})
+bind("XF86AudioLowerVolume", "Lower audio volume", hl.dsp.exec_cmd(shell.volume_down), {
+	locked = true,
+	repeating = true,
+})
+bind("XF86AudioMute", "Toggle audio mute", hl.dsp.exec_cmd(shell.volume_mute), {
+	locked = true,
+	repeating = true,
+})
+bind("XF86AudioMicMute", "Toggle microphone mute", hl.dsp.exec_cmd(shell.mic_mute), {
+	locked = true,
+	repeating = true,
+})
 
-hl.bind(
+bind(
 	"XF86MonBrightnessUp",
+	"Raise display brightness",
 	hl.dsp.exec_cmd("brightnessctl --quiet --class=backlight set +5%"),
 	{ locked = true, repeating = true }
 )
-hl.bind(
+bind(
 	"XF86MonBrightnessDown",
+	"Lower display brightness",
 	hl.dsp.exec_cmd("brightnessctl --quiet --class=backlight set 5%-"),
 	{ locked = true, repeating = true }
 )
 
-hl.bind("SUPER + M", monitors.toggle_aspect_ratio, {
-	desc = "Toggle single-window max width",
-})
+bind("SUPER + M", "Toggle single-window max width", monitors.toggle_aspect_ratio)

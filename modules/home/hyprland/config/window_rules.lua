@@ -15,6 +15,12 @@ local windows = {
 	{ class = "org.gnome.Calculator", size = { 360, 620 } },
 }
 
+hl.window_rule({
+	match = { class = "nos-screensaver" },
+	float = true,
+	fullscreen = true,
+})
+
 for _, window in ipairs(windows) do
 	hl.window_rule({
 		match = window.title and { title = window.title } or { class = window.class },

@@ -34,6 +34,30 @@
       nos-update = mkNosScript "nos-update" "${self}/modules/system/scripts/nos-update.sh";
       nos-install = mkNosScript "nos-install" "${scriptDirectory}/nos-install.sh";
       nos-remove = mkNosScript "nos-remove" "${scriptDirectory}/nos-remove.sh";
+      nos-iso-install = pkgs.writeShellScriptBin "nos-iso-install" ''
+        export QEMU_FIRMWARE_DIR="${pkgs.qemu}/share/qemu"
+        export PATH="/run/wrappers/bin:${
+          lib.makeBinPath [
+            pkgs.acl
+            pkgs.coreutils
+            pkgs.qemu
+            pkgs.util-linux
+          ]
+        }:$PATH"
+        exec ${pkgs.bash}/bin/bash ${scriptDirectory}/nos-iso-install.sh "$@"
+      '';
+      nos-iso-boot = pkgs.writeShellScriptBin "nos-iso-boot" ''
+        export PATH="/run/wrappers/bin:${
+          lib.makeBinPath [
+            pkgs.coreutils
+            pkgs.gnugrep
+            pkgs.libarchive
+            pkgs.systemd
+            pkgs.util-linux
+          ]
+        }:$PATH"
+        exec ${pkgs.bash}/bin/bash ${scriptDirectory}/nos-iso-boot.sh "$@"
+      '';
       nos-new-host = mkNosScript "nos-new-host" "${self}/modules/system/scripts/nos-new-host.sh";
 
       managementPackages = lib.optionals (flakeDirectory != null) [
@@ -42,6 +66,8 @@
         nos-update
         nos-install
         nos-remove
+        nos-iso-install
+        nos-iso-boot
         nos-new-host
       ];
 
@@ -76,6 +102,7 @@
           enable = true;
           interactiveShellInit = ''
             set -g fish_greeting
+            set -e NIXOS_OZONE_WL
 
             if test "$TERM" != linux
               set -g fish_color_command ${colors.accent}
@@ -97,9 +124,13 @@
           shellAliases = {
             cd = "z";
             ff = "fastfetch";
-            ll = "eza -la --icons";
-            ls = "eza --icons";
-            startw = "uwsm start hyprland-uwsm.desktop";
+            # better ls
+            ls = "eza -lh --group-directories-first --icons=auto";
+            lt = "eza --tree --level=2 --long --icons --git";
+            lta = "lt -a";
+            lsa = "ls -a";
+            # login
+            start = "uwsm start hyprland-uwsm.desktop";
           };
         };
         kitty = {

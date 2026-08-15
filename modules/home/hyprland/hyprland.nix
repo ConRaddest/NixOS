@@ -37,37 +37,6 @@
           workspaces = { ${lib.concatMapStringsSep ", " toString monitor.workspaces} },
         }
       '';
-
-      scrollOverview = pkgs.hyprlandPlugins.mkHyprlandPlugin {
-        hyprland = pkgs.hyprland;
-        pluginName = "scrolloverview";
-        version = "0.1.0";
-        src = inputs.hyprland-scroll-overview;
-
-        buildInputs = [ pkgs.lua5_4 ];
-        enableParallelBuilding = true;
-        dontUseCmakeConfigure = true;
-
-        buildPhase = ''
-          runHook preBuild
-          make all
-          runHook postBuild
-        '';
-
-        installPhase = ''
-          runHook preInstall
-          mkdir -p "$out/lib"
-          install -Dm755 scrolloverview.so "$out/lib/libscrolloverview.so"
-          runHook postInstall
-        '';
-
-        meta = {
-          description = "Scrollable workspace overview plugin for Hyprland";
-          homepage = "https://github.com/yayuuu/hyprland-scroll-overview";
-          license = lib.licenses.bsd3;
-          platforms = lib.platforms.linux;
-        };
-      };
     in
     {
       # Lua config and generated adapter below render semantic colors directly.
@@ -81,12 +50,6 @@
         wl-clipboard
         wtype
       ];
-
-      home.sessionVariables = {
-        GTK_USE_PORTAL = "1";
-        MOZ_ENABLE_WAYLAND = "1";
-        NIXOS_OZONE_WL = "1";
-      };
 
       wayland.windowManager.hyprland = {
         enable = true;
@@ -140,11 +103,6 @@
               return {
                 ${lib.concatMapStringsSep ",\n" monitorLua host.monitors}
               }
-            '';
-          };
-          "hypr/nix/plugins.lua" = {
-            text = ''
-              hl.plugin.load("${scrollOverview}/lib/libscrolloverview.so")
             '';
           };
           "hypr/nix/shell.lua" = {

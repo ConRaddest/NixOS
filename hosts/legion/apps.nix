@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     audacity
+    chromium
     cmatrix
     drawio
     gimp

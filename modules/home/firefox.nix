@@ -12,10 +12,7 @@
     {
       home.packages = [ pkgs.mkcert ];
 
-      stylix.targets.firefox = {
-        profileNames = [ "default" ];
-        firefoxGnomeTheme.enable = true;
-      };
+      stylix.targets.firefox.enable = false;
 
       xdg.mimeApps = {
         enable = true;

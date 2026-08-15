@@ -23,7 +23,7 @@ Multi-host NixOS configuration for x86_64 workstations. It manages both system s
 No graphical login manager is enabled. Log in through TTY and start Hyprland with:
 
 ```bash
-startw
+start
 ```
 
 ## Repository structure
@@ -155,7 +155,7 @@ export HOST_NAME=<hostname>
 After reboot, log in and run:
 
 ```bash
-startw
+start
 ```
 
 ### 7. Remove temporary password hash
@@ -234,7 +234,7 @@ cd ~/NixOS
 sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-After reboot, log in through TTY and run `startw`.
+After reboot, log in through TTY and run `start`.
 
 ## Host settings
 

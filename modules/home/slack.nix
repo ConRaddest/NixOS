@@ -9,7 +9,7 @@
         name = "slack-x11";
         runtimeInputs = [ pkgs.slack ];
         text = ''
-          export NIXOS_OZONE_WL=0
+          unset NIXOS_OZONE_WL
           exec slack --ozone-platform=x11 --disable-features=WebRTCPipeWireCapturer -s "$@"
         '';
       };

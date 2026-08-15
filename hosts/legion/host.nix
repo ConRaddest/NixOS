@@ -162,8 +162,10 @@ let
       self.lib.homeModules.npm
       self.lib.homeModules.nvim
       self.lib.homeModules.pi
+      self.lib.homeModules.screensaver
       self.lib.homeModules.ssh
       self.lib.homeModules.starship
+      self.lib.homeModules.voxtype
       self.lib.homeModules.yazi
 
       # Desktop environment

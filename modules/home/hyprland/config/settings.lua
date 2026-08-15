@@ -1,16 +1,4 @@
 hl.config({
-	plugin = {
-		scrolloverview = {
-			gesture_distance = 300,
-			scale = 0.5,
-			workspace_gap = 100,
-			layout = "vertical",
-			wallpaper = 0,
-			blur = false,
-			input = { scroll_event_delay = 0 },
-			shadow = { enabled = false },
-		},
-	},
 	input = {
 		accel_profile = "flat",
 		sensitivity = 1.5,
@@ -26,15 +14,15 @@ hl.config({
 		layout = "dwindle",
 	},
 	decoration = {
-		rounding = 8,
-		-- active_opacity = 0.97,
-		-- inactive_opacity = 0.96,
+		rounding = 0,
+		active_opacity = 0.97,
+		inactive_opacity = 0.96,
 		-- fullscreen_opacity = 0.99,
-		-- blur = { enabled = true, passes = 4, size = 4, xray = true },
+		blur = { enabled = true, passes = 4, size = 4, xray = true },
 		shadow = {
 			enabled = true,
-			range = 12,
-			render_power = 3,
+			range = 20,
+			render_power = 50,
 			color = 0x33000000,
 			color_inactive = 0x22000000,
 			offset = { 0, 4 },
