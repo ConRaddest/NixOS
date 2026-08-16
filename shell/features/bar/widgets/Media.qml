@@ -1,5 +1,6 @@
 import QtQuick
 import qs
+import qs.services
 
 Item {
   id: root
@@ -14,7 +15,7 @@ Item {
     id: icon
 
     anchors.centerIn: parent
-    text: "󰕾"
+    text: AudioService.outputIcon
     color: root.iconColor
     font.family: "monospace"
     font.pixelSize: root.iconSize

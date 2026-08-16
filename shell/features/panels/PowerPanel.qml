@@ -20,9 +20,7 @@ PopupWindow {
   implicitWidth: 460
   implicitHeight: 285
   color: "transparent"
-  grabFocus: true
 
-  // qmllint disable missing-type unqualified unresolved-type
   anchor {
     window: root.anchorWindow
     edges: Edges.Top | Edges.Left
@@ -30,15 +28,17 @@ PopupWindow {
     adjustment: PopupAdjustment.Slide
 
     onAnchoring: {
-      if (!root.anchorItem || !root.anchorWindow)
+      if (!anchorItem || !root.anchorWindow)
         return;
 
-      const point = root.anchorWindow.contentItem.mapFromItem(root.anchorItem, root.anchorItem.width - root.implicitWidth, root.anchorItem.height + root.barGap);
-      anchor.rect.x = Math.round(point.x);
-      anchor.rect.y = Math.round(point.y);
+      // 1. Map widget position to window coordinates
+      const mapped = anchorItem.mapToItem(root.anchorWindow.contentItem, 0, 0);
+
+      // 2. Calculate X so panel's right edge aligns with widget's right edge
+      anchor.rect.x = Math.round(mapped.x + anchorItem.width - root.implicitWidth);
+      anchor.rect.y = Math.round(mapped.y + anchorItem.height + root.barGap);
     }
   }
-  // qmllint enable missing-type unqualified unresolved-type
 
   Rectangle {
     anchors.fill: parent
@@ -46,6 +46,11 @@ PopupWindow {
     border.color: Colors.accent
     border.width: 2
     radius: 0
+
+    MouseArea {
+      anchors.fill: parent
+      onPressed: mouse => mouse.accepted = true
+    }
 
     ColumnLayout {
       anchors.fill: parent

@@ -17,7 +17,7 @@ PanelWindow {
   }
 
   exclusionMode: ExclusionMode.Ignore
-  WlrLayershell.layer: WlrLayershell.Layer.Overlay
+  WlrLayershell.layer: WlrLayershell.Overlay
 
   implicitWidth: 320
   implicitHeight: 64
@@ -93,6 +93,22 @@ PanelWindow {
         font.pixelSize: 14
         font.bold: true
       }
+    }
+  }
+  // Place inside OSD.qml:
+  Connections {
+    target: MonitorsService
+
+    function onOsdTriggered(type, value, icon) {
+      root.show(type, value, icon);
+    }
+  }
+
+  Connections {
+    target: AudioService
+
+    function onOsdTriggered(type, value, icon) {
+      root.show(type, value, icon);
     }
   }
 }

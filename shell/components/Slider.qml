@@ -86,7 +86,7 @@ ColumnLayout {
       implicitWidth: 12
       implicitHeight: 12
       radius: 6
-      color: slider.value > 1.0 ? Colors.accent : Colors.foreground
+      color: Colors.foreground
     }
   }
 

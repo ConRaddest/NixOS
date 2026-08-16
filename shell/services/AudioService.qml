@@ -1,22 +1,22 @@
 pragma Singleton
-
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
+import qs.services
 
 Item {
   id: root
 
   signal osdTriggered(string type, real value, string icon)
 
-  // Direct Pipewire Node Proxies
   readonly property PwNode rawDefaultSink: Pipewire.defaultAudioSink
   readonly property PwNode rawDefaultSource: Pipewire.defaultAudioSource
   readonly property var nodes: Pipewire.nodes ? Pipewire.nodes.values : []
 
-  // Safe Filtered Candidates
   readonly property var candidateSinks: {
     var list = [];
+    if (!nodes)
+      return list;
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       if (n && n.isSink && !n.isStream)
@@ -27,6 +27,8 @@ Item {
 
   readonly property var candidateSources: {
     var list = [];
+    if (!nodes)
+      return list;
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       if (n && !n.isSink && !n.isStream && n.audio)
@@ -35,46 +37,11 @@ Item {
     return list;
   }
 
-  // Active Default Sinks & Sources
   readonly property PwNode activeSink: rawDefaultSink || (candidateSinks.length > 0 ? candidateSinks[0] : null)
   readonly property PwNode activeSource: rawDefaultSource || (candidateSources.length > 0 ? candidateSources[0] : null)
 
-  // Object Trackers keep internal Pipewire object states alive
-  PwObjectTracker {
-    objects: root.candidateSinks
-  }
-  PwObjectTracker {
-    objects: root.candidateSources
-  }
-
-  // Peak Monitor components natively integrated with Pipewire
-  PwNodePeakMonitor {
-    id: outputPeakMon
-    node: root.activeSink
-    enabled: !!root.activeSink
-  }
-
-  PwNodePeakMonitor {
-    id: inputPeakMon
-    node: root.activeSource
-    enabled: !!root.activeSource
-  }
-
-  // Live Readouts
-  readonly property real outputVolume: activeSink && activeSink.audio ? activeSink.audio.volume : 0.0
-  readonly property real inputVolume: activeSource && activeSource.audio ? activeSource.audio.volume : 0.0
-  readonly property bool outputMuted: activeSink && activeSink.audio ? activeSink.audio.muted : false
-  readonly property bool inputMuted: activeSource && activeSource.audio ? activeSource.audio.muted : false
-
-  readonly property real outputPeak: outputPeakMon.peak || 0.0
-  readonly property real inputPeak: inputPeakMon.peak || 0.0
-
-  // Snapshot lists for SelectList UI components
   property var sinkList: []
   property var sourceList: []
-
-  readonly property string defaultSinkId: activeSink ? String(activeSink.id) : ""
-  readonly property string defaultSourceId: activeSource ? String(activeSource.id) : ""
 
   function rebuildSnapshots() {
     var sList = [];
@@ -86,7 +53,7 @@ Item {
         icon: "󰓃"
       });
     }
-    root.sinkList = sList;
+    sinkList = sList;
 
     var srcList = [];
     for (var j = 0; j < candidateSources.length; j++) {
@@ -97,50 +64,105 @@ Item {
         icon: "󰍬"
       });
     }
-    root.sourceList = srcList;
+    sourceList = srcList;
   }
 
-  // Refresh snapshots on timer to avoid mid-frame array mutation crashes
-  Timer {
-    id: refreshTimer
-    interval: 75
-    repeat: false
-    onTriggered: root.rebuildSnapshots()
+  readonly property real outputVolume: activeSink && activeSink.audio ? activeSink.audio.volume : 0.0
+  readonly property real inputVolume: activeSource && activeSource.audio ? activeSource.audio.volume : 0.0
+  readonly property bool outputMuted: activeSink && activeSink.audio ? activeSink.audio.muted : false
+  readonly property bool inputMuted: activeSource && activeSource.audio ? activeSource.audio.muted : false
+
+  readonly property string outputIcon: {
+    if (outputMuted || outputVolume === 0.0)
+      return "󰝟";
+    if (outputVolume < 0.33)
+      return "󰕿";
+    if (outputVolume < 0.66)
+      return "󰖀";
+    return "󰕾";
   }
 
-  onCandidateSinksChanged: refreshTimer.restart()
-  onCandidateSourcesChanged: refreshTimer.restart()
+  readonly property string inputIcon: {
+    if (inputMuted || inputVolume === 0.0)
+      return "󰍭";
+    return "󰍬";
+  }
 
-  Component.onCompleted: rebuildSnapshots()
-
-  // Actions
   function setOutputVolume(val) {
-    if (!activeSink || !activeSink.audio)
+    if (!activeSink)
       return;
-    var clamped = Math.max(0.0, Math.min(1.0, val));
-    activeSink.audio.volume = clamped;
+
+    var targetVol = val;
+    if (targetVol > 1.5 && targetVol <= 150)
+      targetVol = targetVol / 100.0;
+    var clamped = Math.max(0.0, Math.min(1.5, targetVol));
+
+    if (activeSink.audio) {
+      activeSink.audio.volume = clamped;
+    }
+
+    if (activeSink.id !== undefined) {
+      var pct = Math.round(clamped * 100) + "%";
+      Quickshell.execDetached(["wpctl", "set-volume", "--limit", "1.5", String(activeSink.id), pct]);
+    }
+
     root.osdTriggered("Volume", clamped, outputIcon);
   }
 
   function setInputVolume(val) {
-    if (!activeSource || !activeSource.audio)
+    if (!activeSource)
       return;
-    var clamped = Math.max(0.0, Math.min(1.0, val));
-    activeSource.audio.volume = clamped;
+
+    var targetVol = val;
+    if (targetVol > 1.5 && targetVol <= 150)
+      targetVol = targetVol / 100.0;
+    var clamped = Math.max(0.0, Math.min(1.5, targetVol));
+
+    if (activeSource.audio) {
+      activeSource.audio.volume = clamped;
+    }
+
+    if (activeSource.id !== undefined) {
+      var pct = Math.round(clamped * 100) + "%";
+      Quickshell.execDetached(["wpctl", "set-volume", "--limit", "1.5", String(activeSource.id), pct]);
+    }
+
     root.osdTriggered("Microphone", clamped, inputIcon);
   }
 
   function toggleOutputMute() {
-    if (!activeSink || !activeSink.audio)
+    if (!activeSink)
       return;
-    activeSink.audio.muted = !activeSink.audio.muted;
+
+    var newMuteState = !outputMuted;
+
+    if (activeSink.audio) {
+      activeSink.audio.muted = newMuteState;
+    }
+
+    if (activeSink.id !== undefined) {
+      var muteVal = newMuteState ? "1" : "0";
+      Quickshell.execDetached(["wpctl", "set-mute", String(activeSink.id), muteVal]);
+    }
+
     root.osdTriggered("Volume", outputVolume, outputIcon);
   }
 
   function toggleInputMute() {
-    if (!activeSource || !activeSource.audio)
+    if (!activeSource)
       return;
-    activeSource.audio.muted = !activeSource.audio.muted;
+
+    var newMuteState = !inputMuted;
+
+    if (activeSource.audio) {
+      activeSource.audio.muted = newMuteState;
+    }
+
+    if (activeSource.id !== undefined) {
+      var muteVal = newMuteState ? "1" : "0";
+      Quickshell.execDetached(["wpctl", "set-mute", String(activeSource.id), muteVal]);
+    }
+
     root.osdTriggered("Microphone", inputVolume, inputIcon);
   }
 
@@ -172,19 +194,24 @@ Item {
     }
   }
 
-  readonly property string outputIcon: {
-    if (outputMuted || outputVolume === 0.0)
-      return "󰝟";
-    if (outputVolume < 0.33)
-      return "󰕿";
-    if (outputVolume < 0.66)
-      return "󰖀";
-    return "󰕾";
+  property Item _internal: Item {
+    Timer {
+      id: refreshTimer
+      interval: 75
+      repeat: false
+      onTriggered: root.rebuildSnapshots()
+    }
+
+    Connections {
+      target: root
+      function onCandidateSinksChanged() {
+        refreshTimer.restart();
+      }
+      function onCandidateSourcesChanged() {
+        refreshTimer.restart();
+      }
+    }
   }
 
-  readonly property string inputIcon: {
-    if (inputMuted || inputVolume === 0.0)
-      return "󰍭";
-    return "󰍬";
-  }
+  Component.onCompleted: rebuildSnapshots()
 }
