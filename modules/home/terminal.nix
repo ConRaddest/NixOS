@@ -36,7 +36,7 @@
             cd = "z";
             ff = "fastfetch";
             # better ls
-            ls = "eza -lh --group-directories-first --icons=auto";
+            ls = "eza -l --group-directories-first --icons=auto";
             lt = "eza --tree --level=2 --long --icons --git";
             lta = "lt -a";
             lsa = "ls -a";

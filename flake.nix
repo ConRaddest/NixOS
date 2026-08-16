@@ -75,6 +75,8 @@
             {
               formatter = pkgs.nixfmt;
 
+              devShells.default = import ./shell.nix { inherit pkgs; };
+
               checks = {
                 formatting =
                   pkgs.runCommand "check-nix-formatting"
