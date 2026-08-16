@@ -3,6 +3,9 @@
     "duplicate-doc-field",
     "duplicate-doc-alias"
   ],
+  "Lua.diagnostics.globals": [
+    "vim"
+  ],
   "Lua.workspace.library": [
     "${workspaceFolder}/.vscode/hl.meta.lua"
   ]
