@@ -66,7 +66,7 @@
 
           while true; do
             tte \
-              -i ${self}/assets/wordmark.txt \
+              -i ${self}/assets/logo.txt \
               --frame-rate 120 \
               --canvas-width 0 \
               --canvas-height 0 \

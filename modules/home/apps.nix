@@ -5,14 +5,19 @@
     { hostName, self, ... }:
 
     {
-      imports = [ "${self}/hosts/${hostName}/apps.nix" ];
+      imports = [
+        "${self}/hosts/${hostName}/apps.nix"
+        self.lib.homeModules.webapps
+      ];
 
-      # Hide upstream entry that has NoDisplay=true but still surfaces in launchers.
-      xdg.desktopEntries.uuctl = {
-        name = "uuctl";
-        exec = "uuctl";
-        noDisplay = true;
-        type = "Application";
+      xdg.desktopEntries = {
+        # Hide upstream entry that has NoDisplay=true but still surfaces in launchers.
+        uuctl = {
+          name = "uuctl";
+          exec = "uuctl";
+          noDisplay = true;
+          type = "Application";
+        };
       };
     };
 }

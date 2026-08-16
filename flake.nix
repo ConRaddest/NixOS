@@ -25,11 +25,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # nice overview for seeing all workspaces on hyprland
-    # Pin matching Hyprland 0.55.4 commit from upstream's hyprpm.toml.
-    hyprland-scroll-overview = {
-      url = "github:yayuuu/hyprland-scroll-overview/cfc23b194ba9378d1606c7aa73060f6ffbe38445";
-      flake = false;
+    hyprland-preview-share-picker = {
+      url = "git+https://github.com/WhySoBad/hyprland-preview-share-picker?submodules=1";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
   };
@@ -42,7 +40,12 @@
         imports = [
           (inputs.import-tree ./modules/system)
           (inputs.import-tree ./modules/home)
-          ((inputs.import-tree.filterNot (lib.hasSuffix "/apps.nix")) ./hosts)
+          (
+            (inputs.import-tree.filterNot (
+              path: lib.hasSuffix "/apps.nix" path || lib.hasSuffix "/webapps.nix" path
+            ))
+            ./hosts
+          )
         ];
 
         options.flake = {

@@ -433,7 +433,7 @@ Select theme and wallpaper in each host definition:
 ```nix
 theme = {
   name = "tokyo-night";
-  wallpaper = "backgrounds/1-sunset-lake.png";
+  wallpaper = "backgrounds/0-winding-road.png";
 };
 ```
 

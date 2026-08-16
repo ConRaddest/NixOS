@@ -6,7 +6,7 @@
 # ╰──────────────────────────────────────────────────────────╯
 
 nos_wordmark() {
-  local wordmark="${NOS_DIR:-$HOME/NixOS}/assets/wordmark.txt"
+  local logo="${NOS_DIR:-$HOME/NixOS}/assets/logo.txt"
   local accent=''
   local reset=''
   local color="${NOS_ACCENT_COLOR:-bb9af7}"
@@ -14,16 +14,14 @@ nos_wordmark() {
   local spaced_subtitle=''
   local columns
   local max_width=0
-  local padding=0
-  local subtitle_padding=0
   local line
   local i
   local -a lines
 
   [[ "${NOS_WORDMARK_SHOWN:-}" != 1 ]] || return 0
 
-  if [[ ! -r "$wordmark" ]]; then
-    printf 'Wordmark is missing: %s\n' "$wordmark" >&2
+  if [[ ! -r "$logo" ]]; then
+    printf 'Wordmark is missing: %s\n' "$logo" >&2
     return 1
   fi
 
@@ -36,10 +34,11 @@ nos_wordmark() {
     reset=$'\033[0m'
   fi
 
-  mapfile -t lines < "$wordmark"
+  mapfile -t lines < "$logo"
   for line in "${lines[@]}"; do
     (( ${#line} > max_width )) && max_width=${#line}
   done
+  columns=$(tput cols 2>/dev/null || printf '%s' "${COLUMNS:-80}")
 
   subtitle=${subtitle^^}
   for (( i = 0; i < ${#subtitle}; i++ )); do
@@ -47,19 +46,19 @@ nos_wordmark() {
     spaced_subtitle+="${subtitle:i:1}"
   done
 
-  columns=$(tput cols 2>/dev/null || printf '%s' "${COLUMNS:-80}")
-  (( columns > max_width )) && padding=$(( (columns - max_width) / 2 ))
-  (( columns > ${#spaced_subtitle} )) && subtitle_padding=$(( (columns - ${#spaced_subtitle}) / 2 ))
-
   printf '%s' "$accent"
-  for line in "${lines[@]}"; do
-    if [[ -n "$line" ]]; then
-      printf '%*s%s\n' "$padding" '' "$line"
-    else
-      printf '\n'
-    fi
-  done
-  printf '\n%*s%s\n' "$subtitle_padding" '' "$spaced_subtitle"
+  if (( columns >= max_width )); then
+    for line in "${lines[@]}"; do
+      printf '%s\n' "$line"
+    done
+    printf '\n'
+  fi
+
+  if (( columns >= ${#spaced_subtitle} )); then
+    printf '%s\n' "$spaced_subtitle"
+  else
+    printf '%s\n' "$subtitle"
+  fi
   printf '%s\n' "$reset"
   export NOS_WORDMARK_SHOWN=1
 }

@@ -29,8 +29,5 @@
    - date / time w/ calendar
    - night light
    - timer
-
-# General Tweaks
-
-2. dynamic web-app wrapper (with seemless microphone / permission sharing)
-4. master list of keybinds
+13. master list of keybinds (need to build when i build the shell)
+14. move rebuilds and refreshes to background tasks with only password prompts

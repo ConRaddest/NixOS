@@ -8,13 +8,16 @@ source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-apps.sh"
 nos_wordmark "Removing Applications"
 
 apps_backup=$(mktemp)
+webapps_backup=$(mktemp)
 cp -- "$apps_file" "$apps_backup"
+cp -- "$webapps_file" "$webapps_backup"
 cleanup() {
   local status=$?
   if ((status != 0)); then
     cp -- "$apps_backup" "$apps_file"
+    cp -- "$webapps_backup" "$webapps_file"
   fi
-  rm -f -- "$apps_backup"
+  rm -f -- "$apps_backup" "$webapps_backup"
   return "$status"
 }
 trap cleanup EXIT
@@ -26,7 +29,9 @@ trap cleanup EXIT
 # shellcheck disable=SC2016 # Inner shell expands preview parameters.
 fzf_args=(
   --multi
-  --preview 'bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; package_preview {1}'\'''
+  --delimiter $'\t'
+  --with-nth 3
+  --preview 'bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; removable_preview "$1" "$2"'\'' _ {1} {2}'
   --preview-label='Tab: Select · Enter: Remove · Alt-P: Preview · Alt-J/K: Scroll'
   --preview-label-pos='bottom'
   --preview-window 'down:35%:wrap'
@@ -41,12 +46,18 @@ fzf_args=(
 # ╰──────────────────────────────────────────────────────────╯
 
 while true; do
-  if ! pkg_names=$(current_apps | fzf "${fzf_args[@]}"); then
+  if ! selections=$(removable_apps | fzf "${fzf_args[@]}"); then
     exit 0
   fi
 
-  [[ -n "${pkg_names:-}" ]] || continue
-  { grep -Fvx -f <(printf '%s\n' "$pkg_names") <(current_apps) || true; } | write_apps_file
+  [[ -n "${selections:-}" ]] || continue
+  package_names=$(printf '%s\n' "$selections" | awk -F '\t' '$1 == "package" { print $2 }')
+  mapfile -t webapp_ids < <(printf '%s\n' "$selections" | awk -F '\t' '$1 == "webapp" { print $2 }')
+
+  if [[ -n "$package_names" ]]; then
+    { grep -Fvx -f <(printf '%s\n' "$package_names") <(current_apps) || true; } | write_apps_file
+  fi
+  ((${#webapp_ids[@]} == 0)) || remove_webapps "${webapp_ids[@]}"
 
   if ! nos-refresh; then
     printf '\nRemove refresh failed.\n'

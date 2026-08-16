@@ -231,21 +231,26 @@
         "type": "github"
       }
     },
-    "hyprland-scroll-overview": {
-      "flake": false,
+    "hyprland-preview-share-picker": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1784111647,
-        "narHash": "sha256-hjzhIWCmaqVtyCy2ZE1+pM3Q2BvAGuC8zQZSj1AtORA=",
-        "owner": "yayuuu",
-        "repo": "hyprland-scroll-overview",
-        "rev": "cfc23b194ba9378d1606c7aa73060f6ffbe38445",
-        "type": "github"
+        "lastModified": 1782052593,
+        "narHash": "sha256-XE6RD/4Mhw/ZRBj0v94kLOERElat5V+e/X0L9eUGf7M=",
+        "ref": "refs/heads/master",
+        "rev": "e2f30ff85486e557018523da45ccbc846e3a499c",
+        "revCount": 55,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/WhySoBad/hyprland-preview-share-picker"
       },
       "original": {
-        "owner": "yayuuu",
-        "repo": "hyprland-scroll-overview",
-        "rev": "cfc23b194ba9378d1606c7aa73060f6ffbe38445",
-        "type": "github"
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/WhySoBad/hyprland-preview-share-picker"
       }
     },
     "import-tree": {
@@ -340,7 +345,7 @@
         "dms": "dms",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
-        "hyprland-scroll-overview": "hyprland-scroll-overview",
+        "hyprland-preview-share-picker": "hyprland-preview-share-picker",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",

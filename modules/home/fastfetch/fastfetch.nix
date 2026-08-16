@@ -48,30 +48,35 @@
           }
           {
             type = "cpu";
-            key = "│ ├";
+            key = "├";
             showPeCoreCount = true;
             keyColor = accent;
           }
           {
             type = "gpu";
-            key = "│ ├";
+            key = "├";
             detectionMethod = "pci";
             format = "{name}";
             keyColor = accent;
           }
           {
             type = "display";
-            key = "│ ├󱄄";
+            key = "├󱄄";
             keyColor = accent;
           }
           {
             type = "memory";
-            key = "│ ├";
+            key = "├";
+            keyColor = accent;
+          }
+          {
+            type = "disk";
+            key = "├";
             keyColor = accent;
           }
           {
             type = "battery";
-            key = "└ └󰁹";
+            key = "└󰁹";
             keyColor = accent;
           }
           "break"
@@ -82,42 +87,42 @@
           }
           {
             type = "kernel";
-            key = "│ ├";
+            key = "├";
             keyColor = accent;
           }
           {
             type = "uptime";
-            key = "│ ├󱫐";
+            key = "├󱫐";
             keyColor = accent;
           }
           {
             type = "packages";
-            key = "│ ├󰏖";
+            key = "├󰏖";
             keyColor = accent;
           }
           {
             type = "shell";
-            key = "│ ├";
+            key = "├";
             keyColor = accent;
           }
           {
             type = "wm";
-            key = "│ ├";
+            key = "├";
             keyColor = accent;
           }
           {
             type = "theme";
-            key = "│ ├󰉼";
+            key = "├󰉼";
             keyColor = accent;
           }
           {
             type = "terminal";
-            key = "│ ├";
+            key = "├";
             keyColor = accent;
           }
           {
             type = "terminalfont";
-            key = "└ └";
+            key = "└";
             keyColor = accent;
           }
           "break"

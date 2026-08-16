@@ -9,9 +9,11 @@ set -euo pipefail
 nos_dir="${NOS_DIR:-$HOME/NixOS}"
 NOS_DIR="$nos_dir"
 # shellcheck source=modules/home/shell/scripts/nos-ui.sh
+# shellcheck disable=SC1091
 source "$nos_dir/modules/home/shell/scripts/nos-ui.sh"
 host_name=$(nos_host_name)
 apps_file="$nos_dir/hosts/$host_name/apps.nix"
+webapps_file="$nos_dir/hosts/$host_name/webapps.nix"
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Application List                                         │
@@ -46,6 +48,62 @@ current_apps() {
   sed -nE "s/^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_'-]*(\.[a-zA-Z_][a-zA-Z0-9_'-]*)*)[[:space:]]*$/\1/p" "$apps_file"
 }
 
+current_webapps() {
+  [[ -f "$webapps_file" ]] || return 0
+  python3 - "$webapps_file" <<'PY'
+import json
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text()
+pattern = re.compile(
+    r'^  \{\n'
+    r'    id = ("(?:\\.|[^"\\])*");\n'
+    r'    name = ("(?:\\.|[^"\\])*");\n'
+    r'    url = ("(?:\\.|[^"\\])*");\n',
+    re.MULTILINE,
+)
+for app_id, name, url in pattern.findall(text):
+    print("\t".join((json.loads(app_id), json.loads(name), json.loads(url))))
+PY
+}
+
+removable_apps() {
+  while IFS= read -r attr; do
+    printf 'package\t%s\t%s\n' "$attr" "$attr"
+  done < <(current_apps)
+
+  while IFS=$'\t' read -r app_id name _url; do
+    printf 'webapp\t%s\t%s [Web App]\n' "$app_id" "$name"
+  done < <(current_webapps)
+}
+
+remove_webapps() {
+  [[ -f "$webapps_file" ]] || return 0
+  python3 - "$webapps_file" "$@" <<'PY'
+import json
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+remove = set(sys.argv[2:])
+pattern = re.compile(
+    r'^  \{\n'
+    r'    id = ("(?:\\.|[^"\\])*");\n'
+    r'(?:    .*\n)*?'
+    r'  \}\n',
+    re.MULTILINE,
+)
+
+def keep_or_remove(match):
+    return "" if json.loads(match.group(1)) in remove else match.group(0)
+
+path.write_text(pattern.sub(keep_or_remove, path.read_text()))
+PY
+}
+
 # ╭──────────────────────────────────────────────────────────╮
 # │ Package Metadata                                         │
 # ╰──────────────────────────────────────────────────────────╯
@@ -61,6 +119,21 @@ package_preview() {
   else
     printf '%s' "$homepage"
   fi
+}
+
+removable_preview() {
+  local entry_type="$1" entry_id="$2" app_id _name url
+  if [[ "$entry_type" == package ]]; then
+    package_preview "$entry_id"
+    return
+  fi
+
+  while IFS=$'\t' read -r app_id _name url; do
+    if [[ "$app_id" == "$entry_id" ]]; then
+      printf 'Chromium web app\n\n%s\n' "$url"
+      return
+    fi
+  done < <(current_webapps)
 }
 
 # ╭──────────────────────────────────────────────────────────╮

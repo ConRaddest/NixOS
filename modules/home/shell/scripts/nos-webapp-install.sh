@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# Add Chromium web app to selected host configuration.
+set -euo pipefail
+
+# shellcheck source=modules/home/shell/scripts/nos-ui.sh
+# shellcheck disable=SC1091
+source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-ui.sh"
+
+nos_operation_terminal "webapp-install" "Install Web App" "$@"
+nos_wordmark "Installing Web App"
+
+host_name=$(nos_host_name)
+webapps_file="$NOS_DIR/hosts/$host_name/webapps.nix"
+[[ -f "$webapps_file" ]] || {
+  printf 'Web app configuration is missing: %s\n' "$webapps_file" >&2
+  exit 1
+}
+
+read -r -p 'Name> ' app_name
+read -r -p 'URL> ' app_url
+session_type=$(
+  printf '%s\n' 'Shared — global Chromium session' 'Private — isolated persistent session' \
+    | fzf --height=~20% --layout=reverse --no-multi --no-sort --prompt='Session> '
+) || exit 0
+if [[ "$session_type" == Private* ]]; then
+  app_private=true
+else
+  app_private=false
+fi
+
+[[ -n "$app_name" && -n "$app_url" ]] || {
+  printf 'Name and URL are required.\n' >&2
+  exit 1
+}
+[[ "$app_url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*:// ]] || app_url="https://$app_url"
+[[ "$app_url" =~ ^https?:// ]] || {
+  printf 'Only HTTP and HTTPS URLs are supported.\n' >&2
+  exit 1
+}
+
+app_id=$(printf '%s' "$app_name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')
+[[ -n "$app_id" ]] || app_id="webapp-$(date +%s)"
+base_id="$app_id"
+suffix=2
+while grep -Fq "id = \"$app_id\";" "$webapps_file"; do
+  app_id="$base_id-$suffix"
+  ((suffix += 1))
+done
+
+page_file=$(mktemp)
+icon_file=$(mktemp)
+cleanup() {
+  rm -f -- "$page_file" "$icon_file"
+}
+trap cleanup EXIT
+
+curl -fsSL --max-time 2 --user-agent 'Mozilla/5.0' "$app_url" 2>/dev/null \
+  | head -c 200000 > "$page_file" || true
+mapfile -t icon_candidates < <(
+  python3 - "$app_url" "$page_file" <<'PY'
+import sys
+from html.parser import HTMLParser
+from pathlib import Path
+from urllib.parse import urljoin, urlsplit, urlunsplit
+
+class Icons(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.icons = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() != "link":
+            return
+        values = dict(attrs)
+        rel = values.get("rel", "").lower()
+        href = values.get("href")
+        if href and "apple-touch-icon" in rel:
+            self.icons.append(href)
+
+url = sys.argv[1]
+parser = Icons()
+try:
+    parser.feed(Path(sys.argv[2]).read_text(errors="ignore")[:200000])
+except OSError:
+    pass
+for href in parser.icons:
+    candidate = urljoin(url, href)
+    if candidate.startswith(("http://", "https://")):
+        print(candidate)
+parts = urlsplit(url)
+origin = f"{parts.scheme}://{parts.netloc}"
+url_without_fragment = urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
+print(f"{origin}/apple-touch-icon.png")
+print(f"https://www.google.com/s2/favicons?domain={url_without_fragment}&sz=256")
+PY
+)
+
+icon_url=''
+for candidate in "${icon_candidates[@]}"; do
+  if curl -fsSL --max-time 10 --user-agent 'Mozilla/5.0' -o "$icon_file" "$candidate" 2>/dev/null \
+    && [[ -s "$icon_file" ]] \
+    && [[ $(file -b --mime-type "$icon_file") == image/* ]]; then
+    icon_url="$candidate"
+    break
+  fi
+done
+[[ -n "$icon_url" ]] || {
+  printf 'Could not find a usable site icon.\n' >&2
+  exit 1
+}
+icon_hash=$(nix hash file "$icon_file")
+
+python3 - "$webapps_file" "$app_id" "$app_name" "$app_url" "$app_private" "$icon_url" "$icon_hash" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+app_id, name, url, private, icon_url, icon_hash = sys.argv[2:]
+marker = "  # WEBAPPS"
+text = path.read_text()
+if marker not in text:
+    raise SystemExit(f"Web app marker is missing: {path}")
+q = json.dumps
+entry = (
+    "  {\n"
+    f"    id = {q(app_id)};\n"
+    f"    name = {q(name)};\n"
+    f"    url = {q(url)};\n"
+    f"    private = {private};\n"
+    f"    iconUrl = {q(icon_url)};\n"
+    f"    iconHash = {q(icon_hash)};\n"
+    "  }\n"
+)
+path.write_text(text.replace(marker, entry + marker, 1))
+PY
+
+nixfmt "$webapps_file"
+printf '\nAdded %s. Refreshing Home Manager...\n' "$app_name"
+nos-refresh

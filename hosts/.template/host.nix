@@ -21,7 +21,7 @@ let
     steam.enable = true;
     theme = {
       name = "tokyo-night";
-      wallpaper = "backgrounds/1-sunset-lake.png";
+      wallpaper = "backgrounds/0-winding-road.png";
     };
 
     boot = {

@@ -332,7 +332,7 @@
       xdg.desktopEntries = {
         windows-vm = {
           name = "Windows";
-          comment = "Launch Windows virtual machine";
+          comment = "Windows qemu virtual machine";
           exec = "windows-vm-start";
           icon = "windows";
           terminal = false;

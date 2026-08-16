@@ -1,13 +1,13 @@
 local configured_monitors = require("nix.monitors")
 
 local M = {}
-local monitor_workspaces = {}
-local workspace_scroll = {}
+local all_workspaces = {}
+local workspace_scroll
 local aspect_ratio_enabled = true
 
 local function assign_workspaces(monitor, workspaces)
-	monitor_workspaces[monitor] = workspaces
 	for _, workspace in ipairs(workspaces) do
+		table.insert(all_workspaces, workspace)
 		hl.workspace_rule({
 			workspace = tostring(workspace),
 			monitor = monitor,
@@ -23,12 +23,10 @@ function M.scroll_workspace(offset)
 		return
 	end
 
-	local workspaces = monitor_workspaces[monitor.name] or {}
-	local state = workspace_scroll[monitor.name]
-	local index = state and state.index
+	local index = workspace_scroll and workspace_scroll.index
 
 	if not index then
-		for current_index, id in ipairs(workspaces) do
+		for current_index, id in ipairs(all_workspaces) do
 			if id == monitor.active_workspace.id then
 				index = current_index
 				break
@@ -37,20 +35,19 @@ function M.scroll_workspace(offset)
 	end
 
 	local target_index = index and index + offset
-	local target = target_index and workspaces[target_index]
+	local target = target_index and all_workspaces[target_index]
 	if not target then
 		return
 	end
 
-	local generation = (state and state.generation or 0) + 1
-	workspace_scroll[monitor.name] = { index = target_index, generation = generation }
+	local generation = (workspace_scroll and workspace_scroll.generation or 0) + 1
+	workspace_scroll = { index = target_index, generation = generation }
 	hl.dispatch(hl.dsp.focus({ workspace = target }))
 
 	-- Continue fast wheel events from queued target, then resync with Hyprland.
 	hl.timer(function()
-		local current = workspace_scroll[monitor.name]
-		if current and current.generation == generation then
-			workspace_scroll[monitor.name] = nil
+		if workspace_scroll and workspace_scroll.generation == generation then
+			workspace_scroll = nil
 		end
 	end, { timeout = 180, type = "oneshot" })
 end
@@ -73,5 +70,7 @@ for _, monitor in ipairs(configured_monitors) do
 		scale = monitor.scale,
 	})
 end
+
+table.sort(all_workspaces)
 
 return M

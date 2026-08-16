@@ -87,7 +87,7 @@
           "hypr/nix/input.lua" = {
             text =
               lib.optionalString config.nos.trackpad ''
-                hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
+                hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
               ''
               + lib.optionalString (config.nos.trackpadName != null) ''
                 hl.device({

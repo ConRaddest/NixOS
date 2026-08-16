@@ -23,7 +23,7 @@
           export NOS_ZONE_TAB_FILE="${pkgs.tzdata}/share/zoneinfo/zone1970.tab"
           export NOS_ACCENT_COLOR=${lib.escapeShellArg colors.accent}
           export FZF_DEFAULT_OPTS=${lib.escapeShellArg config.home.sessionVariables.FZF_DEFAULT_OPTS}
-          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.nix-search}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:${pkgs.python3}/bin:$PATH"
+          export PATH="${pkgs.home-manager}/bin:${pkgs.nixfmt}/bin:${pkgs.nix-search}/bin:${pkgs.jq}/bin:${pkgs.findutils}/bin:${pkgs.git}/bin:${pkgs.mkpasswd}/bin:${pkgs.fzf}/bin:${pkgs.python3}/bin:${pkgs.curl}/bin:${pkgs.file}/bin:$PATH"
           exec ${pkgs.bash}/bin/bash ${script} "$@"
         '';
 
@@ -34,6 +34,7 @@
       nos-update = mkNosScript "nos-update" "${self}/modules/system/scripts/nos-update.sh";
       nos-install = mkNosScript "nos-install" "${scriptDirectory}/nos-install.sh";
       nos-remove = mkNosScript "nos-remove" "${scriptDirectory}/nos-remove.sh";
+      nos-webapp-install = mkNosScript "nos-webapp-install" "${scriptDirectory}/nos-webapp-install.sh";
       nos-iso-install = pkgs.writeShellScriptBin "nos-iso-install" ''
         export QEMU_FIRMWARE_DIR="${pkgs.qemu}/share/qemu"
         export PATH="/run/wrappers/bin:${
@@ -66,6 +67,7 @@
         nos-update
         nos-install
         nos-remove
+        nos-webapp-install
         nos-iso-install
         nos-iso-boot
         nos-new-host
