@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import qs
 import "widgets/datetime"
 
 Variants {
@@ -9,8 +10,6 @@ Variants {
   PanelWindow {
     required property var modelData
 
-    screen: modelData
-    color: "transparent"
     implicitHeight: 30
 
     anchors {
@@ -21,12 +20,20 @@ Variants {
 
     Rectangle {
       anchors.fill: parent
-      color: "#1a1b26"
+      color: Colors.background
 
       RowLayout {
         anchors.fill: parent
         anchors.leftMargin: 12
         anchors.rightMargin: 12
+
+        Datetime {}
+
+        Item {
+          Layout.fillWidth: true
+        }
+
+        Datetime {}
 
         Item {
           Layout.fillWidth: true
