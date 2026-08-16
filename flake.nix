@@ -40,12 +40,7 @@
         imports = [
           (inputs.import-tree ./modules/system)
           (inputs.import-tree ./modules/home)
-          (
-            (inputs.import-tree.filterNot (
-              path: lib.hasSuffix "/apps.nix" path || lib.hasInfix "/.template/" path
-            ))
-            ./hosts
-          )
+          ((inputs.import-tree.filterNot (path: lib.hasSuffix "/apps.nix" path)) ./hosts)
         ];
 
         options.flake = {

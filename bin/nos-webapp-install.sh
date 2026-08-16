@@ -18,8 +18,8 @@ apps_file="$NOS_DIR/hosts/$host_name/apps.nix"
   exit 1
 }
 
-read -r -p 'Name> ' app_name
-read -r -p 'URL> ' app_url
+read -r -p 'Web App Name: ' app_name
+read -r -p 'Web App URL: ' app_url
 session_type=$(
   printf '%s\n' 'Shared — global Chromium session' 'Private — isolated persistent session' \
     | fzf --height=~20% --layout=reverse --no-multi --no-sort --prompt='Session> '
@@ -139,4 +139,4 @@ PY
 
 nixfmt "$apps_file"
 printf '\nAdded %s. Refreshing Home Manager...\n' "$app_name"
-nos refresh
+nos switch

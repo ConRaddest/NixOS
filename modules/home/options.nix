@@ -42,12 +42,6 @@
           default = [ ];
           description = "Chromium web applications declared with host packages.";
         };
-
-        development.mutableConfig = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Use mutable config sources from nos.flakeDirectory instead of immutable Nix store sources.";
-        };
       };
     };
 }

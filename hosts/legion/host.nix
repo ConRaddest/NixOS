@@ -1,6 +1,5 @@
 {
   inputs,
-  lib,
   self,
   ...
 }:
@@ -17,22 +16,6 @@ let
     initialHashedPassword = null;
     steam.enable = true;
 
-    features = {
-      audio = true;
-      battery = true;
-      bluetooth = true;
-      docker = true;
-      onepassword = true;
-      printing = true;
-      steam = true;
-      windows = true;
-      graphics = {
-        primary = "nvidia";
-        integrated = null;
-      };
-    };
-
-    development.mutableConfig = false;
     trackpad = {
       enable = true;
       name = "msft0001:01-06cb:cd5f-touchpad";
@@ -46,13 +29,6 @@ let
     boot = {
       mode = "uefi";
       device = null;
-    };
-
-    hardware = {
-      deepSleep = true;
-      thermald = true;
-      nvidiaOpen = false;
-      nvidiaPrime = null;
     };
 
     git = {
@@ -109,8 +85,10 @@ let
       }
     ];
 
-    firefoxProfilePath = "td4m60gg.default";
-    firefoxCertificatePath = "/home/cdt/.local/share/mkcert/rootCA.pem";
+    firefox = {
+      profilePath = "td4m60gg.default";
+      certificatePath = "/home/cdt/.local/share/mkcert/rootCA.pem";
+    };
 
     windows = {
       timeZone = "Africa/Johannesburg";
@@ -149,39 +127,10 @@ let
     config.allowUnfree = true;
   };
 
-  optionalHomeModules =
-    with self.lib.homeModules;
-    lib.optionals host.features.audio [ audio ]
-    ++ lib.optionals host.features.battery [ battery ]
-    ++ lib.optionals host.features.bluetooth [ bluetooth ]
-    ++ lib.optionals host.features.docker [ lazydocker ]
-    ++ lib.optionals host.features.onepassword [ ssh ]
-    ++ lib.optionals host.features.steam [ steam ]
-    ++ lib.optionals host.features.windows [ windows ];
-
-  graphicsModules =
-    if host.features.graphics.primary == "none" then
-      [ ]
-    else
-      [ self.nixosModules.${host.features.graphics.primary} ]
-      ++ lib.optionals (
-        host.features.graphics.primary == "nvidia" && host.features.graphics.integrated != null
-      ) [ self.nixosModules.${host.features.graphics.integrated} ];
-
-  optionalSystemModules =
-    graphicsModules
-    ++ lib.optionals host.features.audio [ self.nixosModules.audio ]
-    ++ lib.optionals host.features.battery [ self.nixosModules.battery ]
-    ++ lib.optionals host.features.bluetooth [ self.nixosModules.bluetooth ]
-    ++ lib.optionals host.features.docker [ self.nixosModules.docker ]
-    ++ lib.optionals host.features.onepassword [ self.nixosModules.onepassword ]
-    ++ lib.optionals host.features.printing [ self.nixosModules.printing ]
-    ++ lib.optionals host.features.steam [ self.nixosModules.steam ];
-
   homeConfig = {
     imports = [
       self.lib.homeModules.options
-      self.lib.homeModules.bin
+      self.lib.homeModules.nos
       self.lib.homeModules.terminal
       self.lib.homeModules.appearance
       self.lib.homeModules.theme
@@ -207,8 +156,14 @@ let
       self.lib.homeModules.screen-share-picker
       self.lib.homeModules.screensaver
       self.lib.homeModules.voxtype
-    ]
-    ++ optionalHomeModules;
+      self.lib.homeModules.audio
+      self.lib.homeModules.battery
+      self.lib.homeModules.bluetooth
+      self.lib.homeModules.lazydocker
+      self.lib.homeModules.ssh
+      self.lib.homeModules.steam
+      self.lib.homeModules.windows
+    ];
 
     config = {
       _module.args = { inherit font; };
@@ -218,7 +173,6 @@ let
         flakeDirectory = host.flakeDirectory;
         trackpad = host.trackpad.enable;
         trackpadName = host.trackpad.name;
-        development.mutableConfig = host.development.mutableConfig;
       };
 
       home = {
@@ -246,11 +200,18 @@ let
         self.nixosModules.vscode
         self.nixosModules.hyprland
         self.nixosModules.portals
-      ]
-      ++ optionalSystemModules;
+        self.nixosModules.nvidia
+        self.nixosModules.audio
+        self.nixosModules.battery
+        self.nixosModules.bluetooth
+        self.nixosModules.docker
+        self.nixosModules.onepassword
+        self.nixosModules.printing
+        self.nixosModules.steam
+      ];
 
       nos = {
-        inherit (host) boot hardware;
+        inherit (host) boot;
       };
 
       networking.hostName = hostName;

@@ -22,14 +22,14 @@
           format = "$directory$character";
 
           directory = {
-            format = "[$path](${theme.bright_cyan}) ";
+            format = "[$path](${theme.accent}) ";
             truncation_length = 3;
             truncation_symbol = "…/";
           };
 
           character = {
-            success_symbol = "[❯](bold ${theme.bright_cyan})";
-            error_symbol = "[❯](bold ${theme.bright_cyan})";
+            success_symbol = "[❯](bold ${theme.accent})";
+            error_symbol = "[❯](bold ${theme.accent})";
           };
         };
       };

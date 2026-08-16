@@ -2,12 +2,7 @@
 
 {
   flake.nixosModules.battery =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { pkgs, ... }:
 
     let
       setPowerProfile = pkgs.writeShellScript "set-power-profile" ''
@@ -40,12 +35,12 @@
       '';
     in
     {
-      boot.kernelParams = lib.optional config.nos.hardware.deepSleep "mem_sleep_default=deep";
+      boot.kernelParams = [ "mem_sleep_default=deep" ];
 
       services = {
         power-profiles-daemon.enable = true;
         upower.enable = true;
-        thermald.enable = config.nos.hardware.thermald;
+        thermald.enable = true;
 
         # Hyprland owns power-key and lid-switch handling.
         logind.settings.Login = {

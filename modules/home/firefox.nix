@@ -30,12 +30,12 @@
         enable = true;
         package = pkgs.firefox;
         policies.Certificates.Install = lib.optional (
-          host.firefoxCertificatePath != null
-        ) host.firefoxCertificatePath;
+          host.firefox.certificatePath != null
+        ) host.firefox.certificatePath;
         profiles.default = {
           id = 0;
           isDefault = true;
-          path = host.firefoxProfilePath;
+          path = host.firefox.profilePath;
           settings = {
             "media.webrtc.pipewire.enabled" = true;
             "widget.gtk.libadwaita-colors.enabled" = false;

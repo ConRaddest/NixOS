@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.lib.homeModules.bin =
+  flake.lib.homeModules.nos =
     {
       self,
       config,
@@ -29,10 +29,10 @@
       ];
       commands = {
 
-        build = {
-          route = [ "build" ];
-          script = "nos-build.sh";
-          summary = "Build and activate NixOS configuration";
+        rebuild = {
+          route = [ "rebuild" ];
+          script = "nos-rebuild.sh";
+          summary = "Rebuild and activate NixOS configuration";
           runtimeInputs = commonInputs ++ [
             pkgs.nix
             pkgs.nixfmt
@@ -51,9 +51,9 @@
             pkgs.uwsm
           ];
         };
-        refresh = {
-          route = [ "refresh" ];
-          script = "nos-refresh.sh";
+        switch = {
+          route = [ "switch" ];
+          script = "nos-switch.sh";
           summary = "Build and activate Home Manager configuration";
           runtimeInputs = commonInputs ++ [
             pkgs.nix
@@ -109,21 +109,6 @@
               python3
             ]);
         };
-        iso-install = {
-          route = [ "iso-install" ];
-          script = "nos-iso-install.sh";
-          summary = "Boot installer ISO in QEMU with physical target disk";
-          runtimeInputs =
-            commonInputs
-            ++ (with pkgs; [
-              acl
-              qemu
-            ]);
-          environment = ''
-            export QEMU_FIRMWARE_DIR="${pkgs.qemu}/share/qemu"
-            export PATH="/run/wrappers/bin:$PATH"
-          '';
-        };
         iso-boot = {
           route = [ "iso-boot" ];
           script = "nos-iso-boot.sh";
@@ -139,34 +124,6 @@
             export PATH="/run/wrappers/bin:$PATH"
           '';
         };
-        new-host = {
-          route = [
-            "host"
-            "new"
-          ];
-          script = "nos-new-host.sh";
-          summary = "Create host configuration from detected hardware";
-          runtimeInputs =
-            commonInputs
-            ++ (with pkgs; [
-              fzf
-              gawk
-              glibcLocales
-              gnugrep
-              inetutils
-              mkpasswd
-              nix
-              nixfmt
-              nixos-install-tools
-              systemd
-              xkeyboard_config
-            ]);
-          environment = ''
-            export NOS_LOCALES_FILE="${pkgs.glibcLocales}/share/i18n/SUPPORTED"
-            export NOS_XKB_RULES_FILE="${pkgs.xkeyboard_config}/share/xkeyboard-config-2/rules/base.lst"
-            export NOS_ZONE_TAB_FILE="${pkgs.tzdata}/share/zoneinfo/zone1970.tab"
-          '';
-        };
       };
 
       commandMetadata = lib.mapAttrs (name: command: {
@@ -175,7 +132,6 @@
         command = lib.concatStringsSep " " ([ "nos" ] ++ command.route);
       }) commands;
 
-      topLevelCommands = removeAttrs commands [ "new-host" ];
       commandRuntimeInputs = lib.unique (
         lib.concatMap (command: command.runtimeInputs) (lib.attrValues commands)
       );
@@ -222,19 +178,9 @@
           fi
           shift
 
-          if [[ "$command" == "host" ]]; then
-            subcommand="''${1:-}"
-            [[ -n "$subcommand" ]] && shift
-            if [[ "$subcommand" == "new" ]]; then
-              ${commandBody commands.new-host}
-            fi
-            printf 'Unknown nos host command: %s\n' "$subcommand" >&2
-            exit 2
-          fi
-
           case "$command" in
           ${lib.concatStringsSep "\n" (
-            lib.mapAttrsToList (name: command: "  ${name}) ${commandBody command} ;;") topLevelCommands
+            lib.mapAttrsToList (name: command: "  ${name}) ${commandBody command} ;;") commands
           )}
             *)
               printf 'Unknown nos command: %s\n\n' "$command" >&2

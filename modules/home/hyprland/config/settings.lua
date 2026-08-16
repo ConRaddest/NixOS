@@ -15,10 +15,9 @@ hl.config({
 	},
 	decoration = {
 		rounding = 0,
-		active_opacity = 0.97,
-		inactive_opacity = 0.96,
-		-- fullscreen_opacity = 0.99,
-		blur = { enabled = true, passes = 4, size = 4, xray = true },
+		active_opacity = 0.95,
+		inactive_opacity = 0.92,
+		blur = { enabled = true, passes = 3, size = 3, xray = true },
 		shadow = {
 			enabled = true,
 			range = 20,

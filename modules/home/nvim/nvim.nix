@@ -18,6 +18,10 @@
           pkgs.writeText "neovim-theme.lua" "return {}";
       plugins = pkgs.linkFarm "neovim-plugins" [
         {
+          name = "snacks.lua";
+          path = ./lua/plugins/snacks.lua;
+        }
+        {
           name = "theme.lua";
           path = themePlugin;
         }

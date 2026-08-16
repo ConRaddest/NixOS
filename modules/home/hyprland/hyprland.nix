@@ -36,18 +36,12 @@
           workspaces = { ${lib.concatMapStringsSep ", " toString monitor.workspaces} },
         }
       '';
-      configSource =
-        storeSource: checkoutPath:
-        if config.nos.development.mutableConfig then
-          config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/${checkoutPath}"
-        else
-          storeSource;
     in
     {
       assertions = [
         {
-          assertion = !config.nos.development.mutableConfig || config.nos.flakeDirectory != null;
-          message = "nos.development.mutableConfig requires nos.flakeDirectory.";
+          assertion = config.nos.flakeDirectory != null;
+          message = "Hyprland config symlinks require nos.flakeDirectory.";
         }
       ];
 
@@ -74,10 +68,10 @@
       xdg = {
         configFile = {
           "hypr/hyprland.lua" = {
-            source = configSource ./hyprland.lua "modules/home/hyprland/hyprland.lua";
+            source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
           };
           "hypr/config" = {
-            source = configSource ./config "modules/home/hyprland/config";
+            source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/config";
           };
           "hypr/nix/colors.lua" = {
             source = pkgs.replaceVars ./colors.lua {
@@ -139,18 +133,42 @@
         };
       };
 
-      systemd.user.services.nos-hyprpolkitagent = {
-        Unit = {
-          Description = "Hyprland Polkit Agent";
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
-          ConditionEnvironment = "XDG_CURRENT_DESKTOP=Hyprland";
+      systemd.user = {
+        paths.hyprland-config-reload = {
+          Unit.Description = "Watch mutable Hyprland configuration";
+          Path = {
+            PathChanged = [
+              "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua"
+              "${config.nos.flakeDirectory}/modules/home/hyprland/config"
+            ];
+            Unit = "hyprland-config-reload.service";
+          };
+          Install.WantedBy = [ "graphical-session.target" ];
         };
-        Service = {
-          ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
-          Restart = "on-failure";
+
+        services = {
+          hyprland-config-reload = {
+            Unit.Description = "Reload Hyprland configuration";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.hyprland}/bin/hyprctl reload";
+            };
+          };
+
+          nos-hyprpolkitagent = {
+            Unit = {
+              Description = "Hyprland Polkit Agent";
+              PartOf = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+              ConditionEnvironment = "XDG_CURRENT_DESKTOP=Hyprland";
+            };
+            Service = {
+              ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
+              Restart = "on-failure";
+            };
+            Install.WantedBy = [ "graphical-session.target" ];
+          };
         };
-        Install.WantedBy = [ "graphical-session.target" ];
       };
     };
 }

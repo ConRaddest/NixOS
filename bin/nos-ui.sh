@@ -73,7 +73,7 @@ nos_operation_terminal() {
   shift 2
 
   # Reuse an existing Kitty terminal for nested operations such as
-  # `nos install` -> `nos refresh`, then return to calling interface.
+  # `nos install` -> `nos switch`, then return to calling interface.
   if [[ -n "${NOS_OPERATION_TERMINAL:-}" || -n "${KITTY_WINDOW_ID:-}" ]]; then
     return 0
   fi
@@ -92,7 +92,7 @@ nos_operation_terminal() {
 nos_operation_lock() {
   local lock_dir
 
-  # Nested commands such as `nos install` -> `nos refresh` share parent lock.
+  # Nested commands such as `nos install` -> `nos switch` share parent lock.
   [[ -z "${NOS_OPERATION_LOCK_FD:-}" ]] || return 0
 
   lock_dir="${XDG_RUNTIME_DIR:-/tmp/nos-$UID}/nos"

@@ -59,10 +59,10 @@
           hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("${voxtype} record toggle"), {
             desc = "Toggle dictation",
           })
-          hl.bind("Print", hl.dsp.exec_cmd("${voxtype} record start"), {
+          hl.bind("F9", hl.dsp.exec_cmd("${voxtype} record start"), {
             desc = "Start dictation",
           })
-          hl.bind("Print", hl.dsp.exec_cmd("${voxtype} record stop"), {
+          hl.bind("F9", hl.dsp.exec_cmd("${voxtype} record stop"), {
             desc = "Stop dictation",
             release = true,
           })

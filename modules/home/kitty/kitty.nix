@@ -43,9 +43,9 @@
         package = kittyWithoutSystemdScopes;
 
         keybindings = {
+          "super+c" = "copy_to_clipboard";
+          "super+v" = "paste_from_clipboard";
           "shift+delete" = "copy_to_clipboard";
-          "ctrl+insert" = "copy_to_clipboard";
-          "shift+insert" = "paste_from_clipboard";
           "ctrl+shift+f12" = "new_os_window_with_cwd";
         };
 

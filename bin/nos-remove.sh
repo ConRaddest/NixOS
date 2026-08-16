@@ -3,8 +3,8 @@
 set -euo pipefail
 
 export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
-# shellcheck source=bin/nos-apps.sh
-source "$NOS_RUNTIME_DIR/nos-apps.sh"
+# shellcheck source=bin/nos-packages.sh
+source "$NOS_RUNTIME_DIR/nos-packages.sh"
 nos_operation_lock
 
 nos_wordmark "Removing Applications"
@@ -30,7 +30,7 @@ fzf_args=(
   --multi
   --delimiter $'\t'
   --with-nth 3
-  --preview 'bash -lc '\''source "$NOS_RUNTIME_DIR/nos-apps.sh"; removable_preview "$1" "$2"'\'' _ {1} {2}'
+  --preview 'bash -lc '\''source "$NOS_RUNTIME_DIR/nos-packages.sh"; removable_preview "$1" "$2"'\'' _ {1} {2}'
   --preview-label='Tab: Select · Enter: Remove · Alt-P: Preview · Alt-J/K: Scroll'
   --preview-label-pos='bottom'
   --preview-window 'down:35%:wrap'
@@ -58,8 +58,8 @@ while true; do
   fi
   ((${#webapp_ids[@]} == 0)) || remove_webapps "${webapp_ids[@]}"
 
-  if ! nos refresh; then
-    printf '\nRemove refresh failed.\n'
+  if ! nos switch; then
+    printf '\nRemove switch failed.\n'
     exit 1
   fi
 

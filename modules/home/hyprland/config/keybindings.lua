@@ -132,9 +132,9 @@ local screenshot_command = "mkdir -p ~/Screenshots && "
 	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
 bind("SUPER + SHIFT + S", "Capture screen region", hl.dsp.exec_cmd(screenshot_command))
 
-bind("SUPER + SHIFT + B", "Build system configuration", hl.dsp.exec_cmd("uwsm app -- nos build"))
-bind("SUPER + SHIFT + U", "Update system configuration", hl.dsp.exec_cmd("uwsm app -- nos update"))
-bind("SUPER + SHIFT + R", "Refresh Home Manager", hl.dsp.exec_cmd("uwsm app -- nos refresh"))
+bind("SUPER + SHIFT + B", "Rebuild system configuration", open_terminal("nos-command-rebuild", "nos rebuild", true))
+bind("SUPER + SHIFT + U", "Update system configuration", open_terminal("nos-command-update", "nos update", true))
+bind("SUPER + SHIFT + R", "Switch Home Manager configuration", open_terminal("nos-command-switch", "nos switch", true))
 bind("SUPER + SHIFT + I", "Install Nix package", open_terminal("nos-command-install", "nos install", true))
 bind("SUPER + SHIFT + X", "Remove Nix package", open_terminal("nos-command-remove", "nos remove", true))
 
