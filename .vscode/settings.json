@@ -9,16 +9,16 @@
   "Lua.workspace.library": [
     "${workspaceFolder}/.vscode/hl.meta.lua"
   ],
-  "qt-qml.qmlls.enabled": true,
-  "qt-qml.qmlls.customExePath": "${workspaceFolder}/bin/qmlls-quickshell",
-  "qt-qml.qmlls.additionalImportPaths": [
-    "/etc/profiles/per-user/cdt/lib/qt-6/qml",
-    "${workspaceFolder}/shell"
-  ],
-  "qt-qml.qmlls.useNoCMakeCalls": true,
-  "[qml]": {
-    "editor.defaultFormatter": "theqtcompany.qt-qml",
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": true
-  }
+  // // "qt-qml.qmlls.enabled": true,
+  // "qt-qml.qmlls.customExePath": "${workspaceFolder}/bin/qmlls-quickshell",
+  // "qt-qml.qmlls.additionalImportPaths": [
+  //   "/etc/profiles/per-user/cdt/lib/qt-6/qml",
+  //   "${workspaceFolder}/shell"
+  // ],
+  // "qt-qml.qmlls.useNoCMakeCalls": true,
+  // "[qml]": {
+  //   "editor.defaultFormatter": "theqtcompany.qt-qml",
+  //   "editor.formatOnSave": true,
+  //   "editor.formatOnPaste": false
+  // }
 }

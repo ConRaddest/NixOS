@@ -13,6 +13,12 @@
 
     let
       cfg = config.nos.theme;
+      flakeDirectory = config.nos.flakeDirectory;
+      shellDirectory =
+        if flakeDirectory == null then
+          "${config.home.homeDirectory}/NixOS/shell"
+        else
+          "${flakeDirectory}/shell";
       themeDirectory = "${self}/themes/${cfg.name}";
       colorsFile = "${themeDirectory}/colors.toml";
       backgroundsDirectory = "${themeDirectory}/backgrounds";
@@ -59,6 +65,24 @@
         "selection_foreground"
       ];
       canonicalColors = map (name: colors.${name} or null) canonicalColorNames;
+      quickshellColors = removeAttrs colors [ "mode" ];
+      quickshellColorsQml = lib.concatStringsSep "\n" (
+        [
+          "pragma Singleton"
+          ""
+          "import QtQuick"
+          ""
+          "QtObject {"
+          "  readonly property string mode: ${builtins.toJSON mode}"
+        ]
+        ++ lib.mapAttrsToList (
+          name: value: "  readonly property color ${name}: ${builtins.toJSON value}"
+        ) quickshellColors
+        ++ [
+          "}"
+          ""
+        ]
+      );
 
       palette = {
         base00 = colors.background;
@@ -139,6 +163,10 @@
       config = {
         assertions = [
           {
+            assertion = flakeDirectory != null;
+            message = "nos.flakeDirectory must be set for Quickshell development.";
+          }
+          {
             assertion = builtins.pathExists colorsFile;
             message = "Theme ${cfg.name} must provide themes/${cfg.name}/colors.toml.";
           }
@@ -215,7 +243,35 @@
           };
         };
 
-        home.file = builtins.listToAttrs (
+        home.packages = [
+          (pkgs.writeShellScriptBin "nos-shell" ''
+            set -euo pipefail
+            shell_directory=${lib.escapeShellArg shellDirectory}
+
+            if [[ ! -f "$shell_directory/shell.qml" ]]; then
+              printf 'Quickshell config not found: %s\n' "$shell_directory" >&2
+              exit 1
+            fi
+
+            exec ${pkgs.quickshell}/bin/qs -p "$shell_directory" "$@"
+          '')
+        ];
+
+        # Make generated singleton visible in mutable source tree. Quickshell can
+        # hot reload source files, while qmlls gets active theme color metadata.
+        home.activation.linkQuickshellColors = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          shell_directory=${lib.escapeShellArg shellDirectory}
+          if [[ -d "$shell_directory" ]]; then
+            run ln -sfn \
+              "$HOME/.local/share/nixos-shell/Colors.qml" \
+              "$shell_directory/Colors.qml"
+          fi
+        '';
+
+        home.file = {
+          ".local/share/nixos-shell/Colors.qml".text = quickshellColorsQml;
+        }
+        // builtins.listToAttrs (
           map (name: {
             name = "Pictures/Wallpapers/${cfg.name}/${name}";
             value = {
@@ -224,6 +280,7 @@
             };
           }) backgroundFiles
         );
+
       };
     };
 }
