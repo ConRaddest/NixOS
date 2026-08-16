@@ -83,4 +83,3 @@ log-file: /dev/null
 input-file: ""
 output-file: ""
 
-max-cores: @maxCores@
