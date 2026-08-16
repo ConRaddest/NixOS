@@ -29,8 +29,10 @@ start
 ## Repository structure
 
 ```text
+bin/                    NOS command and helper scripts
+docs/                   architecture and runtime contracts
 hosts/
-├── _template/          template used for new machines
+├── .template/          template used for new machines
 └── <hostname>/
     ├── host.nix        machine and user settings
     ├── hardware.nix    generated hardware configuration
@@ -39,7 +41,11 @@ hosts/
 modules/
 ├── home/               Home Manager modules
 └── system/             NixOS modules
+
+tests/                  script and future integration tests
 ```
+
+Architecture contracts live in `docs/architecture.md`, `docs/command-contract.md`, and `docs/state-layout.md`.
 
 Each host exports:
 
@@ -71,7 +77,7 @@ cd NixOS
 ### 2. Create host configuration
 
 ```bash
-./modules/system/scripts/nos-new-host.sh --root /mnt
+./bin/nos-new-host.sh --root /mnt
 ```
 
 Wizard asks for:
@@ -185,7 +191,7 @@ nix shell nixpkgs#mkpasswd nixpkgs#fzf
 ### 3. Create host
 
 ```bash
-./modules/system/scripts/nos-new-host.sh
+./bin/nos-new-host.sh
 ```
 
 Important choices:
@@ -463,20 +469,20 @@ Evaluate without building:
 nix flake check --no-build
 ```
 
-Checks cover Nix formatting, Deadnix, Statix, ShellCheck, every exported NixOS configuration, and every exported Home Manager configuration. Host checks are generated from flake outputs, so newly exported hosts are included automatically. `.github/workflows/check.yml` runs the same suite for pushes to `main` and pull requests.
+Checks cover Nix formatting, Deadnix, Statix, ShellCheck, NOS command contracts, every exported NixOS configuration, and every exported Home Manager configuration. Host checks are generated from flake outputs, so newly exported hosts are included automatically. `.github/workflows/check.yml` runs the same suite for pushes to `main` and pull requests.
 
 ## Common commands
 
 ### Build and apply system plus Home Manager
 
 ```bash
-nos-build
+nos build
 ```
 
 ### Apply Home Manager only
 
 ```bash
-nos-refresh
+nos refresh
 ```
 
 Management commands reject untracked Nix files, format only changed Nix files, build before activation, and never stage repository changes. Failed refreshes, package edits, and input updates restore files to their pre-command state. System builds create a persistent NixOS generation before activation and require sudo authentication.
@@ -484,14 +490,16 @@ Management commands reject untracked Nix files, format only changed Nix files, b
 ### Update flake inputs and rebuild
 
 ```bash
-nos-update
+nos update
 ```
 
 ### Add another host
 
 ```bash
-nos-new-host
+nos host new
 ```
+
+Direct `nos-*` command names remain available as compatibility aliases.
 
 ### List outputs
 

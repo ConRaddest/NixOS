@@ -86,6 +86,27 @@ nos_operation_terminal() {
 }
 
 # ╭──────────────────────────────────────────────────────────╮
+# │ Operation Lock                                           │
+# ╰──────────────────────────────────────────────────────────╯
+
+nos_operation_lock() {
+  local lock_dir
+
+  # Nested commands such as nos-install -> nos-refresh share parent lock.
+  [[ -z "${NOS_OPERATION_LOCK_FD:-}" ]] || return 0
+
+  lock_dir="${XDG_RUNTIME_DIR:-/tmp/nos-$UID}/nos"
+  mkdir -p -- "$lock_dir"
+  exec {NOS_OPERATION_LOCK_FD}>"$lock_dir/operation.lock"
+  export NOS_OPERATION_LOCK_FD
+
+  if ! flock -n "$NOS_OPERATION_LOCK_FD"; then
+    printf 'Another NOS operation is already running.\n' >&2
+    return 1
+  fi
+}
+
+# ╭──────────────────────────────────────────────────────────╮
 # │ Host Selection                                           │
 # ╰──────────────────────────────────────────────────────────╯
 

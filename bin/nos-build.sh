@@ -1,27 +1,32 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# shellcheck source=modules/home/shell/scripts/nos-ui.sh
-source "$NOS_DIR/modules/home/shell/scripts/nos-ui.sh"
+export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+# shellcheck source=bin/nos-ui.sh
+source "$NOS_RUNTIME_DIR/nos-ui.sh"
 
-nos_operation_terminal "update" "NixOS Update" "$@"
+nos_operation_terminal "build" "NixOS Build" "$@"
+nos_operation_lock
 
-run_update() {
+nix_opts=(--option warn-dirty false)
+if [[ "${1:-}" == "--offline" ]]; then
+  nix_opts+=(--option substitute false)
+fi
+
+run_build() {
   local host_name result system_path
   local -a changed_files=()
 
-  nos_wordmark "Updating System Configuration" || return
+  nos_wordmark "Rebuilding System Configuration" || return
   host_name=$(nos_host_name) || return
   nos_require_tracked_nix_files || return
   mapfile -d '' -t changed_files < <(nos_changed_nix_files)
-  [[ ! -f "$NOS_DIR/flake.lock" ]] || changed_files+=("flake.lock")
   nos_transaction_begin "${changed_files[@]}"
   trap nos_transaction_restore EXIT
 
   nos_format_changed_nix || return
-  nos_run nix flake update --flake "$NOS_DIR" || return
   result="$NOS_TRANSACTION_DIR/system"
-  nos_run nix build --out-link "$result" \
+  nos_run nix build "${nix_opts[@]}" --out-link "$result" \
     "$NOS_DIR#nixosConfigurations.$host_name.config.system.build.toplevel" || return
   system_path=$(readlink -f "$result") || return
   nos_run sudo nix-env \
@@ -33,4 +38,4 @@ run_update() {
   trap - EXIT
 }
 
-run_update
+run_build

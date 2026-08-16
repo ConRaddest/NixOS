@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# shellcheck source=modules/home/shell/scripts/nos-ui.sh
-source "$NOS_DIR/modules/home/shell/scripts/nos-ui.sh"
+export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+# shellcheck source=bin/nos-ui.sh
+source "$NOS_RUNTIME_DIR/nos-ui.sh"
 
 nos_operation_terminal "refresh" "Home Manager Refresh" "$@"
+nos_operation_lock
 
 nix_opts=(--option warn-dirty false)
 if [[ "${1:-}" == "--offline" ]]; then

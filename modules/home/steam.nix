@@ -14,10 +14,6 @@
         name = "steam-launcher";
         runtimeInputs = [ pkgs.steam ];
         text = ''
-          # DMS runs as a Qt systemd service. Do not leak its Qt/Wayland
-          # environment into Steam's older X11 UI and embedded browser.
-          unset NIXOS_OZONE_WL QT_PLUGIN_PATH QT_QPA_PLATFORM
-          unset QT_QPA_PLATFORMTHEME QT_QPA_PLATFORMTHEME_QT6
           export GDK_BACKEND=x11
           exec steam "$@"
         '';
@@ -28,7 +24,7 @@
 
       xdg.desktopEntries.steam = {
         name = "Steam";
-        comment = "Application for managing and playing games on Steam";
+        comment = "Application for managing and playing games";
         exec = "steam-launcher %U";
         icon = "steam";
         type = "Application";

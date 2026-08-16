@@ -8,9 +8,10 @@ set -euo pipefail
 
 nos_dir="${NOS_DIR:-$HOME/NixOS}"
 NOS_DIR="$nos_dir"
-# shellcheck source=modules/home/shell/scripts/nos-ui.sh
+export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+# shellcheck source=bin/nos-ui.sh
 # shellcheck disable=SC1091
-source "$nos_dir/modules/home/shell/scripts/nos-ui.sh"
+source "$NOS_RUNTIME_DIR/nos-ui.sh"
 host_name=$(nos_host_name)
 apps_file="$nos_dir/hosts/$host_name/apps.nix"
 webapps_file="$nos_dir/hosts/$host_name/webapps.nix"

@@ -2,8 +2,10 @@
 # Remove packages from the selected host application list.
 set -euo pipefail
 
-# shellcheck source=modules/home/shell/scripts/nos-apps.sh
-source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-apps.sh"
+export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+# shellcheck source=bin/nos-apps.sh
+source "$NOS_RUNTIME_DIR/nos-apps.sh"
+nos_operation_lock
 
 nos_wordmark "Removing Applications"
 
@@ -31,7 +33,7 @@ fzf_args=(
   --multi
   --delimiter $'\t'
   --with-nth 3
-  --preview 'bash -lc '\''source "$NOS_DIR/modules/home/shell/scripts/nos-apps.sh"; removable_preview "$1" "$2"'\'' _ {1} {2}'
+  --preview 'bash -lc '\''source "$NOS_RUNTIME_DIR/nos-apps.sh"; removable_preview "$1" "$2"'\'' _ {1} {2}'
   --preview-label='Tab: Select · Enter: Remove · Alt-P: Preview · Alt-J/K: Scroll'
   --preview-label-pos='bottom'
   --preview-window 'down:35%:wrap'

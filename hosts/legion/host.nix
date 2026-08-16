@@ -143,8 +143,9 @@ let
 
   homeConfig = {
     imports = [
-      # Shell and core user environment
-      self.lib.homeModules.shell
+      # Terminal and core user environment
+      self.lib.homeModules.bin
+      self.lib.homeModules.terminal
       self.lib.homeModules.appearance
       self.lib.homeModules.theme
       self.lib.homeModules.apps

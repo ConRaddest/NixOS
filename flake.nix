@@ -42,7 +42,10 @@
           (inputs.import-tree ./modules/home)
           (
             (inputs.import-tree.filterNot (
-              path: lib.hasSuffix "/apps.nix" path || lib.hasSuffix "/webapps.nix" path
+              path:
+              lib.hasSuffix "/apps.nix" path
+              || lib.hasSuffix "/webapps.nix" path
+              || lib.hasInfix "/.template/" path
             ))
             ./hosts
           )
@@ -126,6 +129,23 @@
                     ''
                       cd ${source}
                       find . -name '*.sh' -print0 | xargs -0 -r shellcheck
+                      touch "$out"
+                    '';
+
+                shell-contracts =
+                  pkgs.runCommand "check-shell-contracts"
+                    {
+                      nativeBuildInputs = [
+                        pkgs.bash
+                        pkgs.coreutils
+                        pkgs.gnugrep
+                        pkgs.util-linux
+                      ];
+                    }
+                    ''
+                      for test in ${source}/tests/shell/*-test.sh; do
+                        bash "$test"
+                      done
                       touch "$out"
                     '';
 

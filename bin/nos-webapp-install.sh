@@ -2,11 +2,13 @@
 # Add Chromium web app to selected host configuration.
 set -euo pipefail
 
-# shellcheck source=modules/home/shell/scripts/nos-ui.sh
+export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+# shellcheck source=bin/nos-ui.sh
 # shellcheck disable=SC1091
-source "${NOS_DIR:-$HOME/NixOS}/modules/home/shell/scripts/nos-ui.sh"
+source "$NOS_RUNTIME_DIR/nos-ui.sh"
 
 nos_operation_terminal "webapp-install" "Install Web App" "$@"
+nos_operation_lock
 nos_wordmark "Installing Web App"
 
 host_name=$(nos_host_name)

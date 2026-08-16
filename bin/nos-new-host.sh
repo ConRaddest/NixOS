@@ -8,8 +8,10 @@ repo_dir=$(git rev-parse --show-toplevel 2>/dev/null) || {
   exit 1
 }
 NOS_DIR="$repo_dir"
-# shellcheck source=modules/home/shell/scripts/nos-ui.sh
-source "$NOS_DIR/modules/home/shell/scripts/nos-ui.sh"
+export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+# shellcheck source=bin/nos-ui.sh
+source "$NOS_RUNTIME_DIR/nos-ui.sh"
+nos_operation_lock
 nos_wordmark "Adding New Host"
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -48,7 +50,7 @@ fi
 # │ Requirements                                             │
 # ╰──────────────────────────────────────────────────────────╯
 
-template_dir="$repo_dir/hosts/_template"
+template_dir="$repo_dir/hosts/.template"
 hosts_dir="$repo_dir/hosts"
 [[ -f "$template_dir/host.nix" ]] || {
   echo "Error: Host template is missing: $template_dir/host.nix" >&2
