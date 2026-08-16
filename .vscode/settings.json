@@ -8,5 +8,12 @@
   ],
   "Lua.workspace.library": [
     "${workspaceFolder}/.vscode/hl.meta.lua"
-  ]
+  ],
+  "qt-qml.qmlls.customExePath": "/etc/profiles/per-user/cdt/bin/qmlls",
+  "qt-qml.qmlls.additionalImportPaths": [
+    "/etc/profiles/per-user/cdt/lib/qt-6/qml",
+    "${workspaceFolder}/.vscode/qml"
+  ],
+  "qt-qml.qmlls.useNoCMakeCalls": true,
+  "qt-qml.doNotAskForQmllsDownload": true
 }

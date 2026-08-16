@@ -109,21 +109,6 @@
               python3
             ]);
         };
-        iso-boot = {
-          route = [ "iso-boot" ];
-          script = "nos-iso-boot.sh";
-          summary = "Prepare one-time native systemd-boot ISO startup";
-          runtimeInputs =
-            commonInputs
-            ++ (with pkgs; [
-              gnugrep
-              libarchive
-              systemd
-            ]);
-          environment = ''
-            export PATH="/run/wrappers/bin:$PATH"
-          '';
-        };
       };
 
       commandMetadata = lib.mapAttrs (name: command: {
