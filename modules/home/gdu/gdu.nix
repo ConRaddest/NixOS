@@ -4,7 +4,6 @@
   flake.lib.homeModules.gdu =
     {
       config,
-      host,
       pkgs,
       ...
     }:
@@ -20,7 +19,6 @@
 
       xdg.configFile."gdu/gdu.yaml".source = pkgs.replaceVars ./gdu.yaml {
         inherit (colors) accent background foreground;
-        maxCores = toString host.gduMaxCores;
       };
     };
 }

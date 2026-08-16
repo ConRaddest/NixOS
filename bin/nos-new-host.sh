@@ -65,6 +65,10 @@ if ! command -v nixos-generate-config >/dev/null 2>&1; then
   echo "Run this command from NixOS or a NixOS installer." >&2
   exit 1
 fi
+if ! command -v nixfmt >/dev/null 2>&1; then
+  echo "Error: nixfmt is required to format generated host files." >&2
+  exit 1
+fi
 
 if ! sudo -v; then
   echo "Error: sudo authentication failed." >&2
@@ -554,6 +558,16 @@ sed -i \
   -e "s|stateVersion = \"26.05\";|stateVersion = \"$escaped_state_version\";|" \
   -e "s|initialHashedPassword = null;|initialHashedPassword = \"$escaped_password_hash\";|" \
   -e "s|steam.enable = true;|steam.enable = $steam;|" \
+  -e "s|      audio = false;|      audio = $audio;|" \
+  -e "s|      battery = false;|      battery = $battery;|" \
+  -e "s|      bluetooth = false;|      bluetooth = $bluetooth;|" \
+  -e "s|      docker = false;|      docker = $docker;|" \
+  -e "s|      onepassword = false;|      onepassword = $onepassword;|" \
+  -e "s|      printing = false;|      printing = $printing;|" \
+  -e "s|      steam = true;|      steam = $steam;|" \
+  -e "s|      windows = false;|      windows = $windows;|" \
+  -e "s|        primary = \"none\";|        primary = \"$gpu\";|" \
+  -e "s|        integrated = null;|        integrated = ${integrated_gpu:+\"$integrated_gpu\"};|" \
   -e "s|mode = \"uefi\";|mode = \"$boot_mode\";|" \
   -e "s|device = null;|device = $boot_device_value;|" \
   -e "s|deepSleep = false;|deepSleep = $deep_sleep;|" \
@@ -565,54 +579,19 @@ sed -i \
   -e "s|timeZone = \"UTC\";|timeZone = \"$escaped_time_zone\";|g" \
   -e "s|locale = \"en_US.UTF-8\";|locale = \"$escaped_locale\";|" \
   -e "s|keyboardLayout = \"us\";|keyboardLayout = \"$escaped_keyboard\";|" \
-  -e "s|gduMaxCores = 4;|gduMaxCores = $cpu_cores;|" \
   -e "s|firefoxProfilePath = \"default\";|firefoxProfilePath = \"$escaped_firefox_profile\";|" \
   -e "s|cpuCores = 4;|cpuCores = $cpu_cores;|" \
-  -e "s|trackpad = false;|trackpad = $trackpad;|" \
+  -e "s|      enable = false;|      enable = $trackpad;|" \
   "$host_file"
 
+if [[ "$nvidia_prime_value" == null ]]; then
+  sed -i 's|        integrated = ;|        integrated = null;|' "$host_file"
+fi
 if [[ -n "$trackpad_name" ]]; then
-  sed -i "s|trackpadName = null;|trackpadName = \"$escaped_trackpad\";|" "$host_file"
+  sed -i "s|      name = null;|      name = \"$escaped_trackpad\";|" "$host_file"
 fi
 
-inject_module() {
-  local marker="$1"
-  local module="$2"
-  sed -i "s|        # $marker|        $module|" "$host_file"
-}
-
-[[ "$gpu" != none ]] &&
-  inject_module GPU_MODULE "self.nixosModules.$gpu"
-[[ "$nvidia_prime_value" != null ]] &&
-  inject_module INTEGRATED_GPU_MODULE "self.nixosModules.$integrated_gpu"
-[[ "$steam" == true ]] &&
-  inject_module STEAM_SYSTEM_MODULE "self.nixosModules.steam"
 [[ "$steam" != true ]] && sed -i '/^[[:space:]]*steam[[:space:]]*$/d' "$host_dir/apps.nix"
-[[ "$battery" == true ]] && {
-  inject_module BATTERY_SYSTEM_MODULE "self.nixosModules.battery"
-  inject_module BATTERY_HOME_MODULE "self.lib.homeModules.battery"
-}
-[[ "$bluetooth" == true ]] && {
-  inject_module BLUETOOTH_SYSTEM_MODULE "self.nixosModules.bluetooth"
-  inject_module BLUETOOTH_HOME_MODULE "self.lib.homeModules.bluetooth"
-}
-[[ "$audio" == true ]] && {
-  inject_module AUDIO_SYSTEM_MODULE "self.nixosModules.audio"
-  inject_module AUDIO_HOME_MODULE "self.lib.homeModules.audio"
-}
-[[ "$docker" == true ]] && {
-  inject_module DOCKER_SYSTEM_MODULE "self.nixosModules.docker"
-  inject_module DOCKER_HOME_MODULE "self.lib.homeModules.lazydocker"
-}
-[[ "$windows" == true ]] &&
-  inject_module WINDOWS_HOME_MODULE "self.lib.homeModules.windows"
-[[ "$onepassword" == true ]] && {
-  inject_module ONEPASSWORD_SYSTEM_MODULE "self.nixosModules.onepassword"
-  inject_module ONEPASSWORD_HOME_MODULE "self.lib.homeModules.ssh"
-}
-[[ "$printing" == true ]] &&
-  inject_module PRINTING_SYSTEM_MODULE "self.nixosModules.printing"
-sed -i -E '/^[[:space:]]*#[[:space:]]+[A-Z_]+_MODULE$/d' "$host_file"
 
 hardware_tmp=$(mktemp)
 trap 'rm -f "$hardware_tmp"' EXIT
@@ -665,6 +644,8 @@ EOF
 }
 EOF
 } > "$hardware_file"
+
+nixfmt "$host_file" "$hardware_file"
 
 # Make generated host visible to Git-backed flake evaluation without staging
 # file contents. Ignored .env remains outside the flake source.

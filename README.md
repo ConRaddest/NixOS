@@ -29,8 +29,7 @@ start
 ## Repository structure
 
 ```text
-bin/                    NOS command and helper scripts
-docs/                   architecture and runtime contracts
+bin/                    NOS command scripts and Home Manager command packaging
 hosts/
 ├── .template/          template used for new machines
 └── <hostname>/
@@ -41,13 +40,9 @@ hosts/
 modules/
 ├── home/               Home Manager modules
 └── system/             NixOS modules
-
-tests/                  script and future integration tests
 ```
 
-Architecture contracts live in `docs/architecture.md`, `docs/command-contract.md`, and `docs/state-layout.md`.
-
-Each host exports:
+Each host file owns its machine data, feature imports, Home Manager assembly, NixOS assembly, package set, module arguments, and exports:
 
 ```text
 nixosConfigurations.<hostname>
@@ -69,7 +64,7 @@ Follow official NixOS installation guide until target filesystems are mounted un
 From installer environment:
 
 ```bash
-nix shell nixpkgs#git nixpkgs#mkpasswd nixpkgs#fzf
+nix shell nixpkgs#git nixpkgs#mkpasswd nixpkgs#fzf nixpkgs#nixfmt
 git clone https://github.com/ConRaddest/NixOS.git NixOS
 cd NixOS
 ```
@@ -115,8 +110,8 @@ Check `hosts/<hostname>/host.nix` contains correct:
 
 - username and home path
 - boot mode
-- graphics module
-- enabled optional modules
+- declarative graphics selection
+- feature flags
 - state version
 
 For NVIDIA PRIME systems, confirm GPU bus IDs. `lspci` reports hexadecimal values while NixOS bus IDs use decimal:
@@ -170,7 +165,7 @@ Wizard stores initial password hash in `host.nix`. After first successful login:
 
 1. Run `passwd`.
 2. Set `initialHashedPassword = null;` in host file.
-3. Rebuild with `nos-build`.
+3. Rebuild with `nos build`.
 
 Do not commit initial password hash.
 
@@ -185,7 +180,7 @@ Keep copy of `/etc/nixos` and important files currently managed manually under h
 ```bash
 git clone https://github.com/ConRaddest/NixOS.git ~/NixOS
 cd ~/NixOS
-nix shell nixpkgs#mkpasswd nixpkgs#fzf
+nix shell nixpkgs#mkpasswd nixpkgs#fzf nixpkgs#nixfmt
 ```
 
 ### 3. Create host
@@ -302,7 +297,7 @@ Mount points must be absolute. Use stable filesystem UUIDs rather than `/dev/sdX
 
 ### Desktop shell
 
-DankMaterialShell provides the desktop shell, launcher, process view, media controls, and Hyprland integration.
+DankMaterialShell provides desktop shell, launcher, process view, media controls, and Hyprland integration. DMS remains enabled. Future Quickshell work belongs in optional `modules/home/quickshell/` boundary; no Quickshell package or service is configured yet.
 
 ### Monitors
 
@@ -332,22 +327,20 @@ Find output names and modes:
 hyprctl monitors all
 ```
 
-### Trackpad
+### Trackpad and config development
 
-Find device name:
-
-```bash
-hyprctl devices
-```
-
-Then set Home Manager host options:
+Find device name with `hyprctl devices`, then set host data:
 
 ```nix
-nos = {
-  trackpad = true;
-  trackpadName = "device-name";
+trackpad = {
+  enable = true;
+  name = "device-name";
 };
+
+development.mutableConfig = false;
 ```
+
+`mutableConfig = false` is production default: hand-written Hyprland config comes from Nix store. Set `true` only for live config development; Hyprland then links `hyprland.lua` and `config/` into configured checkout. Generated color, theme, input, monitor, and shell files remain immutable. Future Quickshell sources must use same option.
 
 ### Other host values
 
@@ -361,22 +354,28 @@ Host file also contains:
 - GDU CPU limit
 - Windows VM memory, CPU, disk, and timezone
 
-## Optional modules
+## Declarative features
 
-Wizard keeps related system and home modules aligned:
+Host feature values select related system and Home Manager modules together:
 
-| Feature    | System                 | Home                     |
-| ---------- | ---------------------- | ------------------------ |
-| Audio      | PipeWire               | audio controls           |
-| Bluetooth  | bluetoothd             | Bluetui                  |
-| Battery    | power profiles         | brightness controls      |
-| Docker     | Docker daemon          | LazyDocker               |
-| Windows VM | Docker/KVM/TUN         | VM launchers and FreeRDP |
-| 1Password  | application and policy | SSH agent config         |
-| Printing   | CUPS                   | none                     |
-| Steam      | Steam support          | Steam launcher           |
+```nix
+features = {
+  audio = true;
+  battery = true;
+  bluetooth = true;
+  docker = true;
+  onepassword = true;
+  printing = true;
+  steam = true;
+  windows = true;
+  graphics = {
+    primary = "nvidia"; # none, amd, intel, or nvidia
+    integrated = null;  # amd or intel for NVIDIA PRIME
+  };
+};
+```
 
-When enabling modules manually, add both sides where applicable.
+Each host file translates feature flags into its system and Home Manager imports. Home Manager NOS option schemas live in `modules/home/options.nix`.
 
 ## Per-host applications
 
@@ -386,7 +385,7 @@ Applications are stored in:
 hosts/<hostname>/apps.nix
 ```
 
-Set `home.packages` to a standard Nix package list:
+Each file contains both native packages and Chromium web apps:
 
 ```nix
 { pkgs, ... }:
@@ -397,36 +396,40 @@ Set `home.packages` to a standard Nix package list:
     libreoffice
     kdePackages.kcalc
   ];
+
+  nos.webApps = [
+    # WEBAPPS
+  ];
 }
 ```
 
 Manage interactively:
 
 ```bash
-nos-install
-nos-remove
+nos install
+nos remove
 ```
 
 Commands edit only host selected by `HOST_NAME`.
 
-## Local `.env`
+## Local host selection and secrets
 
-Example:
+Copy `.env.example` to `.env` or let `nos host new` create it:
 
 ```bash
 export HOST_NAME=legion
-export NPM_TOKEN=replace-me
-export WINDOWS_USERNAME=Docker
-export WINDOWS_PASSWORD=replace-me
 ```
 
-Notes:
+`.env` is ignored, stores host selection only, and is not sourced into Fish. NOS helpers parse `HOST_NAME` directly.
 
-- `nos-new-host` creates `.env` with new hostname when file is missing.
-- `.env` is ignored by Git
-- helper commands read `HOST_NAME`
-- every interactive Fish terminal loads all exported values from `.env`
-- Windows scripts also read Windows credentials directly from `.env`
+Windows credentials belong in `~/.config/nos/secrets/windows.env`, mode `0600`:
+
+```bash
+install -d -m 700 ~/.config/nos/secrets
+install -m 600 /dev/null ~/.config/nos/secrets/windows.env
+```
+
+Run `windows-install` to populate file safely. For manual migration, move only `WINDOWS_USERNAME` and `WINDOWS_PASSWORD` lines from old `.env` into this file, then remove them from `.env`. Store currently unused NPM token in `~/.config/nos/secrets/npm.env` mode `0600`; no terminal consumer loads it. Never put credentials in Nix or tracked files.
 
 ## Theming
 
@@ -446,7 +449,7 @@ theme = {
 To add a theme, create its directory in `themes/`, provide `colors.toml` and bundled wallpapers, select it, then rebuild:
 
 ```bash
-nos-build
+nos build
 ```
 
 ## Validation and CI
@@ -469,9 +472,11 @@ Evaluate without building:
 nix flake check --no-build
 ```
 
-Checks cover Nix formatting, Deadnix, Statix, ShellCheck, NOS command contracts, every exported NixOS configuration, and every exported Home Manager configuration. Host checks are generated from flake outputs, so newly exported hosts are included automatically. `.github/workflows/check.yml` runs the same suite for pushes to `main` and pull requests.
+Checks cover Nix formatting, Deadnix, Statix, ShellCheck, every exported NixOS configuration, and every exported Home Manager configuration. Host checks are generated from flake outputs, so newly exported hosts are included automatically.
 
 ## Common commands
+
+`modules/home/bin.nix` owns command definitions, runtime inputs, routing, help, packaging, and generated `commands.json`.
 
 ### Build and apply system plus Home Manager
 
@@ -499,7 +504,7 @@ nos update
 nos host new
 ```
 
-Direct `nos-*` command names remain available as compatibility aliases.
+`nos <route>` is only installed command interface; legacy `nos-*` executable aliases are not packaged.
 
 ### List outputs
 
@@ -507,7 +512,7 @@ Direct `nos-*` command names remain available as compatibility aliases.
 nix flake show .
 ```
 
-`nos-new-host` marks generated host files with `git add -N`, making them visible to Git-backed flake evaluation without staging their contents. Ignored `.env` remains outside flake source and Nix store.
+`nos host new` marks generated host files with `git add -N`, making them visible to Git-backed flake evaluation without staging their contents. Generator writes feature values directly and never edits module import markers. Ignored host-only `.env` remains outside flake source and Nix store.
 
 ## Windows VM
 

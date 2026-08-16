@@ -27,9 +27,10 @@
         ncurses
         util-linux
       ];
-
       commands = {
+
         build = {
+          route = [ "build" ];
           script = "nos-build.sh";
           summary = "Build and activate NixOS configuration";
           runtimeInputs = commonInputs ++ [
@@ -40,6 +41,7 @@
           ];
         };
         update = {
+          route = [ "update" ];
           script = "nos-update.sh";
           summary = "Update flake inputs, build, and activate NixOS";
           runtimeInputs = commonInputs ++ [
@@ -50,6 +52,7 @@
           ];
         };
         refresh = {
+          route = [ "refresh" ];
           script = "nos-refresh.sh";
           summary = "Build and activate Home Manager configuration";
           runtimeInputs = commonInputs ++ [
@@ -60,6 +63,7 @@
           ];
         };
         install = {
+          route = [ "install" ];
           script = "nos-install.sh";
           summary = "Add packages to selected host";
           runtimeInputs =
@@ -76,6 +80,7 @@
             ]);
         };
         remove = {
+          route = [ "remove" ];
           script = "nos-remove.sh";
           summary = "Remove packages or web apps from selected host";
           runtimeInputs =
@@ -90,6 +95,7 @@
             ]);
         };
         webapp-install = {
+          route = [ "webapp-install" ];
           script = "nos-webapp-install.sh";
           summary = "Add Chromium web app to selected host";
           runtimeInputs =
@@ -104,6 +110,7 @@
             ]);
         };
         iso-install = {
+          route = [ "iso-install" ];
           script = "nos-iso-install.sh";
           summary = "Boot installer ISO in QEMU with physical target disk";
           runtimeInputs =
@@ -118,6 +125,7 @@
           '';
         };
         iso-boot = {
+          route = [ "iso-boot" ];
           script = "nos-iso-boot.sh";
           summary = "Prepare one-time native systemd-boot ISO startup";
           runtimeInputs =
@@ -132,6 +140,10 @@
           '';
         };
         new-host = {
+          route = [
+            "host"
+            "new"
+          ];
           script = "nos-new-host.sh";
           summary = "Create host configuration from detected hardware";
           runtimeInputs =
@@ -144,6 +156,7 @@
               inetutils
               mkpasswd
               nix
+              nixfmt
               nixos-install-tools
               systemd
               xkeyboard_config
@@ -158,45 +171,47 @@
 
       commandMetadata = lib.mapAttrs (name: command: {
         inherit name;
-        inherit (command) summary;
-        executable = "nos-${name}";
+        inherit (command) route summary;
+        command = lib.concatStringsSep " " ([ "nos" ] ++ command.route);
       }) commands;
 
-      mkCommand =
-        name: command:
-        pkgs.writeShellApplication {
-          name = "nos-${name}";
-          inherit (command) runtimeInputs;
-          text = ''
-            export NOS_RUNTIME_DIR="${runtime}/libexec/nos"
-            ${lib.optionalString (flakeDirectory != null) "export NOS_DIR=${lib.escapeShellArg flakeDirectory}"}
-            export NOS_ACCENT_COLOR=${lib.escapeShellArg colors.accent}
-            export FZF_DEFAULT_OPTS=${lib.escapeShellArg config.home.sessionVariables.FZF_DEFAULT_OPTS}
-            ${command.environment or ""}
-            exec bash "$NOS_RUNTIME_DIR/${command.script}" "$@"
-          '';
-        };
-
-      commandPackages = lib.mapAttrsToList mkCommand commands;
+      topLevelCommands = removeAttrs commands [ "new-host" ];
+      commandRuntimeInputs = lib.unique (
+        lib.concatMap (command: command.runtimeInputs) (lib.attrValues commands)
+      );
+      commandBody = command: ''
+        ${command.environment or ""}
+        exec bash "$NOS_RUNTIME_DIR/${command.script}" "$@"
+      '';
 
       padCommand =
         name: name + lib.concatStrings (lib.replicate (lib.max 1 (18 - builtins.stringLength name)) " ");
 
       commandHelp = lib.concatStringsSep "\n" (
-        lib.mapAttrsToList (name: command: "  ${padCommand name}${command.summary}") commands
+        lib.mapAttrsToList (
+          _: command:
+          let
+            route = lib.concatStringsSep " " command.route;
+          in
+          "  ${padCommand route}${command.summary}"
+        ) commands
       );
 
       nos = pkgs.writeShellApplication {
         name = "nos";
-        runtimeInputs = [ pkgs.coreutils ];
+        runtimeInputs = commandRuntimeInputs;
         text = ''
+          export NOS_RUNTIME_DIR="${runtime}/libexec/nos"
+          ${lib.optionalString (flakeDirectory != null) "export NOS_DIR=${lib.escapeShellArg flakeDirectory}"}
+          export NOS_ACCENT_COLOR=${lib.escapeShellArg colors.accent}
+          export FZF_DEFAULT_OPTS=${lib.escapeShellArg config.home.sessionVariables.FZF_DEFAULT_OPTS}
+
           usage() {
             cat <<'EOF'
           Usage: nos <command> [args...]
 
           Commands:
           ${commandHelp}
-            host new           Create host configuration from detected hardware
           EOF
           }
 
@@ -211,7 +226,7 @@
             subcommand="''${1:-}"
             [[ -n "$subcommand" ]] && shift
             if [[ "$subcommand" == "new" ]]; then
-              exec nos-new-host "$@"
+              ${commandBody commands.new-host}
             fi
             printf 'Unknown nos host command: %s\n' "$subcommand" >&2
             exit 2
@@ -219,7 +234,7 @@
 
           case "$command" in
           ${lib.concatStringsSep "\n" (
-            lib.mapAttrsToList (name: _: "  ${name}) exec nos-${name} \"\$@\" ;;") commands
+            lib.mapAttrsToList (name: command: "  ${name}) ${commandBody command} ;;") topLevelCommands
           )}
             *)
               printf 'Unknown nos command: %s\n\n' "$command" >&2
@@ -252,7 +267,7 @@
           nos-fonts
           nos-mono-fonts
         ]
-        ++ lib.optionals (flakeDirectory != null) ([ nos ] ++ commandPackages);
+        ++ lib.optionals (flakeDirectory != null) [ nos ];
         sessionVariables = lib.optionalAttrs (flakeDirectory != null) {
           NOS_DIR = flakeDirectory;
         };

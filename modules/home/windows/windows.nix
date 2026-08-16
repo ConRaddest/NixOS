@@ -10,12 +10,7 @@
     }:
 
     let
-      mutableConfigDir =
-        if config.nos.flakeDirectory != null then
-          config.nos.flakeDirectory
-        else
-          "${config.xdg.configHome}/nos";
-      envFile = "${mutableConfigDir}/.env";
+      envFile = "${config.xdg.configHome}/nos/secrets/windows.env";
 
       windows-vm-rdp = pkgs.writeShellScriptBin "windows-vm-rdp" ''
         set -euo pipefail
@@ -197,10 +192,13 @@
           local key="$1"
           local value="$2"
           local tmp
+          umask 077
           tmp="$(mktemp)"
 
           mkdir -p "$(dirname "$env_file")"
+          chmod 700 "$(dirname "$env_file")"
           touch "$env_file"
+          chmod 600 "$env_file"
           grep -Ev "^(export[[:space:]]+)?''${key}=" "$env_file" > "$tmp" || true
           printf 'export %s=%q\n' "$key" "$value" >> "$tmp"
           cat "$tmp" > "$env_file"
@@ -318,7 +316,7 @@
         fi
 
         if [[ -f "$env_file" ]]; then
-          echo "removing windows credentials from .env..."
+          echo "removing windows credentials..."
           remove_env_var WINDOWS_USERNAME
           remove_env_var WINDOWS_PASSWORD
         fi

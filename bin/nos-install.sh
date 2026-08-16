@@ -82,7 +82,7 @@ while true; do
   [[ -n "${pkg_names:-}" ]] || continue
   { current_apps; printf '\n%s\n' "$pkg_names"; } | write_apps_file
 
-  if ! nos-refresh; then
+  if ! nos refresh; then
     printf '\nInstall refresh failed.\n'
     exit 1
   fi

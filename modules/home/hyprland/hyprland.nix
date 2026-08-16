@@ -36,8 +36,21 @@
           workspaces = { ${lib.concatMapStringsSep ", " toString monitor.workspaces} },
         }
       '';
+      configSource =
+        storeSource: checkoutPath:
+        if config.nos.development.mutableConfig then
+          config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/${checkoutPath}"
+        else
+          storeSource;
     in
     {
+      assertions = [
+        {
+          assertion = !config.nos.development.mutableConfig || config.nos.flakeDirectory != null;
+          message = "nos.development.mutableConfig requires nos.flakeDirectory.";
+        }
+      ];
+
       # Lua config and generated adapter below render semantic colors directly.
       stylix.targets.hyprland.enable = false;
 
@@ -61,10 +74,10 @@
       xdg = {
         configFile = {
           "hypr/hyprland.lua" = {
-            source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/hyprland.lua";
+            source = configSource ./hyprland.lua "modules/home/hyprland/hyprland.lua";
           };
           "hypr/config" = {
-            source = config.lib.file.mkOutOfStoreSymlink "${config.nos.flakeDirectory}/modules/home/hyprland/config";
+            source = configSource ./config "modules/home/hyprland/config";
           };
           "hypr/nix/colors.lua" = {
             source = pkgs.replaceVars ./colors.lua {

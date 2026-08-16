@@ -10,16 +10,13 @@ nos_operation_lock
 nos_wordmark "Removing Applications"
 
 apps_backup=$(mktemp)
-webapps_backup=$(mktemp)
 cp -- "$apps_file" "$apps_backup"
-cp -- "$webapps_file" "$webapps_backup"
 cleanup() {
   local status=$?
   if ((status != 0)); then
     cp -- "$apps_backup" "$apps_file"
-    cp -- "$webapps_backup" "$webapps_file"
   fi
-  rm -f -- "$apps_backup" "$webapps_backup"
+  rm -f -- "$apps_backup"
   return "$status"
 }
 trap cleanup EXIT
@@ -61,7 +58,7 @@ while true; do
   fi
   ((${#webapp_ids[@]} == 0)) || remove_webapps "${webapp_ids[@]}"
 
-  if ! nos-refresh; then
+  if ! nos refresh; then
     printf '\nRemove refresh failed.\n'
     exit 1
   fi

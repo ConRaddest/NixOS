@@ -15,4 +15,8 @@
     vscode
     zapzap
   ];
+
+  nos.webApps = [
+    # WEBAPPS
+  ];
 }

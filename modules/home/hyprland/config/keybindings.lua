@@ -132,11 +132,11 @@ local screenshot_command = "mkdir -p ~/Screenshots && "
 	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
 bind("SUPER + SHIFT + S", "Capture screen region", hl.dsp.exec_cmd(screenshot_command))
 
-bind("SUPER + SHIFT + B", "Build system configuration", hl.dsp.exec_cmd("uwsm app -- nos-build"))
-bind("SUPER + SHIFT + U", "Update system configuration", hl.dsp.exec_cmd("uwsm app -- nos-update"))
-bind("SUPER + SHIFT + R", "Refresh Home Manager", hl.dsp.exec_cmd("uwsm app -- nos-refresh"))
-bind("SUPER + SHIFT + I", "Install Nix package", open_terminal("nos-install", "nos-install", true))
-bind("SUPER + SHIFT + X", "Remove Nix package", open_terminal("nos-remove", "nos-remove", true))
+bind("SUPER + SHIFT + B", "Build system configuration", hl.dsp.exec_cmd("uwsm app -- nos build"))
+bind("SUPER + SHIFT + U", "Update system configuration", hl.dsp.exec_cmd("uwsm app -- nos update"))
+bind("SUPER + SHIFT + R", "Refresh Home Manager", hl.dsp.exec_cmd("uwsm app -- nos refresh"))
+bind("SUPER + SHIFT + I", "Install Nix package", open_terminal("nos-command-install", "nos install", true))
+bind("SUPER + SHIFT + X", "Remove Nix package", open_terminal("nos-command-remove", "nos remove", true))
 
 bind("SUPER + X", "Universal cut", send_shortcut_once("CTRL", "X"))
 bind("SUPER + C", "Universal copy", universal_clipboard_shortcut("CTRL", "C", "CTRL", "Insert"))

@@ -12,9 +12,9 @@ nos_operation_lock
 nos_wordmark "Installing Web App"
 
 host_name=$(nos_host_name)
-webapps_file="$NOS_DIR/hosts/$host_name/webapps.nix"
-[[ -f "$webapps_file" ]] || {
-  printf 'Web app configuration is missing: %s\n' "$webapps_file" >&2
+apps_file="$NOS_DIR/hosts/$host_name/apps.nix"
+[[ -f "$apps_file" ]] || {
+  printf 'Application configuration is missing: %s\n' "$apps_file" >&2
   exit 1
 }
 
@@ -44,7 +44,7 @@ app_id=$(printf '%s' "$app_name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0
 [[ -n "$app_id" ]] || app_id="webapp-$(date +%s)"
 base_id="$app_id"
 suffix=2
-while grep -Fq "id = \"$app_id\";" "$webapps_file"; do
+while grep -Fq "id = \"$app_id\";" "$apps_file"; do
   app_id="$base_id-$suffix"
   ((suffix += 1))
 done
@@ -112,31 +112,31 @@ done
 }
 icon_hash=$(nix hash file "$icon_file")
 
-python3 - "$webapps_file" "$app_id" "$app_name" "$app_url" "$app_private" "$icon_url" "$icon_hash" <<'PY'
+python3 - "$apps_file" "$app_id" "$app_name" "$app_url" "$app_private" "$icon_url" "$icon_hash" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 path = Path(sys.argv[1])
 app_id, name, url, private, icon_url, icon_hash = sys.argv[2:]
-marker = "  # WEBAPPS"
+marker = "    # WEBAPPS"
 text = path.read_text()
 if marker not in text:
     raise SystemExit(f"Web app marker is missing: {path}")
 q = json.dumps
 entry = (
-    "  {\n"
-    f"    id = {q(app_id)};\n"
-    f"    name = {q(name)};\n"
-    f"    url = {q(url)};\n"
-    f"    private = {private};\n"
-    f"    iconUrl = {q(icon_url)};\n"
-    f"    iconHash = {q(icon_hash)};\n"
-    "  }\n"
+    "    {\n"
+    f"      id = {q(app_id)};\n"
+    f"      name = {q(name)};\n"
+    f"      url = {q(url)};\n"
+    f"      private = {private};\n"
+    f"      iconUrl = {q(icon_url)};\n"
+    f"      iconHash = {q(icon_hash)};\n"
+    "    }\n"
 )
 path.write_text(text.replace(marker, entry + marker, 1))
 PY
 
-nixfmt "$webapps_file"
+nixfmt "$apps_file"
 printf '\nAdded %s. Refreshing Home Manager...\n' "$app_name"
-nos-refresh
+nos refresh

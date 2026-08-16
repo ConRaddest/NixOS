@@ -14,35 +14,50 @@ export NOS_RUNTIME_DIR="${NOS_RUNTIME_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[
 source "$NOS_RUNTIME_DIR/nos-ui.sh"
 host_name=$(nos_host_name)
 apps_file="$nos_dir/hosts/$host_name/apps.nix"
-webapps_file="$nos_dir/hosts/$host_name/webapps.nix"
 
 # ╭──────────────────────────────────────────────────────────╮
 # │ Application List                                         │
 # ╰──────────────────────────────────────────────────────────╯
 
 write_apps_file() {
-  local names tmp
+  local names packages tmp
   names=$(mktemp)
+  packages=$(mktemp)
   tmp=$(mktemp --suffix=.nix)
   cat > "$names"
 
   if grep -Ev "^[a-zA-Z_][a-zA-Z0-9_'-]*(\.[a-zA-Z_][a-zA-Z0-9_'-]*)*$|^[[:space:]]*$" "$names" >&2; then
     printf 'Invalid Nixpkgs package attribute.\n' >&2
-    rm -f "$names" "$tmp"
+    rm -f "$names" "$packages" "$tmp"
     return 1
   fi
 
   {
-    printf '{ pkgs, ... }:\n\n{\n  home.packages = with pkgs; [\n'
+    printf '  home.packages = with pkgs; [\n'
     sed '/^[[:space:]]*$/d' "$names" | sort -u | while IFS= read -r attr; do
       printf '    %s\n' "$attr"
     done
-    printf '  ];\n}\n'
-  } > "$tmp"
+    printf '  ];'
+  } > "$packages"
+
+  python3 - "$apps_file" "$packages" "$tmp" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+packages = Path(sys.argv[2]).read_text()
+text = path.read_text()
+pattern = re.compile(r"^  home\.packages = with pkgs; \[\n.*?^  \];", re.MULTILINE | re.DOTALL)
+updated, count = pattern.subn(lambda _: packages, text, count=1)
+if count != 1:
+    raise SystemExit(f"Package list is missing: {path}")
+Path(sys.argv[3]).write_text(updated)
+PY
 
   nixfmt "$tmp"
   mv "$tmp" "$apps_file"
-  rm -f "$names"
+  rm -f "$names" "$packages"
 }
 
 current_apps() {
@@ -50,8 +65,7 @@ current_apps() {
 }
 
 current_webapps() {
-  [[ -f "$webapps_file" ]] || return 0
-  python3 - "$webapps_file" <<'PY'
+  python3 - "$apps_file" <<'PY'
 import json
 import re
 import sys
@@ -59,10 +73,10 @@ from pathlib import Path
 
 text = Path(sys.argv[1]).read_text()
 pattern = re.compile(
-    r'^  \{\n'
-    r'    id = ("(?:\\.|[^"\\])*");\n'
-    r'    name = ("(?:\\.|[^"\\])*");\n'
-    r'    url = ("(?:\\.|[^"\\])*");\n',
+    r'^    \{\n'
+    r'      id = ("(?:\\.|[^"\\])*");\n'
+    r'      name = ("(?:\\.|[^"\\])*");\n'
+    r'      url = ("(?:\\.|[^"\\])*");\n',
     re.MULTILINE,
 )
 for app_id, name, url in pattern.findall(text):
@@ -81,8 +95,7 @@ removable_apps() {
 }
 
 remove_webapps() {
-  [[ -f "$webapps_file" ]] || return 0
-  python3 - "$webapps_file" "$@" <<'PY'
+  python3 - "$apps_file" "$@" <<'PY'
 import json
 import re
 import sys
@@ -91,10 +104,10 @@ from pathlib import Path
 path = Path(sys.argv[1])
 remove = set(sys.argv[2:])
 pattern = re.compile(
-    r'^  \{\n'
-    r'    id = ("(?:\\.|[^"\\])*");\n'
-    r'(?:    .*\n)*?'
-    r'  \}\n',
+    r'^    \{\n'
+    r'      id = ("(?:\\.|[^"\\])*");\n'
+    r'(?:      .*\n)*?'
+    r'    \}\n',
     re.MULTILINE,
 )
 

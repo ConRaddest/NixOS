@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: nos-iso-install <installer.iso> <target-disk>
+Usage: nos iso-install <installer.iso> <target-disk>
 
 Boot an ISO in a UEFI QEMU VM and expose a physical disk to its installer.
 The target must be a whole disk, for example /dev/nvme1n1 or /dev/sdb.

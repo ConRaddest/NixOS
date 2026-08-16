@@ -7,8 +7,8 @@ entry_file="/boot/loader/entries/$entry_id"
 
 usage() {
   cat <<'EOF'
-Usage: nos-iso-boot <arch-based-installer.iso>
-       nos-iso-boot --remove
+Usage: nos iso-boot <arch-based-installer.iso>
+       nos iso-boot --remove
 
 Prepare a one-time native boot of an ArchISO-compatible installer through
 systemd-boot. Native boot lets installer detect physical hardware.
@@ -107,4 +107,4 @@ sudo bootctl set-oneshot "$entry_id"
 
 printf '\nNative ISO boot prepared. Next reboot will start installer once.\n'
 printf 'ISO remains at %s; do not move or delete it yet.\n' "$iso"
-printf 'Run nos-iso-boot --remove from NixOS after installation.\n'
+printf 'Run nos iso-boot --remove from NixOS after installation.\n'

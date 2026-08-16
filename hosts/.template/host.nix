@@ -1,15 +1,13 @@
 {
-  self,
   inputs,
   lib,
+  self,
   ...
 }:
 
 let
-  # Copy this directory to hosts/<host-name>. hostName then derives from
-  # directory name, keeping NixOS and Home Manager outputs unique.
+  # Copy this directory to hosts/<host-name>. Output names derive from directory name.
   hostName = baseNameOf (toString ./.);
-
   host = {
     system = "x86_64-linux";
     username = "CHANGE_ME";
@@ -19,6 +17,28 @@ let
     stateVersion = "26.05";
     initialHashedPassword = null;
     steam.enable = true;
+
+    features = {
+      audio = false;
+      battery = false;
+      bluetooth = false;
+      docker = false;
+      onepassword = false;
+      printing = false;
+      steam = true;
+      windows = false;
+      graphics = {
+        primary = "none";
+        integrated = null;
+      };
+    };
+
+    development.mutableConfig = false;
+    trackpad = {
+      enable = false;
+      name = null;
+    };
+
     theme = {
       name = "tokyo-night";
       wallpaper = "backgrounds/0-winding-road.png";
@@ -51,7 +71,6 @@ let
     mounts = [ ];
     monitors = [ ];
 
-    gduMaxCores = 4;
     firefoxProfilePath = "default";
     firefoxCertificatePath = null;
 
@@ -62,7 +81,6 @@ let
       diskSize = "64G";
     };
   };
-
   font = {
     system = "Adwaita Sans";
     size = 11;
@@ -92,17 +110,43 @@ let
     config.allowUnfree = true;
   };
 
+  optionalHomeModules =
+    with self.lib.homeModules;
+    lib.optionals host.features.audio [ audio ]
+    ++ lib.optionals host.features.battery [ battery ]
+    ++ lib.optionals host.features.bluetooth [ bluetooth ]
+    ++ lib.optionals host.features.docker [ lazydocker ]
+    ++ lib.optionals host.features.onepassword [ ssh ]
+    ++ lib.optionals host.features.steam [ steam ]
+    ++ lib.optionals host.features.windows [ windows ];
+
+  graphicsModules =
+    if host.features.graphics.primary == "none" then
+      [ ]
+    else
+      [ self.nixosModules.${host.features.graphics.primary} ]
+      ++ lib.optionals (
+        host.features.graphics.primary == "nvidia" && host.features.graphics.integrated != null
+      ) [ self.nixosModules.${host.features.graphics.integrated} ];
+
+  optionalSystemModules =
+    graphicsModules
+    ++ lib.optionals host.features.audio [ self.nixosModules.audio ]
+    ++ lib.optionals host.features.battery [ self.nixosModules.battery ]
+    ++ lib.optionals host.features.bluetooth [ self.nixosModules.bluetooth ]
+    ++ lib.optionals host.features.docker [ self.nixosModules.docker ]
+    ++ lib.optionals host.features.onepassword [ self.nixosModules.onepassword ]
+    ++ lib.optionals host.features.printing [ self.nixosModules.printing ]
+    ++ lib.optionals host.features.steam [ self.nixosModules.steam ];
+
   homeConfig = {
     imports = [
-      # Terminal and core user environment
+      self.lib.homeModules.options
       self.lib.homeModules.bin
       self.lib.homeModules.terminal
       self.lib.homeModules.appearance
       self.lib.homeModules.theme
       self.lib.homeModules.apps
-      # AUDIO_HOME_MODULE
-      # BATTERY_HOME_MODULE
-      # BLUETOOTH_HOME_MODULE
       self.lib.homeModules.btop
       self.lib.homeModules.directories
       self.lib.homeModules.dev
@@ -110,43 +154,22 @@ let
       self.lib.homeModules.fzf
       self.lib.homeModules.gdu
       self.lib.homeModules.git
-      # DOCKER_HOME_MODULE
       self.lib.homeModules.npm
       self.lib.homeModules.nvim
       self.lib.homeModules.pi
-      # ONEPASSWORD_HOME_MODULE
       self.lib.homeModules.starship
       self.lib.homeModules.yazi
-
-      # Desktop environment
       self.lib.homeModules.dms
       self.lib.homeModules.firefox
       self.lib.homeModules.hyprland
       self.lib.homeModules.kitty
       self.lib.homeModules.slack
-      self.lib.homeModules.steam
-      self.lib.homeModules.teamsForLinux
-      # WINDOWS_HOME_MODULE
       self.lib.homeModules.zapzap
-    ];
-
-    options.nos = {
-      flakeDirectory = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Mutable checkout path used by repository helper commands.";
-      };
-      trackpad = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Whether host has a trackpad.";
-      };
-      trackpadName = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Hyprland input device name for host trackpad.";
-      };
-    };
+      self.lib.homeModules.screen-share-picker
+      self.lib.homeModules.screensaver
+      self.lib.homeModules.voxtype
+    ]
+    ++ optionalHomeModules;
 
     config = {
       _module.args = { inherit font; };
@@ -154,84 +177,70 @@ let
       nos = {
         inherit (host) theme;
         flakeDirectory = host.flakeDirectory;
-        trackpad = false;
-        trackpadName = null;
+        trackpad = host.trackpad.enable;
+        trackpadName = host.trackpad.name;
+        development.mutableConfig = host.development.mutableConfig;
       };
 
       home = {
-        homeDirectory = host.homeDirectory;
-        stateVersion = host.stateVersion;
-        username = host.username;
+        inherit (host) homeDirectory stateVersion username;
       };
 
       nixpkgs.config.allowUnfree = true;
-
       programs.home-manager.enable = true;
     };
   };
+
+  systemConfig =
+    { stateVersion, ... }:
+    {
+      imports = [
+        self.nixosModules."${hostName}Hardware"
+        inputs.home-manager.nixosModules.home-manager
+        self.nixosModules.options
+        self.nixosModules.boot
+        self.nixosModules.core
+        self.nixosModules.rsa
+        self.nixosModules.networking
+        self.nixosModules.nix
+        self.nixosModules.security
+        self.nixosModules.vscode
+        self.nixosModules.hyprland
+        self.nixosModules.portals
+      ]
+      ++ optionalSystemModules;
+
+      nos = {
+        inherit (host) boot hardware;
+      };
+
+      networking.hostName = hostName;
+      system.stateVersion = stateVersion;
+
+      home-manager = {
+        useGlobalPkgs = false;
+        useUserPackages = true;
+        extraSpecialArgs = specialArgs;
+        users.${host.username} = homeConfig;
+      };
+    };
 in
 {
   flake = {
-    nixosModules."${hostName}Configuration" =
-      { stateVersion, ... }:
-      {
-        imports = [
-          self.nixosModules."${hostName}Hardware"
-          inputs.home-manager.nixosModules.home-manager
+    nixosModules."${hostName}Configuration" = systemConfig;
 
-          self.nixosModules.options
-          self.nixosModules.boot
-          self.nixosModules.core
-          self.nixosModules.rsa
-          self.nixosModules.networking
-          self.nixosModules.nix
-          self.nixosModules.security
-          self.nixosModules.vscode
+    nixosConfigurations.${hostName} = inputs.nixpkgs.lib.nixosSystem {
+      inherit specialArgs;
+      system = host.system;
+      modules = [ systemConfig ];
+    };
 
-          self.nixosModules.hyprland
-          self.nixosModules.portals
-
-          # GPU_MODULE
-          # INTEGRATED_GPU_MODULE
-          # BLUETOOTH_SYSTEM_MODULE
-          # AUDIO_SYSTEM_MODULE
-          # BATTERY_SYSTEM_MODULE
-          # PRINTING_SYSTEM_MODULE
-          # DOCKER_SYSTEM_MODULE
-          # STEAM_SYSTEM_MODULE
-          # ONEPASSWORD_SYSTEM_MODULE
-        ];
-
-        nos = {
-          boot = host.boot;
-          hardware = host.hardware;
-        };
-
-        networking.hostName = hostName;
-        system.stateVersion = stateVersion;
-
-        home-manager = {
-          useGlobalPkgs = false;
-          useUserPackages = true;
+    homeConfigurations."${host.username}@${hostName}" =
+      inputs.home-manager.lib.homeManagerConfiguration
+        {
+          inherit pkgs;
           extraSpecialArgs = specialArgs;
-          users.${host.username} = homeConfig;
+          modules = [ homeConfig ];
         };
-      };
-
-    nixosConfigurations = {
-      "${hostName}" = inputs.nixpkgs.lib.nixosSystem {
-        inherit specialArgs;
-        system = host.system;
-        modules = [ self.nixosModules."${hostName}Configuration" ];
-      };
-    };
-
-    homeConfigurations = {
-      "${host.username}@${hostName}" = inputs.home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        extraSpecialArgs = specialArgs;
-        modules = [ homeConfig ];
-      };
-    };
   };
 }

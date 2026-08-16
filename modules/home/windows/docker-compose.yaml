@@ -29,4 +29,4 @@ services:
       CPU_CORES: "@cpuCores@"
       DISK_SIZE: "@diskSize@"
       USERNAME: ${WINDOWS_USERNAME:-Docker}
-      PASSWORD: ${WINDOWS_PASSWORD:?Run windows-install to save WINDOWS_PASSWORD in ~/NixOS/.env}
+      PASSWORD: ${WINDOWS_PASSWORD:?Run windows-install to create ~/.config/nos/secrets/windows.env}

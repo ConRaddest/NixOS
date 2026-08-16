@@ -10,7 +10,6 @@
     }:
 
     let
-      flakeDirectory = config.nos.flakeDirectory;
       colors = lib.mapAttrs (_: lib.removePrefix "#") config.nos.theme.colors;
     in
     {
@@ -32,19 +31,7 @@
               set -g fish_color_command ${colors.accent}
               set -g fish_color_param ${colors.foreground}
             end
-          ''
-          + lib.optionalString (flakeDirectory != null) ''
-
-            if test -f "${flakeDirectory}/.env"
-              fenv source "${flakeDirectory}/.env"
-            end
           '';
-          plugins = [
-            {
-              name = "foreign-env";
-              src = pkgs.fishPlugins.foreign-env.src;
-            }
-          ];
           shellAliases = {
             cd = "z";
             ff = "fastfetch";
