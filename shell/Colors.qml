@@ -1,1 +1,0 @@
-/home/cdt/.local/share/nixos-shell/Colors.qml

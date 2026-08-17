@@ -12,14 +12,8 @@ local windows = {
 	{ class = "termfilechooser" },
 	{ class = "1password" },
 	{ class = "lazy-docker" },
-	{ class = "org.gnome.Calculator", size = { 360, 620 } },
+	{ class = "org.gnome.Calculator",  size = { 360, 620 } },
 }
-
-hl.window_rule({
-	match = { class = "nos-screensaver" },
-	float = true,
-	fullscreen = true,
-})
 
 for _, window in ipairs(windows) do
 	hl.window_rule({

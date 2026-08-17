@@ -24,7 +24,7 @@
           directory = {
             format = "[$path](${theme.accent}) ";
             truncation_length = 3;
-            truncation_symbol = "…/";
+            truncation_symbol = "";
           };
 
           character = {

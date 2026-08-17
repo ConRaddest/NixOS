@@ -1,5 +1,6 @@
 hl.config({
 	input = {
+		scroll_factor = 0.1,
 		accel_profile = "flat",
 		sensitivity = 1.5,
 		repeat_rate = 35,
@@ -17,7 +18,7 @@ hl.config({
 		rounding = 0,
 		active_opacity = 0.98,
 		inactive_opacity = 0.96,
-		blur = { enabled = true, passes = 3, size = 3, xray = true },
+		blur = { enabled = true, special = true, passes = 2, size = 3, xray = true },
 		shadow = {
 			enabled = true,
 			range = 20,

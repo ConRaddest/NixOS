@@ -4,6 +4,7 @@
   home.packages = with pkgs; [
     audacity
     chromium
+    claude-code
     cmatrix
     drawio
     gimp

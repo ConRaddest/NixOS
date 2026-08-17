@@ -90,11 +90,7 @@ end)
 
 for _, direction in ipairs({ "left", "right", "up", "down" }) do
 	bind("SUPER + " .. direction, "Focus window " .. direction, hl.dsp.focus({ direction = direction }))
-	bind(
-		"SUPER + SHIFT + " .. direction,
-		"Move window " .. direction,
-		hl.dsp.window.move({ direction = direction })
-	)
+	bind("SUPER + SHIFT + " .. direction, "Move window " .. direction, hl.dsp.window.move({ direction = direction }))
 end
 
 for workspace = 1, 9 do
@@ -106,16 +102,18 @@ for workspace = 1, 9 do
 	)
 end
 
+bind("SUPER + SHIFT + S", "Move window to special workspace", hl.dsp.window.move({ workspace = "special:terminal" }))
+
 bind(
 	"SUPER + equal",
 	"Increase window width",
-	hl.dsp.window.resize({ x = 100, y = 0, relative = true }),
+	hl.dsp.window.resize({ x = 75, y = 0, relative = true }),
 	{ repeating = true }
 )
 bind(
 	"SUPER + minus",
 	"Decrease window width",
-	hl.dsp.window.resize({ x = -100, y = 0, relative = true }),
+	hl.dsp.window.resize({ x = -75, y = 0, relative = true }),
 	{ repeating = true }
 )
 bind("SUPER + mouse:272", "Drag window", hl.dsp.window.drag(), { mouse = true })
@@ -125,12 +123,11 @@ bind(
 	"Pick screen colour and copy hex code",
 	hl.dsp.exec_cmd("hyprpicker --autocopy --format=hex --lowercase-hex")
 )
-bind("SUPER + CTRL + S", "Start Matrix screensaver", hl.dsp.exec_cmd("nos-screensaver"))
 
 local screenshot_command = "mkdir -p ~/Screenshots && "
 	.. 'file="$HOME/Screenshots/screenshot-$(date +%Y%m%d-%H%M%S).png" && '
 	.. 'grim -g "$(slurp)" "$file" && wl-copy --type image/png < "$file"'
-bind("SUPER + SHIFT + S", "Capture screen region", hl.dsp.exec_cmd(screenshot_command))
+bind("PRINT", "Capture screen region", hl.dsp.exec_cmd(screenshot_command))
 
 bind("SUPER + SHIFT + B", "Rebuild system configuration", open_terminal("nos-command-rebuild", "nos rebuild", true))
 bind("SUPER + SHIFT + U", "Update system configuration", open_terminal("nos-command-update", "nos update", true))

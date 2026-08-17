@@ -154,7 +154,6 @@ let
       self.lib.homeModules.slack
       self.lib.homeModules.zapzap
       self.lib.homeModules.screen-share-picker
-      self.lib.homeModules.screensaver
       self.lib.homeModules.voxtype
       self.lib.homeModules.audio
       self.lib.homeModules.battery

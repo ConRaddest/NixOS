@@ -2,5 +2,4 @@
 result
 result-*
 .direnv
-shell/.qmlls.ini
 shell/Colors.qml
